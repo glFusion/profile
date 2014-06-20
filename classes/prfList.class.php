@@ -55,7 +55,7 @@ class prfList
     {
         global $_GROUPS, $_USER;
 
-        $this->isAdmin = SEC_hasRights('profile.admin, profile.manage', 'OR') ?
+        $this->isAdmin = SEC_hasRights('profile.admin, profile.manage,user.edit', 'OR') ?
                 true : false;
 
         // Get the group memberships to verify view access.  Admins see all.
@@ -744,7 +744,6 @@ class prfList
         USES_class_navbar();
 
         $menu = new navbar();
-        // $menu = array();
         $sql = "SELECT * from {$_TABLES['profile_lists']} 
                 {$this->access_sql} 
                 ORDER BY orderby ASC";
@@ -761,11 +760,9 @@ class prfList
         }
         while ($A = DB_fetchArray($r, false)) {
             // not using COM_buildUrl here since there may be a query string
-            //$menu[$A['title']] = PRF_PI_URL .
             $menu->add_menuitem($A['title'], PRF_PI_URL .  
                     '/list.php?listid=' . $A['listid'] . $query);
         }
-        //$retval = glfNavBar($menu, $this->title);
         $menu->set_selected($this->title);
         return $menu->generate();
     }
@@ -1239,12 +1236,16 @@ function PRF_getListField($fieldname, $fieldvalue, $A, $icon_arr, $extras)
             $_CONF['site_url'] . '/users.php?mode=profile&uid=' . $A['uid']);
         break;
 
+    case 'username':
+        $retval = COM_createLink($fieldvalue,
+            $_CONF['site_url'] . '/users.php?mode=profile&uid=' . $A['uid']);
+        break;
+
     case 'sys_directory':
         $retval = $fieldvalue == 1 ? $LANG_PROFILE['yes'] : $LANG_PROFILE['no'];
         break;
 
     case 'sys_membertype':
-    case 'username':
     case 'email':
         $retval = $fieldvalue;
         break;

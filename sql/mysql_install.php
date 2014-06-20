@@ -23,6 +23,7 @@ CREATE TABLE {$_TABLES['profile_def']} (
   `enabled` tinyint(1) NOT NULL default '1',
   `required` tinyint(1) NOT NULL default '0',
   `user_reg` tinyint(1) NOT NULL default '0',
+  `show_in_profile` tinyint(1) NOT NULL default '1',
   `prompt` varchar(80) default '',
   `options` text,
   `group_id` mediumint(8) unsigned NOT NULL default '1',

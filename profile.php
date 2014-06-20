@@ -35,8 +35,8 @@ $_TABLES['profile_values']  = $_DB_table_prefix . 'profile_values';
 */
 global $_PRF_CONF;
 $_PRF_CONF['pi_name']           = 'profile';
-$_PRF_CONF['pi_version']        = '1.1.3';
-$_PRF_CONF['gl_version']        = '1.2.0';
+$_PRF_CONF['pi_version']        = '1.1.4';
+$_PRF_CONF['gl_version']        = '1.3.0';
 $_PRF_CONF['pi_url']            = 'http://www.leegarner.com';
 $_PRF_CONF['pi_display_name']   = 'Custom Profile';
 
