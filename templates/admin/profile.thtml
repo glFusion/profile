@@ -1,0 +1,485 @@
+{# begin {templatelocation} #}
+<script type="text/javascript">
+
+window.addEvent('domready',function() {
+    var myValidator = new fValidator("frm1");
+});
+
+function setName(x) {
+    if (x.value != '') {
+        x.value = x.value.replace('prf_','');
+        x.value = x.value.replace(/[^a-zA-Z0-9]+/g,'');
+        x.value = 'prf_' + x.value;
+    }
+}
+
+function PRF_changeType(value)
+{
+  //document.getElementById('format').style.display = 'none';
+  document.getElementById('dt_input_format').style.display = 'none';
+  document.getElementById('date_showtime').style.display = 'none';
+  document.getElementById('date_24h').style.display = 'none';
+  document.getElementById('text_size').style.display = 'none';
+  document.getElementById('text_maxlen').style.display = 'none';
+  document.getElementById('value').style.display = 'none';
+  //document.getElementById('mask').style.display = 'none';
+  //document.getElementById('stripmask').style.display = 'none';
+  document.getElementById('autogen').style.display = 'none';
+  document.getElementById('selvalues').style.display = 'none';
+  document.getElementById('multichk_values').style.display = 'none';
+  document.getElementById('static_value').style.display = 'none';
+  document.getElementById('chk_defvalue').style.display = 'none';
+  document.getElementById('defvalue').style.display = '';
+  document.getElementById('rows').style.display = 'none';
+  document.getElementById('cols').style.display = 'none';
+  document.getElementById('hlp_defvalue').innerHTML = '';
+  document.getElementById('required').style.display = '';
+
+  switch(value) {
+  case 'radio':
+    document.getElementById('defvalue').style.display = 'none';
+    document.getElementById('selvalues').style.display = '';
+    document.getElementById('hlp_defvalue').innerHTML = 
+        '{$LANG_PROFILE['hlp_fld_def_option_name']}';
+    break;
+  case 'select':
+    document.getElementById('defvalue').style.display = 'none';
+    document.getElementById('selvalues').style.display = '';
+    document.getElementById('hlp_defvalue').innerHTML = 
+        '{$LANG_PROFILE['hlp_fld_enter_def_option']}';
+    break;
+  case 'checkbox':
+    document.getElementById('chk_defvalue').style.display = '';
+    document.getElementById('defvalue').style.display = 'none';
+    break;
+  case 'multicheck':
+    document.getElementById('multichk_values').style.display = '';
+    document.getElementById('defvalue').style.display = 'none';
+    break;
+  case 'date':
+    //document.getElementById('format').style.display = '';
+    document.getElementById('dt_input_format').style.display = '';
+    //document.getElementById('date_showtime').style.display = '';
+    document.getElementById('date_24h').style.display = '';
+    document.getElementById('hlp_defvalue').innerHTML = 
+        '{$LANG_PROFILE['hlp_fld_enter_default']}';
+    break;
+  case 'static':
+    document.getElementById('static_value').style.display = '';
+    document.getElementById('plugin').style.display = 'none';
+    document.getElementById('defvalue').style.display = 'none';
+    document.getElementById('required').style.display = 'none';
+    //document.getElementById('invisible').style.display = 'none';
+    break;
+  case 'textarea':
+    document.getElementById('cols').style.display = '';
+    document.getElementById('rows').style.display = '';
+    break;
+  case 'account':
+    break;
+  case 'text':
+  default:
+    document.getElementById('text_size').style.display = '';
+    document.getElementById('text_maxlen').style.display = '';
+    document.getElementById('hlp_defvalue').innerHTML = 
+        '{$LANG_PROFILE['hlp_fld_enter_default']}';
+    //document.getElementById('mask').style.display = '';
+    //document.getElementById('stripmask').style.display = '';
+    document.getElementById('autogen').style.display = '';
+    break;
+  }
+  
+}
+
+function sel_insertRow(list) {
+    var count = list.getElementsByTagName('li').length;
+    var new_element = document.createElement('li');
+    new_element.innerHTML = 
+            '<input id=\"vName'+count+'\" name=\"selvalues[]\" />' +
+        '<input type="radio" name="sel_default" value="' + count + '" />';
+    list.insertBefore(new_element, list.lastChild);
+    //document.getElementById('vName'+count).hide().slideDown('medium').focus();
+    document.getElementById('vName'+count).focus();
+}
+
+function multichk_insertRow(list) {
+    var count = list.getElementsByTagName('li').length;
+    var new_element = document.createElement('li');
+    new_element.innerHTML = 
+        '<input id=\"multiName'+count+'\" name=\"multichk_values['+count+']\" />' +
+        '<input type=\"checkbox\" name=\"multichk_default['+count+']\" value=\"1\" />';
+    list.insertBefore(new_element, list.lastChild);
+    //document.getElementById('multiName'+count).hide().slideDown('medium').focus();
+    document.getElementById('multiName'+count).focus();
+}
+
+</script>
+
+<form id="frm1" action="{site_url}/admin/plugins/profile/index.php"
+    method="post">
+<input type="hidden" name="valueCount" value="0" />
+<input type="hidden" name="id" value="{id}" />
+<input type="hidden" name="oldname" value="{name}" />
+<input type="hidden" name="oldtype" value="{type}" />
+<fieldset>
+<table>
+<tr>
+  <td width="150">{$LANG_PROFILE['fieldname']}:
+  </td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_fieldname', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    {!if is_sys}
+      <input type="hidden" name="name" value="{name}" />{name}
+      <input type="hidden" name="is_sys" value="1" />
+    {!else}
+      <input type="text" class="fValidate['required']" size="32" name="name" 
+        value="{name}" onblur="javascript:setName(this);" />
+      <input type="hidden" name="is_sys" value="0" />
+    {!endif}
+  </td>
+</tr>
+<tr>
+  <td>{$LANG_PROFILE['textprompt']}:</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_prompt', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="text" size="80" name="prompt" value="{prompt}" />
+  </td>
+</tr>
+<tr>
+  <td>{$LANG_PROFILE['help_text']}:</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_helptext', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="text" name="help_text" maxlength="255" size="40" value="{help_text}" />
+  </td>
+</tr>
+
+<tr>
+  <td>{$LANG_PROFILE['fieldtype']}:</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_type', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    {!if is_sys}
+      <input id="type" type="hidden" name="type" value="{type}" />{type}
+    {!else}
+      <select id="type" name="type" 
+        onchange="PRF_changeType(this.options[this.selectedIndex].value)">
+        {type_options}
+      </select>
+    {!endif}
+  </td>
+</tr>
+
+<tr id="plugin" style="display:none;">
+  <td>Plugin:</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_type', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <select id="plugin" name="plugin">
+        <option value="">-- {$LANG_PROFILE['none']} --</option>
+        {plugin_options}
+    </select>
+  </td>
+</tr>
+
+<tr id="text_size">
+  <td>{$LANG_PROFILE['inputlen']}:</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_length', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="text" size="4" name="size" value="{size}" />
+  </td>
+</tr>
+<tr id="text_maxlen">
+  <td>{$LANG_PROFILE['maxlen']}:</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_length', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="text" size="4" name="maxlength" value="{maxlength}" />
+  </td>
+</tr>
+
+<tr id="cols">
+  <td>{$LANG_PROFILE['columns']}:</td>
+  <td>
+    <a href="#" class="toolbar"
+        onclick="popupWindow('{doc_url}#desc_columns', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="text" size="4" name="cols" value="{cols}">
+  </td>
+</tr>
+
+<tr id="rows">
+  <td>{$LANG_PROFILE['rows']}:</td>
+  <td>
+    <a href="#" class="toolbar"
+        onclick="popupWindow('{doc_url}#desc_rows', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="text" size="4" name="rows" value="{rows}">
+  </td>
+</tr>
+
+<tr id="value">
+  <td>{$LANG_PROFILE['value']}:</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_valuestr', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="text" size="32" name="valuestr" value="{valuestr}" />
+  </td>
+</tr>
+
+<tr id="static_value">
+  <td>{$LANG_PROFILE['value']}:</td>
+  <td valign="center">
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_value', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <textarea rows="4" cols="40" name="static_val">{valuestr}</textarea>
+  </td>
+</tr>
+
+<tr id="selvalues">
+  <td>{$LANG_PROFILE['value']}:
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_values', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <img src="{layout_url}/images/addchild.png"
+        class="gl_mootip" title="{$LANG_PROFILE['add_value']}"
+        onclick="javascript:sel_insertRow(document.getElementById('fieldValuesList'));" />
+    </td>
+  <td>
+    <ul id="fieldValuesList">
+        {list_input}
+    </ul>
+  </td>
+</tr>
+
+<tr id="multichk_values">
+  <td>{$LANG_PROFILE['value']}:
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_values', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <img src="{layout_url}/images/addchild.png"
+        class="gl_mootip" title="{$LANG_PROFILE['add_value']}"
+        onclick="javascript:multichk_insertRow(document.getElementById('multichk_fieldValuesList'));" />
+    </td>
+  <td>
+    <ul id="multichk_fieldValuesList">
+        {multichk_input}
+    </ul>
+  </td>
+</tr>
+
+<tr id="chk_defvalue">
+  <td>{$LANG_PROFILE['defvalue']}:</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_default', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="checkbox" name="chkdefvalue" value="1" {chkdefault_chk} />
+    &nbsp;<span id="hlp_defvalue"></span>
+  </td>
+</tr>
+
+<tr id="defvalue">
+  <td>{$LANG_PROFILE['defvalue']}:</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_default', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="text" size="32" name="defvalue" value="{defvalue}" />
+    &nbsp;<span id="hlp_defvalue"></span>
+  </td>
+</tr>
+
+<tr id="date_showtime">
+  <td>{$LANG_PROFILE['showtime']}?</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_showtime', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="checkbox" value="1" name="showtime" {shtime_chk} />
+  </td>
+</tr>
+<tr id="date_24h">
+  <td>{$LANG_PROFILE['hourformat']}?</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_24hr', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="radio" name="timeformat" value="12" {12h_sel} />
+        {$LANG_PROFILE['hour12']}&nbsp;
+    <input type="radio" name="timeformat" value="24" {24h_sel} />
+        {$LANG_PROFILE['hour24']}
+    <input type="radio" name="timeformat" value="" {tm_none_sel} />
+        {$LANG_PROFILE['none']}
+  </td>
+</tr>
+
+<!--<tr id="format">
+  <td>{$LANG_PROFILE['format']}:</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_format', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="text" size="32" name="format" value="{format}" />
+    &nbsp;{$LANG_PROFILE['hlp_fld_enter_format']}
+  </td>
+</tr>-->
+
+<tr id="dt_input_format">
+  <td>{$LANG_PROFILE['input_format']}:</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_dt_input_format', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <select name="dt_input_format">{dt_input_format}</select>
+  </td>
+</tr>
+
+<tr id="autogen">
+  <td>{$LANG_PROFILE['autogen']}?</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_autogen', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="checkbox" value="1" name="autogen" {autogen_chk} />
+  </td>
+</tr>
+
+<!--
+<tr id="mask">
+  <td>{$LANG_PROFILE['mask']}:</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_mask', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="text" size="32" name="mask" value="{mask}">
+    &nbsp;{$LANG_PROFILE['hlp_fld_mask']}
+  </td>
+</tr>
+
+<tr id="stripmask">
+  <td>{$LANG_PROFILE['stripmask']}?</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_stripmask', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="checkbox" value="1" name="stripmask" {stripmask_chk}>
+  </td>
+</tr>
+-->
+
+<tr>
+  <td>{$LANG_PROFILE['enabled']}:</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_enabled', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="checkbox" value="1" name="enabled" {ena_chk} />
+  </td>
+</tr>
+
+<tr id="required">
+  <td>{$LANG_PROFILE['required']}:</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_required', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="checkbox" value="1" name="required" {req_chk} />
+  </td>
+</tr>
+
+<tr id="registration">
+  <td>{$LANG_PROFILE['ent_registration']}:</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_registration', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="checkbox" value="1" name="user_reg" {user_reg_chk} />
+  </td>
+</tr>
+
+<tr id="show_in_profile">
+  <td>{$LANG_PROFILE['show_in_profile']}:</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_show_in_profile', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="checkbox" value="1" name="show_in_profile" {in_prf_chk} />
+  </td>
+</tr>
+
+<tr id="spancols">
+  <td>{$LANG_PROFILE['spancols']}?:</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_spancols', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="checkbox" value="1" name="spancols" {spancols_chk} />
+  </td>
+</tr>
+
+<tr id="pos_after">
+  <td>{$LANG_PROFILE['pos_after']}:</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_position', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <select name="orderby">
+      {!if editing}
+      <option value="{orderby}" seleted="selected">-- {$LANG_PROFILE['nochange']} --</option>
+      {!endif}
+      <option value="1">{$LANG_PROFILE['first']}</option>
+      {orderby_selection}
+    </select>
+  </td>
+</tr>
+</table>
+</fieldset>
+<fieldset>
+<legend>{$LANG_PROFILE['permissions']}</legend>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_permissions', 'Help', 640, 480, 1)">
+        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+<table>
+<tr>
+  <td width="150">{$LANG_PROFILE['defgroup']}:</td>
+  <td>{group_dropdown}</td>
+</tr>
+<tr>
+  <td>{$LANG_PROFILE['permissions']}:</td>
+  <td>{permissions}</td>
+</tr>
+</table>
+</fieldset>
+
+<input type="submit" name="savedef" value="{$LANG_ADMIN['submit']}" />
+<input type="reset" name="reset" value="{$LANG_PROFILE['reset']}" />
+<input type="reset" name="cancel" value="{$LANG_ADMIN['cancel']}" 
+    onclick="javascript:document.location.href='{site_url}/admin/plugins/profile/index.php';" />
+{!if is_sys}
+{!else}
+  <input type="submit" name="deletedef" value="{$LANG_ADMIN['delete']}" 
+    onclick="return confirm('Do you really want to delete this item?');" />
+{!endif}
+</form>
+
+<script type="text/javascript">
+  // Change the form according to the initial type.  The oldtype value may
+  // be empty for a new item, so the default (text) fields will be activated.
+  window.addEvent('load', function() {
+    PRF_changeType("{oldtype}");
+  });
+</script>
+{# end {templatelocation} #}

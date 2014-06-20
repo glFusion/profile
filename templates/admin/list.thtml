@@ -1,0 +1,164 @@
+{# begin {templatelocation} #}
+<script type="text/javascript">
+window.addEvent('domready',function() {
+    var myValidator = new fValidator("frm1");
+});
+
+function insertRow(list) {
+    var count = list.getElementsByTagName('li').length;
+    var new_element = document.createElement('li');
+    new_element.innerHTML = 
+            '<input id=\"vName'+count+'\" name=\"selvalues[]\" />' +
+        '<input type="radio" name="sel_default" value="' + count + '" />';
+    list.insertBefore(new_element, list.lastChild);
+    //document.getElementById('vName'+count).hide().slideDown('medium').focus();
+    document.getElementById('vName'+count).focus();
+}
+</script>
+
+<form id="frm1" action="{site_url}/admin/plugins/profile/index.php"
+    method="post">
+<input type="hidden" name="oldid" value="{listid}" />
+<fieldset>
+<table>
+<tr>
+  <td width="150">{$LANG_PROFILE['listid']}:
+  </td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_name', 'Help', 640, 480, 1)"><img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="text" class="fValidate['required']" size="32" name="listid" 
+        value="{listid}" id="f_listid" />
+  </td>
+</tr>
+
+<tr>
+  <td>{$LANG_PROFILE['title']}:</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_title', 'Help', 640, 480, 1)"><img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="text" class="fValidate['required']" size="80" 
+        name="title" value="{title}" id="f_title" />
+  </td>
+</tr>
+
+<tr>
+  <td width="150">{$LANG_PROFILE['list_view_grp']}:</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_group', 'Help', 640, 480, 1)"><img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <select name="group_id">
+    {view_grp_select}
+    </select>
+  </td>
+</tr>
+
+<tr>
+  <td width="150">{$LANG_PROFILE['list_incl_grp']}:</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_incl_grp', 'Help', 640, 480, 1)"><img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <select name="incl_grp">
+    {incl_grp_select}
+    </select>
+  </td>
+</tr>
+
+<tr>
+  <td width="150">{$LANG_PROFILE['incl_user_stat']}:</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_incl_user_stat', 'Help', 640, 480, 1)"><img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="checkbox" name="incl_user_stat[]" value="3" {ustat_chk3} />{lang_active}
+    <input type="checkbox" name="incl_user_stat[]" value="0" {ustat_chk0} />{lang_disabled}
+    <input type="checkbox" name="incl_user_stat[]" value="1" {ustat_chk1} />{lang_activation}
+    <input type="checkbox" name="incl_user_stat[]" value="2" {ustat_chk2} />{lang_approval}
+    <input type="checkbox" name="incl_user_stat[]" value="4" {ustat_chk4} />{lang_verification}
+  </td>
+</tr>
+
+<tr>
+  <td width="150">{$LANG_PROFILE['incl_exp_stat']}:</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_incl_exp_stat', 'Help', 640, 480, 1)"><img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="checkbox" name="incl_exp_stat[]" {exp_chk1} value="1">{$LANG_PROFILE['current']}&nbsp;&nbsp;
+    <input type="checkbox" name="incl_exp_stat[]" {exp_chk2} value="2">{$LANG_PROFILE['arrears']}
+    <input type="checkbox" name="incl_exp_stat[]" {exp_chk4} value="4">{$LANG_PROFILE['expired']}
+  </td>
+</tr>
+
+<tr>
+  <td width="150">{$LANG_PROFILE['orderby']}:</td>
+  <td>
+    <a href="#" class="toolbar" 
+        onclick="popupWindow('{doc_url}#desc_orderby', 'Help', 640, 480, 1)"><img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <input type="text" name="orderby" size="4" value="{orderby}" />
+  </td>
+</tr>
+
+</table>
+
+<table class="pluginProfileListTable">
+<tr>
+  <th>{$LANG_PROFILE['include']}</th>
+  <th>{$LANG_PROFILE['orderby']}</th>
+  <th>{$LANG_PROFILE['field']}</th>
+  <th>{$LANG_PROFILE['hdr_text']}</th>
+  <th>{$LANG_PROFILE['q_sortable']}</th>
+  <th>{$LANG_PROFILE['q_searchable']}</th>
+  <th>{$LANG_PROFILE['def_sort']}</th>
+</tr>
+<!-- BEGIN FieldRow -->
+<tr>
+  <td>
+    <input type="checkbox" name="field[{fld_name}]" value="1" {fld_chk} />
+    <input type="hidden" name="fld_dbfield[{fld_name}]" value="{fld_dbfield}" />
+  </td>
+  <td>
+    <input type="text" size="3" name="order[{fld_name}]" value="{order}" />&nbsp;
+    {!if public_field}
+    <img src="{site_url}/profile/images/visible.png" width="16" height="16" class="gl_mootip" title="{$LANG_PROFILE['hlp_visible']}" />
+    {!else}
+    <img src="{site_url}/profile/images/invisible.png" width="16" height="16" class="gl_mootip" title="{$LANG_PROFILE['hlp_invisible']}" />
+    {!endif}
+    <input type="hidden" name="fld_id[{fld_name}]" value="{fld_name}" />
+    </td>
+  <td>{fld_name} {fld_opt}</td>
+  <td><input type="text" name="fld_text[{fld_name}]" size="40" maxlength="40" value="{fld_text}" /></td>
+
+  {!if allow_sort}
+  <td align="center"><input type="checkbox" name="sort[{fld_name}]" value="1" {sort_chk} /></td>
+  <td align="center"><input type="checkbox" name="search[{fld_name}]" value="1" {search_chk} /></td>
+  <td>
+    <input type="radio" name="sortby" value="{fld_name}:A" {ASC_sel} />A
+    <input type="radio" name="sortby" value="{fld_name}:D" {DESC_sel} />D
+  </td>
+  {!else}
+  <td></td>
+  <td></td>
+  <td></td>
+  {!endif}
+
+</tr>
+<!-- END FieldRow -->
+
+</table>
+
+{!if use_add_sql}
+<table class="pluginProfileListTable">
+<tr>
+  <td>Additional SQL:</td>
+  <td><input type="text" name="srch_sql" size="80" maxlength="255" value="{srch_sql}" /></td>
+</tr>
+</table>
+{!endif}
+
+</fieldset>
+
+<input name="savelist" type="submit" value="{$LANG_ADMIN['submit']}" />
+<input name="reset" type="reset" value="{$LANG_PROFILE['reset']}" />
+<input name="cancellist" type="submit" value="{$LANG_ADMIN['cancel']}"
+    onclick="javascript:document.location.href='{referrer}';" />
+</form>
+{# end {templatelocation} #}

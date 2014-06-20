@@ -1,0 +1,25 @@
+{# begin {templatelocation} #}
+<form id="srch" action="{site_url}/admin/plugins/profile/index.php"
+    method="POST">
+<table>
+<tr>
+  <th>{$LANG_PROFILE['field']}</th>
+  <th>{$LANG_PROFILE['contains']}</th>
+  <th>{$LANG_PROFILE['empty']}?</th>
+</tr>
+<!-- BEGIN FldRow -->
+<tr>
+  <td width="150">{fld_prompt}: </td>
+  <td>{fld_input}</td>
+  {!if fld_empty}
+    <td align="center"><input type="checkbox" value="1" name="empty[{fld_name}]" /></td>
+  {!endif}
+</tr>
+<!-- END FldRow -->
+</table>
+
+<input type="submit" name="dousersearch" value="{$LANG_ADMIN['submit']}" />
+<input type="reset" name="searchreset" value="{$LANG_PROFILE['reset']}" />
+</form>
+
+{# end {templatelocation} #}

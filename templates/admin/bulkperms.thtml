@@ -1,0 +1,12 @@
+{# begin {templatelocation} #}
+<form id="frm1" action="{site_url}/admin/plugins/profile/index.php"
+    method="POST">
+  <span class="alert">
+    Warning: This function will reset ALL permissions on ALL profile fields to the defaults.
+    <br />If this is not what you want, click the "{$LANG_ADMIN['cancel']}" button now.
+  </span>
+  <input type="submit" name="permresetconfirm" value="{$LANG_ADMIN['submit']}">
+  <input type="submit" name="button2" value="{$LANG_ADMIN['cancel']}">
+</form>
+{# end {templatelocation} #}
+

@@ -1,0 +1,6 @@
+{# begin {templatelocation} #}
+<h1>{$LANG_PROFILE['admin_title']}</h1>
+{version}<br />
+{menu}
+{page_content}
+{# end {templatelocation} #}

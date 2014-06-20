@@ -1,0 +1,15 @@
+<div style="position:relative; float:left; margin:2px;">
+  {!if profile_url}
+  <a href="{profile_url}">
+  {!endif}
+    <img class=gl_mootip src="{photo_url}" width="{img_width}" title="{caption}">
+  {!if profile_url}
+    </a>
+  {!endif}
+  <br />
+  <div style="text-align:center;">
+    {fullname}
+    <br />&nbsp;
+  </div>
+</div>
+

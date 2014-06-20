@@ -1,0 +1,29 @@
+{# begin {templatelocation} #}
+<!-- BEGIN QueueRow -->
+  <p>
+  {!if spancols}
+  {!else}
+  {!if prompt}
+    <label for="{fieldname}">{prompt}:</label>
+  {!endif}
+  {!endif}
+  <span class="pluginProfileField">
+  {field}
+  {!if is_static}
+  {!else}
+  {!if is_visible}
+    <img src="{site_url}/profile/images/visible.png" width="16" height="16" class="gl_mootip" title="{$LANG_PROFILE['hlp_visible']}" />
+  {!else}
+    <img src="{site_url}/profile/images/invisible.png" width="16" height="16" class="gl_mootip" title="{$LANG_PROFILE['hlp_invisible']}" />
+  {!endif}
+  {!if is_required}
+    <img src="{site_url}/profile/images/required.png" width="16" height="16" class="gl_mootip" title="{$LANG_PROFILE['hlp_required']}" />
+  {!endif}
+  {!if help_text}
+    <img src="{layout_url}/images/info.png" width="16" height="16" class="gl_mootip" title="{help_text}" />
+  {!endif}
+  {!endif}
+  </span>
+  </p>
+<!-- END QueueRow -->
+{# end {templatelocation} #}

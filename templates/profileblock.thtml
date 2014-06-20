@@ -1,0 +1,24 @@
+{# begin {templatelocation} #}
+<div class="profile-header">
+  {$LANG_PROFILE['block_title']}
+</div>
+<table class="pluginProfileBlock">
+<!-- BEGIN profile_row -->
+  <tr><td>
+    {!if descrip}
+      {descrip}:&nbsp;&nbsp;
+    {!endif}
+  </td>
+  <td>{value}&nbsp;&nbsp;
+  {!if showvisicons}
+  {!if is_visible}
+    <img src="{site_url}/profile/images/visible.png" width="16" height="16" class="gl_mootip" title="{$LANG_PROFILE['hlp_visible']}" />
+  {!else}
+    <img src="{site_url}/profile/images/invisible.png" width="16" height="16" class="gl_mootip" title="{$LANG_PROFILE['hlp_invisible']}" />
+  {!endif}
+  {!endif}
+  </td>
+  </tr>
+<!-- END profile_row -->
+</table>
+{# end {templatelocation} #}

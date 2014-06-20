@@ -1,0 +1,9 @@
+<tr>
+  <td style="width:100px;">
+    <label for="sys_directory">{prf_prompt}:</label>
+  </td>
+  <td>
+    {prf_field}
+  </td>
+</tr>
+

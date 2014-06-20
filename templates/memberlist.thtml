@@ -1,0 +1,13 @@
+{# begin {templatelocation} #}
+<style type="text/css">
+div.scroll {
+    overflow: auto;
+}
+</style>
+{menu}
+{export_link}
+<div class="scroll">
+  {list_contents}
+</div>
+<div class="alignright">{footer}</div>
+{# end {templatelocation} #}

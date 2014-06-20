@@ -1,0 +1,17 @@
+<div>
+  <form action="{myself}" method="POST">
+    <select name="group"
+      onchange="javascript: document.location.href='{myself}?group='+this.options[this.selectedIndex].value">
+      {grp_select}
+    </select>
+    <!--<input type="text" name="srchval" value="{srchval}">-->
+    <input id="header-textbox" type="text" name="srchval" maxlength="255" 
+        value="{srchval}" title="Search" 
+        onfocus="if (this.value=='Search')this.value='';" 
+        onblur="if(this.value=='')this.value='Search';" />
+  </form>
+</div>
+<div>
+{pagemenu}
+</div>
+<div>

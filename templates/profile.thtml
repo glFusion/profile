@@ -1,0 +1,12 @@
+{# begin {templatelocation} #}
+<!-- BEGIN QueueRow -->
+<tr>
+  <td class="alignright">
+    {!if prompt}
+    <label for="{fieldname}">{prompt}:</label>
+    {!endif}
+  </td>
+  <td>{field}</td>
+</tr>
+<!-- END QueueRow -->
+{# end {templatelocation} #}
