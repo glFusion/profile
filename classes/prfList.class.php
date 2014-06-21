@@ -247,8 +247,6 @@ class prfList
                 if (is_array($extras['f_info']) && isset($pi_tmp['f_info']) &&
                         is_array($pi_tmp['f_info'])) {
                     $extras['f_info'] = array_merge($extras['f_info'], $pi_tmp['f_info']);
-                    /*foreach ($pi_tmp['f_info'] as $f_info) {
-                        $extras[] = $f_info;*/
                 }
             }
        }
@@ -273,6 +271,8 @@ class prfList
         $field_select .= ', p.sys_directory, ' .
             ($this->isAdmin ? '1' : '0') . ' AS is_admin';
 
+        // Set the uid level to be excluded.
+        // uids > $noshow_uid will be included.
         if ($_PRF_CONF['list_incl_admin']) {
             $noshow_uid = 1;
         } else {
@@ -328,21 +328,12 @@ class prfList
         }*/
 
         if ($this->name_format == 1) {
-                $full_name = "IF (u.fullname = '' OR u.fullname IS NULL,
-                        u.fullname, 
-                        CONCAT(SUBSTRING_INDEX(u.fullname,' ',-1), ', ',
-                        SUBSTRING_INDEX(u.fullname,' ',1))) AS fullname,
-                        SUBSTRING_INDEX(u.fullname,'',-1) AS lname,
-                        SUBSTRING_INDEX(u.fullname,'',1) AS fname,
-                    u.fullname AS realfullname,
-                    1 AS name_format";
-            //$full_name = "SUBSTRING_INDEX(u.fullname,' ',-1) AS lname," .
-            //        "SUBSTRING_INDEX(u.fullname,' ',1) AS fname, 1 as name_format";
-        } else {
-            $full_name = "u.fullname AS fullname, 0 AS name_format";
+            USES_lglib_class_nameparser();
         }
+        $full_name = "u.fullname AS fullname, 0 AS name_format";
         $sql = "SELECT u.uid, u.username, u.email, u.homepage, u.photo, 
-                p.*, $full_name
+                p.*, u.fullname AS fullname,
+                {$this->name_format} AS name_format
                 $field_select,
                 DATEDIFF(NOW(), p.sys_expires) as exp_diff
                 FROM {$_TABLES['users']} u
@@ -1227,9 +1218,10 @@ function PRF_getListField($fieldname, $fieldvalue, $A, $icon_arr, $extras)
             $fieldvalue = $A['username'];
         }
         if ($A['name_format'] == 1) {
-            // Fix single-word fullnames, like "Cher"
-            if ($fieldvalue == $A['realfullname'] . ', ' . $A['realfullname']) {
-                $fieldvalue = $A['realfullname'];
+            $parts = NameParser::Parse($fieldvalue);
+            $fieldvalue = NameParser::LCF($fieldvalue);
+            if ($parts['suffix'] != '') {
+                $fieldvalue .= ' ' . $parts['suffix'];
             }
         }
         $retval = COM_createLink($fieldvalue,
