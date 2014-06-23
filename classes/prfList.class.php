@@ -328,12 +328,20 @@ class prfList
         }*/
 
         if ($this->name_format == 1) {
-            USES_lglib_class_nameparser();
+            $full_name = "IF (u.fullname = '' OR u.fullname IS NULL,
+                    u.fullname, 
+                    CONCAT(SUBSTRING_INDEX(u.fullname,' ',-1), ', ',
+                    SUBSTRING_INDEX(u.fullname,' ',1))) AS fullname,
+                    SUBSTRING_INDEX(u.fullname,'',-1) AS lname,
+                    SUBSTRING_INDEX(u.fullname,'',1) AS fname,
+                    u.fullname AS realfullname";
+            //USES_lglib_class_nameparser();
+        } else {
+            $full_name = "u.fullname AS fullname, 0 AS name_format";
         }
-        $full_name = "u.fullname AS fullname, 0 AS name_format";
         $sql = "SELECT u.uid, u.username, u.email, u.homepage, u.photo, 
-                p.*, u.fullname AS fullname,
-                {$this->name_format} AS name_format
+                {$this->name_format} AS name_format,
+                p.*, $full_name
                 $field_select,
                 DATEDIFF(NOW(), p.sys_expires) as exp_diff
                 FROM {$_TABLES['users']} u
@@ -1218,10 +1226,14 @@ function PRF_getListField($fieldname, $fieldvalue, $A, $icon_arr, $extras)
             $fieldvalue = $A['username'];
         }
         if ($A['name_format'] == 1) {
-            $parts = NameParser::Parse($fieldvalue);
+            /*$parts = NameParser::Parse($fieldvalue);
             $fieldvalue = NameParser::LCF($fieldvalue);
             if ($parts['suffix'] != '') {
                 $fieldvalue .= ' ' . $parts['suffix'];
+            }*/
+            // Fix single-word fullnames, like "Cher"
+            if ($fieldvalue == $A['realfullname'] . ', ' . $A['realfullname']) {
+                $fieldvalue = $A['realfullname'];
             }
         }
         $retval = COM_createLink($fieldvalue,
