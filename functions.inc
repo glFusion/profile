@@ -146,6 +146,24 @@ function plugin_user_delete_profile($uid)
 
 
 /**
+*   Support merging local accounts into remote accounts
+*
+*   @param  integer $origUID    Original (local) user ID
+*   @param  integer $destUID    New (remote) user ID
+*/
+function plugin_user_move_profile($origUID, $destUID)
+{
+    global $_TABLES;
+
+    $origUID = (int)$origUID;
+    $destUID = (int)$destUID;
+
+    DB_query("UPDATE {$_TABLES['profile_data']}
+            SET puid = $destUID WHERE puid = $origUID", 1);
+}
+
+
+/**
 *   Upgrade the Profile plugin
 *   @return integer Number of message to display (true = generic success msg)
 */
