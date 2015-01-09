@@ -3,9 +3,9 @@
 *   Upgrade routines for the Custom Profile plugin
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2011 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2009-2015 Lee Garner <lee@leegarner.com>
 *   @package    profile
-*   @version    1.1.2
+*   @version    1.1.4
 *   @license    http://opensource.org/licenses/gpl-2.0.php 
 *               GNU Public License v2 or later
 *   @filesource
@@ -72,6 +72,13 @@ function profile_do_upgrade($current_ver)
         // upgrade to 1.1.3
         COM_errorLog("Updating Profile Plugin to 1.1.3");
         $error = profile_upgrade_1_1_3();
+        if ($error)
+            return $error;
+    }
+
+    if ($current_ver < '1.1.4') {
+        COM_errorLog("Updating Profile Plugin to 1.1.4");
+        $error = profile_upgrade_1_1_4();
         if ($error)
             return $error;
     }
@@ -508,6 +515,49 @@ function profile_upgrade_1_1_3()
         $nstat = DB_escapeString(@serialize($ustat));
         DB_query("UPDATE {$_TABLES['profile_lists']} SET 
                 incl_user_stat = '$nstat' WHERE listid='$listid'");
+    }
+    return $status;
+}
+
+
+/**
+*   Upgrade to version 1.1.4
+*   Adds first and last name fields to the profile data
+*   Returns non-zero if an error is encountered at any point.
+*   @return integer     Zero for success, non-zero on error
+*/
+function profile_upgrade_1_1_4()
+{
+    global $_TABLES;
+
+    $sql = array(
+        "ALTER TABLE {$_TABLES['profile_data']}
+            ADD sys_lname varchar(40) AFTER sys_parent",
+        "ALTER TABLE {$_TABLES['profile_data']}
+            ADD sys_fname varchar(40) AFTER sys_parent",
+        "INSERT INTO {$_TABLES['profile_def']}
+                (orderby, name, type, enabled, required, user_reg,
+                prompt, options, sys, perm_owner)
+            VALUES
+                (41, 'sys_fname', 'fname', 0, 0, 0,
+                    '{$LANG_PROFILE['fname']}', '', 1, 0),
+                (42, 'sys_fname', 'fname', 0, 0, 0,
+                    '{$LANG_PROFILE['fname']}', '', 1, 0)",
+    ); 
+    $status = profile_do_upgrade_sql('1.1.4', $sql);
+    if ($status > 0) return $status;
+
+    USES_lglib_class_nameparser();
+    $sql = "SELECT uid, fullname FROM {$_TABLES['users']}";
+    $res = DB_query($sql);
+    while ($A = DB_fetchArray($res, false)) {
+        $fname = DB_escapeString(NameParser::F($A['fullname']));
+        $lname = DB_escapeString(NameParser::L($A['fullname']));
+        $uid = (int)$A['uid'];
+        $sql = "UPDATE {$_TABLES['profile_data']} SET
+                sys_fname='$fname', sys_lname='$lname'
+                WHERE puid=$uid";
+        DB_query($sql);
     }
     return $status;
 }

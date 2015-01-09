@@ -2,11 +2,11 @@
 /**
 *   Provides automatic installation of the Profile plugin
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2009-2015 Lee Garner <lee@leegarner.com>
 *   @package    profile
-*   @version    0.0.2
+*   @version    1.1.4
 *   @license    http://opensource.org/licenses/gpl-2.0.php 
-*   GNU Public License v2 or later
+*               GNU Public License v2 or later
 *   @filesource
 */
 
@@ -116,12 +116,23 @@ function plugin_postinstall_profile()
 {
     global $PRF_sampledata, $_TABLES, $_PRF_CONF;
 
-    // Try to copy admin documentation.
-    //$filepath = "{$_CONF['path']}/plugins/{$_PRF_CONF['pi_name']}";
-    //$filepath = PRF_PI_PATH;
-    //@copy($filepath .'/docs/'. $_PRF_CONF['pi_name'].'_.html', 
-    //        $_CONF['path_html'].'/docs/'.$_PRF_CONF['pi_name'].'_def.html');
-
+    // Create data records for each user and populate first and
+    // last name fields
+    USES_lglib_class_nameparser();
+    $sql = "SELECT uid, fullname FROM {$_TABLES['users']}";
+    $res = DB_query($sql);
+    while ($A = DB_fetchArray($res, false)) {
+        $fname = DB_escapeString(NameParser::F($A['fullname']));
+        $lname = DB_escapeString(NameParser::L($A['fullname']));
+        $uid = (int)$A['uid'];
+        $value_arr[] = "($uid, '$fname', '$lname')";
+    }
+    $values = implode(',', $value_arr);
+    $sql = "INSERT INTO {$_TABLES['profile_data']}
+                (puid, sys_fname, sys_lname)
+            VALUES $values";
+    DB_query($sql);
+ 
     // Install sample data
     if (is_array($PRF_sampledata)) {
         foreach ($PRF_sampledata as $sql) {

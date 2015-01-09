@@ -3,9 +3,9 @@
 *   Table definitions for the Profile plugin
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2009-2015 Lee Garner <lee@leegarner.com>
 *   @package    profile
-*   @version    0.0.2
+*   @version    1.1.4
 *   @license    http://opensource.org/licenses/gpl-2.0.php 
 *   GNU Public License v2 or later
 *   @filesource
@@ -16,24 +16,25 @@ global $_TABLES;
 
 $_SQL['profile_def'] = "
 CREATE TABLE {$_TABLES['profile_def']} (
-  `id` int(11) NOT NULL auto_increment,
-  `orderby` int(11) unsigned default NULL,
-  `name` varchar(32) NOT NULL,
-  `type` varchar(32) NOT NULL default 'text',
-  `enabled` tinyint(1) NOT NULL default '1',
-  `required` tinyint(1) NOT NULL default '0',
-  `user_reg` tinyint(1) NOT NULL default '0',
-  `show_in_profile` tinyint(1) NOT NULL default '1',
-  `prompt` varchar(80) default '',
-  `options` text,
-  `group_id` mediumint(8) unsigned NOT NULL default '1',
-  `perm_owner` tinyint(1) unsigned NOT NULL default '3',
-  `perm_group` tinyint(1) unsigned NOT NULL default '3',
-  `perm_members` tinyint(1) unsigned NOT NULL default '1',
-  `perm_anon` tinyint(1) unsigned NOT NULL default '1',
-  `sys` tinyint(1) unsigned NOT NULL default '0',
-  `plugin` varchar(255) DEFAULT '',
-  PRIMARY KEY  (`id`)
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `orderby` int(11) unsigned DEFAULT NULL,
+  `name` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
+  `type` varchar(32) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'text',
+  `enabled` tinyint(1) NOT NULL DEFAULT '1',
+  `required` tinyint(1) NOT NULL DEFAULT '1',
+  `user_reg` tinyint(1) NOT NULL DEFAULT '0',
+  `show_in_profile` tinyint(1) NOT NULL DEFAULT '1',
+  `prompt` varchar(80) COLLATE utf8_unicode_ci DEFAULT '',
+  `options` text COLLATE utf8_unicode_ci,
+  `group_id` mediumint(8) unsigned NOT NULL DEFAULT '1',
+  `perm_owner` tinyint(1) unsigned NOT NULL DEFAULT '3',
+  `perm_group` tinyint(1) unsigned NOT NULL DEFAULT '3',
+  `perm_members` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `perm_anon` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `sys` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `plugin` varchar(255) COLLATE utf8_unicode_ci DEFAULT '',
+  PRIMARY KEY (`id`),
+  KEY `idx_orderby` (`orderby`)
 )";
 
 $_SQL['profile_data'] = "CREATE TABLE {$_TABLES['profile_data']} (
@@ -42,7 +43,10 @@ $_SQL['profile_data'] = "CREATE TABLE {$_TABLES['profile_data']} (
   `sys_expires` date default NULL,
   `sys_directory` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `sys_parent` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY  (`puid`)
+  `sys_fname` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `sys_lname` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY  (`puid`),
+  KEY `lname` (`sys_lname`,`sys_fname`)
 )";
 
 $_SQL['profile_lists'] = "CREATE TABLE `{$_TABLES['profile_lists']}` (
@@ -73,6 +77,10 @@ $PRF_sampledata = array(
             'a:1:{s:7:\"default\";i:1;}', 1, 1),
         (40, 'sys_parent', 'account', 0, 0, 0, '{$LANG_PROFILE['parent_uid']}', 
             'a:1:{s:7:\"default\";s:1:\"0\";}', 1, 1),
+        (42, 'sys_fname', 'fname', 0, 0, 0, '{$LANG_PROFILE['fname']}', 
+            '', 1, 0),
+        (44, 'sys_parent', 'account', 0, 0, 0, '{$LANG_PROFILE['lname']}', 
+            '', 1, 0),
         (50, 'prf_address1', 'text', 1, 1, 1, 'Address Line 1', 
             'a:2:{s:4:\"size\";i:40;s:9:\"maxlength\";i:80;}', 0, 3),
         (60, 'prf_address2', 'text', 1, 0, 1, 'Address Line 2', 

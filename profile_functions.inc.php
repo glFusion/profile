@@ -4,9 +4,9 @@
 *   Load by calling USES_profile_functions()
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2009-2015 Lee Garner <lee@leegarner.com>
 *   @package    profile
-*   @version    1.1.1
+*   @version    1.1.4
 *   @license    http://opensource.org/licenses/gpl-2.0.php 
 *               GNU Public License v2 or later
 *   @filesource
@@ -173,6 +173,15 @@ function PRF_saveData($vals, $uid = 0, $type = 'edit')
     }
     // If any validation errors found, return false now
     if ($validation_errs > 0) return false;
+
+    if (isset($vals['fullname'])) {
+        USES_lglib_class_nameparser();
+        // Break the fullname into first and last names
+        $fname = DB_escapeString(NameParser::F($vals['fullname']));
+        $lname = DB_escapeString(NameParser::L($vals['fullname']));
+        $fld_sql[] = "sys_fname = '$fname'";
+        $fld_sql[] = "sys_lname = '$lname'";
+    }
 
     foreach ($A as $name => $data) {
         switch ($data->type) {
