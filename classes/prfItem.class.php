@@ -1139,8 +1139,7 @@ class prfMultiCheck extends prfItem
                     "<input {$this->_frmClass} type=\"checkbox\" " .
                     "name=\"{$this->name}[$id]\" id=\"{$this->name}_$id\" " .
                     "value=\"$value\" $sel {$this->_frmReadonly} />&nbsp;" .
-                    "<label for=\"{$this->name}_$id\">" . $value .
-                    '</label></span>' .LB;
+                    $value . '</span>' . LB;
             $i++;
         }
         return $fld;
