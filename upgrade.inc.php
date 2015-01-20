@@ -528,7 +528,7 @@ function profile_upgrade_1_1_3()
 */
 function profile_upgrade_1_1_4()
 {
-    global $_TABLES;
+    global $_TABLES, $LANG_PROFILE;
 
     $sql = array(
         "ALTER TABLE {$_TABLES['profile_data']}
