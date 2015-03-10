@@ -128,7 +128,7 @@ function multichk_insertRow(list) {
   </td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_fieldname', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_fieldname', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     {!if is_sys}
       <input type="hidden" name="name" value="{name}" />{name}
@@ -144,7 +144,7 @@ function multichk_insertRow(list) {
   <td>{$LANG_PROFILE['textprompt']}:</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_prompt', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_prompt', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="text" size="80" name="prompt" value="{prompt}" />
   </td>
@@ -153,7 +153,7 @@ function multichk_insertRow(list) {
   <td>{$LANG_PROFILE['help_text']}:</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_helptext', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_helptext', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="text" name="help_text" maxlength="255" size="40" value="{help_text}" />
   </td>
@@ -163,7 +163,7 @@ function multichk_insertRow(list) {
   <td>{$LANG_PROFILE['fieldtype']}:</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_type', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_type', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     {!if is_sys}
       <input id="type" type="hidden" name="type" value="{type}" />{type}
@@ -180,7 +180,7 @@ function multichk_insertRow(list) {
   <td>Plugin:</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_type', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_type', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <select id="plugin" name="plugin">
         <option value="">-- {$LANG_PROFILE['none']} --</option>
@@ -193,7 +193,7 @@ function multichk_insertRow(list) {
   <td>{$LANG_PROFILE['inputlen']}:</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_length', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_length', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="text" size="4" name="size" value="{size}" />
   </td>
@@ -202,7 +202,7 @@ function multichk_insertRow(list) {
   <td>{$LANG_PROFILE['maxlen']}:</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_length', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_length', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="text" size="4" name="maxlength" value="{maxlength}" />
   </td>
@@ -212,7 +212,7 @@ function multichk_insertRow(list) {
   <td>{$LANG_PROFILE['columns']}:</td>
   <td>
     <a href="#" class="toolbar"
-        onclick="popupWindow('{doc_url}#desc_columns', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_columns', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="text" size="4" name="cols" value="{cols}">
   </td>
@@ -222,7 +222,7 @@ function multichk_insertRow(list) {
   <td>{$LANG_PROFILE['rows']}:</td>
   <td>
     <a href="#" class="toolbar"
-        onclick="popupWindow('{doc_url}#desc_rows', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_rows', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="text" size="4" name="rows" value="{rows}">
   </td>
@@ -232,7 +232,7 @@ function multichk_insertRow(list) {
   <td>{$LANG_PROFILE['value']}:</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_valuestr', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_valuestr', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="text" size="32" name="valuestr" value="{valuestr}" />
   </td>
@@ -242,7 +242,7 @@ function multichk_insertRow(list) {
   <td>{$LANG_PROFILE['value']}:</td>
   <td valign="center">
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_value', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_value', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <textarea rows="4" cols="40" name="static_val">{valuestr}</textarea>
   </td>
@@ -251,7 +251,7 @@ function multichk_insertRow(list) {
 <tr id="selvalues">
   <td>{$LANG_PROFILE['value']}:
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_values', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_values', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <img src="{layout_url}/images/addchild.png"
         class="gl_mootip" title="{$LANG_PROFILE['add_value']}"
@@ -267,7 +267,7 @@ function multichk_insertRow(list) {
 <tr id="multichk_values">
   <td>{$LANG_PROFILE['value']}:
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_values', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_values', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <img src="{layout_url}/images/addchild.png"
         class="gl_mootip" title="{$LANG_PROFILE['add_value']}"
@@ -284,7 +284,7 @@ function multichk_insertRow(list) {
   <td>{$LANG_PROFILE['defvalue']}:</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_default', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_default', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="checkbox" name="chkdefvalue" value="1" {chkdefault_chk} />
     &nbsp;<span id="hlp_defvalue"></span>
@@ -295,7 +295,7 @@ function multichk_insertRow(list) {
   <td>{$LANG_PROFILE['defvalue']}:</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_default', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_default', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="text" size="32" name="defvalue" value="{defvalue}" />
     &nbsp;<span id="hlp_defvalue"></span>
@@ -306,7 +306,7 @@ function multichk_insertRow(list) {
   <td>{$LANG_PROFILE['showtime']}?</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_showtime', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_showtime', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="checkbox" value="1" name="showtime" {shtime_chk} />
   </td>
@@ -315,7 +315,7 @@ function multichk_insertRow(list) {
   <td>{$LANG_PROFILE['hourformat']}?</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_24hr', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_24hr', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="radio" name="timeformat" value="12" {12h_sel} />
         {$LANG_PROFILE['hour12']}&nbsp;
@@ -330,7 +330,7 @@ function multichk_insertRow(list) {
   <td>{$LANG_PROFILE['format']}:</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_format', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_format', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="text" size="32" name="format" value="{format}" />
     &nbsp;{$LANG_PROFILE['hlp_fld_enter_format']}
@@ -341,7 +341,7 @@ function multichk_insertRow(list) {
   <td>{$LANG_PROFILE['input_format']}:</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_dt_input_format', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_dt_input_format', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <select name="dt_input_format">{dt_input_format}</select>
   </td>
@@ -351,7 +351,7 @@ function multichk_insertRow(list) {
   <td>{$LANG_PROFILE['autogen']}?</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_autogen', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_autogen', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="checkbox" value="1" name="autogen" {autogen_chk} />
   </td>
@@ -362,7 +362,7 @@ function multichk_insertRow(list) {
   <td>{$LANG_PROFILE['mask']}:</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_mask', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_mask', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="text" size="32" name="mask" value="{mask}">
     &nbsp;{$LANG_PROFILE['hlp_fld_mask']}
@@ -373,7 +373,7 @@ function multichk_insertRow(list) {
   <td>{$LANG_PROFILE['stripmask']}?</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_stripmask', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_stripmask', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="checkbox" value="1" name="stripmask" {stripmask_chk}>
   </td>
@@ -384,7 +384,7 @@ function multichk_insertRow(list) {
   <td>{$LANG_PROFILE['enabled']}:</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_enabled', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_enabled', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="checkbox" value="1" name="enabled" {ena_chk} />
   </td>
@@ -394,7 +394,7 @@ function multichk_insertRow(list) {
   <td>{$LANG_PROFILE['required']}:</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_required', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_required', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="checkbox" value="1" name="required" {req_chk} />
   </td>
@@ -404,7 +404,7 @@ function multichk_insertRow(list) {
   <td>{$LANG_PROFILE['ent_registration']}:</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_registration', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_registration', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="checkbox" value="1" name="user_reg" {user_reg_chk} />
   </td>
@@ -414,7 +414,7 @@ function multichk_insertRow(list) {
   <td>{$LANG_PROFILE['show_in_profile']}:</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_show_in_profile', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_show_in_profile', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="checkbox" value="1" name="show_in_profile" {in_prf_chk} />
   </td>
@@ -424,7 +424,7 @@ function multichk_insertRow(list) {
   <td>{$LANG_PROFILE['spancols']}?:</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_spancols', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_spancols', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="checkbox" value="1" name="spancols" {spancols_chk} />
   </td>
@@ -434,7 +434,7 @@ function multichk_insertRow(list) {
   <td>{$LANG_PROFILE['pos_after']}:</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_position', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_position', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
     <select name="orderby">
       {!if editing}
@@ -450,7 +450,7 @@ function multichk_insertRow(list) {
 <fieldset>
 <legend>{$LANG_PROFILE['permissions']}</legend>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_permissions', 'Help', 640, 480, 1)">
+        onclick="popupWindow('{doc_url}#desc_permissions', 'Help', 640, 480, 1);return false;">
         <img src="{layout_url}/images/button_help.png" alt="" /></a>
 <table>
 <tr>

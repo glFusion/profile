@@ -26,7 +26,7 @@ function insertRow(list) {
   </td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_name', 'Help', 640, 480, 1)"><img src="{layout_url}/images/button_help.png" alt="" /></a>
+        onclick="popupWindow('{doc_url}#desc_name', 'Help', 640, 480, 1);return false;"><img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="text" class="fValidate['required']" size="32" name="listid" 
         value="{listid}" id="f_listid" />
   </td>
@@ -36,7 +36,7 @@ function insertRow(list) {
   <td>{$LANG_PROFILE['title']}:</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_title', 'Help', 640, 480, 1)"><img src="{layout_url}/images/button_help.png" alt="" /></a>
+        onclick="popupWindow('{doc_url}#desc_title', 'Help', 640, 480, 1);return false;"><img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="text" class="fValidate['required']" size="80" 
         name="title" value="{title}" id="f_title" />
   </td>
@@ -46,7 +46,7 @@ function insertRow(list) {
   <td width="150">{$LANG_PROFILE['list_view_grp']}:</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_group', 'Help', 640, 480, 1)"><img src="{layout_url}/images/button_help.png" alt="" /></a>
+        onclick="popupWindow('{doc_url}#desc_group', 'Help', 640, 480, 1);return false;"><img src="{layout_url}/images/button_help.png" alt="" /></a>
     <select name="group_id">
     {view_grp_select}
     </select>
@@ -57,7 +57,7 @@ function insertRow(list) {
   <td width="150">{$LANG_PROFILE['list_incl_grp']}:</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_incl_grp', 'Help', 640, 480, 1)"><img src="{layout_url}/images/button_help.png" alt="" /></a>
+        onclick="popupWindow('{doc_url}#desc_incl_grp', 'Help', 640, 480, 1);return false;"><img src="{layout_url}/images/button_help.png" alt="" /></a>
     <select name="incl_grp">
     {incl_grp_select}
     </select>
@@ -68,7 +68,7 @@ function insertRow(list) {
   <td width="150">{$LANG_PROFILE['incl_user_stat']}:</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_incl_user_stat', 'Help', 640, 480, 1)"><img src="{layout_url}/images/button_help.png" alt="" /></a>
+        onclick="popupWindow('{doc_url}#desc_incl_user_stat', 'Help', 640, 480, 1);return false;"><img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="checkbox" name="incl_user_stat[]" value="3" {ustat_chk3} />{lang_active}
     <input type="checkbox" name="incl_user_stat[]" value="0" {ustat_chk0} />{lang_disabled}
     <input type="checkbox" name="incl_user_stat[]" value="1" {ustat_chk1} />{lang_activation}
@@ -81,7 +81,7 @@ function insertRow(list) {
   <td width="150">{$LANG_PROFILE['incl_exp_stat']}:</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_incl_exp_stat', 'Help', 640, 480, 1)"><img src="{layout_url}/images/button_help.png" alt="" /></a>
+        onclick="popupWindow('{doc_url}#desc_incl_exp_stat', 'Help', 640, 480, 1);return false;"><img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="checkbox" name="incl_exp_stat[]" {exp_chk1} value="1">{$LANG_PROFILE['current']}&nbsp;&nbsp;
     <input type="checkbox" name="incl_exp_stat[]" {exp_chk2} value="2">{$LANG_PROFILE['arrears']}
     <input type="checkbox" name="incl_exp_stat[]" {exp_chk4} value="4">{$LANG_PROFILE['expired']}
@@ -92,7 +92,7 @@ function insertRow(list) {
   <td width="150">{$LANG_PROFILE['orderby']}:</td>
   <td>
     <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_orderby', 'Help', 640, 480, 1)"><img src="{layout_url}/images/button_help.png" alt="" /></a>
+        onclick="popupWindow('{doc_url}#desc_orderby', 'Help', 640, 480, 1);return false;"><img src="{layout_url}/images/button_help.png" alt="" /></a>
     <input type="text" name="orderby" size="4" value="{orderby}" />
   </td>
 </tr>
