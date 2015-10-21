@@ -782,7 +782,7 @@ function {$this->name}_onUpdate(cal)
             $year = isset($vals[$this->name . '_year']) ?
                     $vals[$this->name . '_year'] : 0;
             USES_lglib_class_datecalc();
-            if (!lgDate::isValidDate($month, $day, $year)) return false;
+            if (!Date_Calc::isValidDate($month, $day, $year)) return false;
         }
         return true;
     }

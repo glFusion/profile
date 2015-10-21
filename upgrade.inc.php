@@ -495,26 +495,41 @@ function profile_upgrade_1_1_3()
 {
     global $_TABLES;
 
-    $sql = array(
-        "ALTER TABLE {$_TABLES['profile_def']}
-            ADD show_in_profile tinyint(1) NOT NULL DEFAULT 1 AFTER user_reg",
-        "ALTER TABLE {$_TABLES['profile_lists']}
+    // Special handling for adding show_in_profile. This function is called
+    // for the 1.1.3 and 1.1.4 update since the SQL wasn't include in new
+    // installations for 1.1.4
+    $sql = array();
+    $r = DB_query("SHOW COLUMNS FROM {$_TABLES['profile_def']}
+            LIKE 'show_in_profile'");
+    if (DB_numRows($r) < 1) {
+        $sql[] = "ALTER TABLE {$_TABLES['profile_def']}
+            ADD show_in_profile tinyint(1) NOT NULL DEFAULT 1 AFTER user_reg";
+    }
+
+    $need_update = false;   // assume it's done and check if it's needed
+    $r = DB_query("SHOW COLUMNS FROM {$_TABLES['profile_lists']} LIKE 'incl_user_state'");
+    $A = DB_fetchArray($r, false);
+    if ($A['Type'] !== 'varchar(64)') {
+        $sql[] = "ALTER TABLE {$_TABLES['profile_lists']}
             CHANGE incl_user_stat incl_user_stat varchar(64) NOT NULL
-            DEFAULT 'a:4:{i:1;i:1;i:2;i:2;i:3;i:3;i:4;i:4;}'",
-    );
+            DEFAULT 'a:4:{i:1;i:1;i:2;i:2;i:3;i:3;i:4;i:4;}'";
+        $need_update = true;    // later, to execute data conversion
+    }
     $status = profile_do_upgrade_sql('1.1.3', $sql);
     if ($status > 0) return $status;
 
-    $sql = "SELECT listid,incl_user_stat FROM {$_TABLES['profile_lists']}";
-    $res = DB_query($sql);
-    while ($A = DB_fetchArray($res, false)) {
-        $listid = DB_escapeString($A['listid']);
-        $ustat = (int)$A['incl_user_stat'];
-        if ($ustat == -1) $ustat = array(1,2,3,4);
-        else $ustat = array($ustat);
-        $nstat = DB_escapeString(@serialize($ustat));
-        DB_query("UPDATE {$_TABLES['profile_lists']} SET 
-                incl_user_stat = '$nstat' WHERE listid='$listid'");
+    if ($need_update) {     // updated profile_lists schema, now change data
+        $sql = "SELECT listid,incl_user_stat FROM {$_TABLES['profile_lists']}";
+        $res = DB_query($sql);
+        while ($A = DB_fetchArray($res, false)) {
+            $listid = DB_escapeString($A['listid']);
+            $ustat = (int)$A['incl_user_stat'];
+            if ($ustat == -1) $ustat = array(1,2,3,4);
+            else $ustat = array($ustat);
+            $nstat = DB_escapeString(@serialize($ustat));
+            DB_query("UPDATE {$_TABLES['profile_lists']} SET 
+                    incl_user_stat = '$nstat' WHERE listid='$listid'");
+        }
     }
     return $status;
 }
@@ -530,6 +545,9 @@ function profile_upgrade_1_1_4()
 {
     global $_TABLES, $LANG_PROFILE;
 
+    COM_errorLog('Performing 1.1.3 SQL updates if needed');
+    profile_upgrade_1_1_3();
+
     $sql = array(
         "ALTER TABLE {$_TABLES['profile_data']}
             ADD sys_lname varchar(40) AFTER sys_parent",
@@ -543,7 +561,7 @@ function profile_upgrade_1_1_4()
                     '{$LANG_PROFILE['fname']}', '', 1, 0),
                 (42, 'sys_fname', 'fname', 0, 0, 0,
                     '{$LANG_PROFILE['fname']}', '', 1, 0)",
-    ); 
+    );
     $status = profile_do_upgrade_sql('1.1.4', $sql);
     if ($status > 0) return $status;
 

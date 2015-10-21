@@ -14,8 +14,7 @@
 /** @global array $_TABLES */
 global $_TABLES;
 
-$_SQL['profile_def'] = "
-CREATE TABLE {$_TABLES['profile_def']} (
+$_SQL['profile_def'] = "CREATE TABLE {$_TABLES['profile_def']} (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `orderby` int(11) unsigned DEFAULT NULL,
   `name` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
@@ -56,7 +55,7 @@ $_SQL['profile_lists'] = "CREATE TABLE `{$_TABLES['profile_lists']}` (
   `fields` text,
   `group_id` int(11) unsigned DEFAULT '13',
   `incl_grp` int(11) unsigned DEFAULT '2',
-  `incl_user_stat` tinyint(2) not null default -1,
+  `incl_user_stat` varchar(64) NOT NULL DEFAULT 'a:4:{i:1;i:1;i:2;i:2;i:3;i:3;i:4;i:4;}',
   `incl_exp_stat` tinyint(2) not null default 7,
   PRIMARY KEY (`listid`)
 )";
