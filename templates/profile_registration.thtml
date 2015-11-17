@@ -1,4 +1,9 @@
 {# begin {templatelocation} #}
+  <script>
+  $(function() {
+    $( document ).tooltip();
+  });
+  </script>
 <!-- BEGIN QueueRow -->
   <p>
   {!if spancols}

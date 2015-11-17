@@ -775,7 +775,7 @@ class prfList
     public function Edit()
     {
         global $_CONF, $_TABLES, $LANG_PROFILE, $LANG_ACCESS, $_PLUGINS,
-                $LANG28, $LANG04;
+                $LANG28, $LANG04, $_SYSTEM;
 
         $T = new Template(PRF_PI_PATH . 'templates/admin/');
         $T->set_file('editform', 'list.thtml');
@@ -795,6 +795,7 @@ class prfList
             'referrer'      => isset($_POST['referrer']) ? 
                     $_POST['referrer'] : PRF_ADMIN_URL . '/index.php?lists=x',
             'doc_url'   => PRF_getDocURL('list_def.html'),
+            'mootools' => $_SYSTEM['disable_mootools'] ? '' : 'true',
         ) );
 
         foreach (array(1,2,4) as $stat) {

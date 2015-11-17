@@ -1,9 +1,10 @@
 {# begin {templatelocation} #}
 <script type="text/javascript">
+{!if mootools}
 window.addEvent('domready',function() {
     var myValidator = new fValidator("frm1");
 });
-
+{!endif}
 function insertRow(list) {
     var count = list.getElementsByTagName('li').length;
     var new_element = document.createElement('li');
@@ -27,7 +28,11 @@ function insertRow(list) {
   <td>
     <a href="#" class="toolbar" 
         onclick="popupWindow('{doc_url}#desc_name', 'Help', 640, 480, 1);return false;"><img src="{layout_url}/images/button_help.png" alt="" /></a>
-    <input type="text" class="fValidate['required']" size="32" name="listid" 
+    {!if mootools}
+    <input type="text" class="fValidate['required']" size="32" name="listid"
+    {!else}
+    <input type="text" class="required" size="32" name="listid"
+    {!endif}
         value="{listid}" id="f_listid" />
   </td>
 </tr>
@@ -37,7 +42,11 @@ function insertRow(list) {
   <td>
     <a href="#" class="toolbar" 
         onclick="popupWindow('{doc_url}#desc_title', 'Help', 640, 480, 1);return false;"><img src="{layout_url}/images/button_help.png" alt="" /></a>
-    <input type="text" class="fValidate['required']" size="80" 
+    {!if mootools}
+    <input type="text" class="fValidate['required']" size="80"
+    {!else}
+    <input type="text" class="required" size="80"
+    {!endif}
         name="title" value="{title}" id="f_title" />
   </td>
 </tr>

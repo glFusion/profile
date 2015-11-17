@@ -1,7 +1,12 @@
 {# begin {templatelocation} #}
 <script type="text/javascript">
 
-window.addEvent('domready',function() {
+{!if mootools}
+window.addEvent('domready',
+{!else}
+$(document).ready(
+{!endif}
+function() {
     var myValidator = new fValidator("frm1");
 });
 
@@ -478,7 +483,12 @@ function multichk_insertRow(list) {
 <script type="text/javascript">
   // Change the form according to the initial type.  The oldtype value may
   // be empty for a new item, so the default (text) fields will be activated.
-  window.addEvent('load', function() {
+{!if mootools}
+  window.addEvent('load',
+{!else}
+$(document).ready(
+{!endif}
+function() {
     PRF_changeType("{oldtype}");
   });
 </script>

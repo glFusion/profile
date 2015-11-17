@@ -1,9 +1,4 @@
 {# begin {templatelocation} #}
-<script language="javascript" type="text/javascript">
-//window.addEvent('domready',function() {
-//    var myValidator = new fValidator("{form_id}");
-//});
-</script>
 <table class="pluginProfileBlock">
 <!-- BEGIN QueueRow -->
 <tr class="{fld_class}">

@@ -22,7 +22,7 @@
 */
 function PRF_editForm($type = 'edit', $uid = 0, $form_id='profileform')
 {
-    global $_CONF, $_USER, $_TABLES, $LANG_PROFILE;
+    global $_CONF, $_USER, $_TABLES, $LANG_PROFILE, $_SYSTEM;
 
     $T = new Template(PRF_PI_PATH . 'templates');
 
@@ -52,6 +52,7 @@ function PRF_editForm($type = 'edit', $uid = 0, $form_id='profileform')
     $T->set_var(array(
         'uid'       => $uid,
         'form_id'   => $form_id,
+        'have_jquery' => $_SYSTEM['disable_jquery'] ? '' : 'true',
     ) );
 
     // Flag to make sure calendar javascript is added only once.  It's

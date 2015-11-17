@@ -136,9 +136,12 @@ class prfItem
     */
     protected function _FormFieldInit()
     {
+        global $_SYSTEM;
+
         // Check for required status.  May need to excluded dates from this...
         if ($this->required == 1) {
-            $this->_frmClass = "class=\"fValidate['required']\" ";
+            $this->_frmClass = $_SYSTEM['disable_jquery'] ? "class=\"fValidate['required']\" " :
+                    'class="required" ';
             $this->user_reg = 1;
         } else {
             $this->_frmClass = '';
