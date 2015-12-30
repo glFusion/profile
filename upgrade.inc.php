@@ -497,7 +497,7 @@ function profile_upgrade_1_1_3()
 
     // Special handling for adding show_in_profile. This function is called
     // for the 1.1.3 and 1.1.4 update since the SQL wasn't include in new
-    // installations for 1.1.4
+    // installations for 1.1.3
     $sql = array();
     $r = DB_query("SHOW COLUMNS FROM {$_TABLES['profile_def']}
             LIKE 'show_in_profile'");

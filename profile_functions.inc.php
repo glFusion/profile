@@ -161,7 +161,7 @@ function PRF_saveData($vals, $uid = 0, $type = 'edit')
     foreach ($A as $name => $data) {
         // Now make changes based on the type of data and applicable options.
         // Managers can override normal validations.
-        if (!$data->validData($vals[$name]) && !PRF_isManager()) {
+        if (!$data->validData($vals[$name], $vals) && !PRF_isManager()) {
             // We could just return false here, but instead continue checking so
             // we can show the user all the errors, not just the first.
             $msg = empty($data->options['help_text']) ?
