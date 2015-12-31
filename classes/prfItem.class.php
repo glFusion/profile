@@ -71,7 +71,7 @@ class prfItem
     *   @param  mixed   $value  Optional value to assign
     *   @param  integer $uid    Optional user ID, current user by default
     */
-    function __construct($item, $value='', $uid = '')
+    public function __construct($item, $value='', $uid = '')
     {
         global $_USER, $_TABLES;
 
@@ -124,7 +124,7 @@ class prfItem
     *
     *   @return string  Value formatted for display
     */
-    function FormatValue($value = '')
+    public function FormatValue($value = '')
     {
         if ($value == '') $value = $this->value;
         return htmlspecialchars($value);
@@ -140,12 +140,13 @@ class prfItem
 
         // Check for required status.  May need to excluded dates from this...
         if ($this->required == 1) {
-            $this->_frmClass = $_SYSTEM['disable_jquery'] ? "class=\"fValidate['required']\" " :
-                    'class="required" ';
+            $this->_frmClass = $_SYSTEM['disable_jquery'] ?
+                "class=\"fValidate['required']\" " :
+                'required';
             $this->user_reg = 1;
         } else {
             $this->_frmClass = '';
-       }
+        }
 
         // If POSTed form data, set the user variable to that.  Otherwise,
         // set it to the default or leave it alone.
@@ -196,7 +197,7 @@ class prfItem
     *
     *   @return array   Field options
     */
-    function Options()
+    public function Options()
     {
         return $this->options;
     }
@@ -211,7 +212,7 @@ class prfItem
     *   @param  mixed   $val    Current field value
     *   @return mixed           Sanitized value.
     */
-    function Sanitize($val)
+    public function Sanitize($val)
     {
         //$val = COM_checkWords(COM_checkHTML($val));
         return $val;
@@ -290,7 +291,7 @@ class prfText extends prfItem
 */
 class prfTextarea extends prfItem
 {
-    function FormField()
+    public function FormField()
     {
         global $LANG_PROFILE, $_CONF;
 
@@ -314,7 +315,7 @@ class prfTextarea extends prfItem
     *   @param  string  $value  Optional value, current value if empty
     *   @return         Formatted value for display.
     */
-    function FormatValue($value = '')
+    public function FormatValue($value = '')
     {
         if (empty($value))
             $value = $this->value;
@@ -331,7 +332,7 @@ class prfTextarea extends prfItem
     *   @param  string  $val    Original value
     *   @return string          Sanitized version.
     */
-    function Sanitize($val)
+    public function Sanitize($val)
     {
         return COM_checkWords($val);
     }
@@ -355,8 +356,7 @@ class prfTextarea extends prfItem
 */
 class prfLink extends prfItem
 {
-
-    function FormatValue($value = '')
+    public function FormatValue($value = '')
     {
         global $_PRF_CONF, $_CONF;
 
@@ -372,7 +372,7 @@ class prfLink extends prfItem
             htmlspecialchars($value) . '</a>';
     }
 
-    function Sanitize($val)
+    public function Sanitize($val)
     {
         $val = parent::Sanitize($val);
         $val = COM_sanitizeURL($val);
@@ -387,8 +387,7 @@ class prfLink extends prfItem
 */
 class prfStatic extends prfItem
 {
-
-    function __construct($item, $value='', $uid='')
+    public function __construct($item, $value='', $uid='')
     {
         parent::__construct($item, $value, $uid);
         $this->value = $this->options['value'];
@@ -400,7 +399,7 @@ class prfStatic extends prfItem
     *
     *   @return string  HTML for data entry field
     */
-    function FormField()
+    public function FormField()
     {
         return $this->options['value'];
     }
@@ -431,7 +430,7 @@ class prfDate extends prfItem
     *   @param  string  $value  Value to display, current value by default
     *   @return string  HTML for formatted field value
     */
-    function FormatValue($value = '')
+    public function FormatValue($value = '')
     {
         global $_PRF_CONF, $_CONF;
 
@@ -493,13 +492,12 @@ class prfDate extends prfItem
     *
     *   @return string      HTML for month, day and year fields.
     */
-    function FormField()
+    public function FormField()
     {
         global $LANG_PROFILE, $_CONF;
 
         $this->_FormFieldInit();
 
-        //if ($this->options['showtime']) {
         if ($this->options['timeformat']) {
             $iFormat = '%Y-%m-%d %H:%M';
             list($date, $time) = explode(' ', $this->value);
@@ -642,7 +640,7 @@ function {$this->name}_onUpdate(cal)
     *
     *   @return array   Array of date formats
     */
-    function DateFormats()
+    public function DateFormats()
     {
         global $LANG_PROFILE;
         $_formats = array(
@@ -678,7 +676,7 @@ function {$this->name}_onUpdate(cal)
     *   @param  integer $hour   Hour to convert
     *   @return array       array(new_hour, ampm_indicator)
     */
-    function hour24to12($hour)
+    public function hour24to12($hour)
     {
         if ($hour >= 12) {
             $ampm = 'pm';
@@ -698,7 +696,7 @@ function {$this->name}_onUpdate(cal)
     *   @param  boolean $pm     True if 'pm' is set
     *   @return integer     New hour
     */
-    function hour12to24($hour, $pm)
+    public function hour12to24($hour, $pm)
     {
         if ($pm) {
             if ($hour < 12) $hour += 12;
@@ -802,7 +800,7 @@ class prfCheckbox extends prfItem
     *   Constructor.
     *   Set up the options array
     */
-    function __construct($item, $value='', $uid='')
+    public function __construct($item, $value='', $uid='')
     {
         parent::__construct($item, $value, $uid);
     }
@@ -814,7 +812,7 @@ class prfCheckbox extends prfItem
     *   @param  integer $value  Optional value.  "1" = on, "0" = off
     *   @return string          String corresponding to value.
     */
-    function FormatValue($value = 0)
+    public function FormatValue($value = 0)
     {
         global $LANG_PROFILE; 
 
@@ -832,7 +830,7 @@ class prfCheckbox extends prfItem
     *
     *   @return string  HTML for checkbox field, with prompt string
     */
-    function FormField()
+    public function FormField()
     {
         $this->_FormFieldInit();
 
@@ -859,7 +857,7 @@ class prfCheckbox extends prfItem
     *   @param  integer $val    Starting value
     *   @return integer         Sanitized value, either 1 or 0
     */
-    function Sanitize($val)
+    public function Sanitize($val)
     {
         $val = $val == 1 ? 1 : 0;
         return $val;
@@ -871,7 +869,7 @@ class prfCheckbox extends prfItem
     *   FValidator doesn't work right, so don't use it and allow
     *   the submission handling to deal with empty checkboxes.
     */
-    function _FormFieldInit()
+    protected function _FormFieldInit()
     {
         parent::_FormFieldInit();
         $this->_frmClass = '';
@@ -922,7 +920,7 @@ class prfRadio extends prfItem
     *   @param  string  $value  Optional value to assign, serialized array
     *   @param  integer $uid    Optional user ID, current user by default
     */
-    function __construct($item, $value='', $uid='')
+    public function __construct($item, $value='', $uid='')
     {
         parent::__construct($item, $value, $uid);
         if (!isset($this->options['values'])) {
@@ -939,7 +937,7 @@ class prfRadio extends prfItem
     *
     *   @return string  HTML for radio buttons & prompts
     */
-    function FormField()
+    public function FormField()
     {
         $this->_FormFieldInit();
 
@@ -958,7 +956,7 @@ class prfRadio extends prfItem
             $sel = $this->value == $value ? PRF_CHECKED : '';
             $fld .= "<input $this->_frmClass type=\"radio\" name=\"{$this->name}\" 
                     id=\"{$this->name}\"
-                    value=\"$value\" $sel $this->_frmReadonly>$value&nbsp;\n";
+                    value=\"" . htmlentities($value) . "\" $sel $this->_frmReadonly>$value&nbsp;\n";
         }
         return $fld;
     }
@@ -1009,7 +1007,7 @@ class prfSelect extends prfItem
     *   @param  mixed   $value  Optional value to assign
     *   @param  integer $uid    Optional user ID, current user by default
     */
-    function __construct($item, $value='', $uid='')
+    public function __construct($item, $value='', $uid='')
     {
         parent::__construct($item, $value, $uid);
         if (!isset($this->options['values'])) {
@@ -1026,7 +1024,7 @@ class prfSelect extends prfItem
     *
     *   @return string  HTML for selection dropdown.  Included <select> tags.
     */
-    function FormField()
+    public function FormField()
     {
         global $LANG_PROFILE;
 
@@ -1041,17 +1039,6 @@ class prfSelect extends prfItem
         }
         $fld .= "</select>\n";
         return $fld; 
-    }
-
-
-    /**
-    *   Get the available options for this item
-    *
-    *   @return array   Options array
-    */
-    function Options()
-    {
-        return $this->options;
     }
 
 
@@ -1099,7 +1086,7 @@ class prfMultiCheck extends prfItem
     *   @param  mixed   $value  Optional value to assign
     *   @param  integer $uid    Optional user ID, current user by default
     */
-    function __construct($item, $value='', $uid='')
+    public function __construct($item, $value='', $uid='')
     {
         parent::__construct($item, $value, $uid);
         // One more unserialization needed for multicheck values
@@ -1119,7 +1106,7 @@ class prfMultiCheck extends prfItem
     *
     *   @return string  HTML for radio buttons & prompts
     */
-    function FormField()
+    public function FormField()
     {
         $this->_FormFieldInit();
 
@@ -1155,24 +1142,13 @@ class prfMultiCheck extends prfItem
     *   @param  integer $value  Not used, just for consistency
     *   @return string          String corresponding to value.
     */
-    function FormatValue($value = '')
+    public function FormatValue($value = '')
     {
         if (is_string($value)) $value = @unserialize($value);
         if (!is_array($value)) $value = $this->value;
         if (is_array($value)) $formatted = implode(', ', $value);
         else $formatted = '';
         return $formatted;
-    }
-
-
-    /**
-    *   Get the available options for this item
-    *
-    *   @return array   Options array
-    */
-    function Options()
-    {
-        return $this->options;
     }
 
 
@@ -1231,32 +1207,12 @@ class prfMultiCheck extends prfItem
 class prfAccount extends prfItem
 {
     /**
-    *   Constructor.
-    *   Set up the values array
-    *
-    *   @param  mixed   $item   Name of item, or array of info
-    *   @param  mixed   $value  Optional value to assign
-    *   @param  integer $uid    Optional user ID, current user by default
-    */
-    /*function __construct($item, $value, $uid='')
-    {
-        parent::__construct($item, $value, $uid);
-        if (!isset($this->options['values'])) {
-            $this->options['values'] = array();
-        } elseif (!is_array($this->options['values'])) {
-            $this->options['values'] = @unserialize($this->options['values']);
-            if (!$this->options['values']) $this->options['values'] = array();
-        }
-    }*/
-
-
-    /**
     *   Create the data entry field
     *
     *   @uses   AccountSelection();
     *   @return string  HTML for selection dropdown.  Includes <select> tags.
     */
-    function FormField()
+    public function FormField()
     {
         global $LANG_PROFILE;
 
@@ -1281,7 +1237,7 @@ class prfAccount extends prfItem
     *   @param  integer $selected   Currently-selected value
     *   @return string              HTML for selection options
     */
-    function AccountSelection($selected = 0)
+    public function AccountSelection($selected = 0)
     {
         global $_TABLES;
 
@@ -1301,7 +1257,7 @@ class prfAccount extends prfItem
     }
 
 
-    function FormatValue($value = 0)
+    public function FormatValue($value = 0)
     {
         global $_CONF, $_TABLES, $LANG_PROFILE;
 
