@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- $Id: photocomp.html 394 2009-07-23 22:48:26Z root $ -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1" />
+  <link rel="stylesheet" type="text/css" href="../../docs/layout/style.css" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Custom Profiles - Field Definitions - glFusion CMS</title>
+</head>
+<body style="direction: ltr;">
+  <div id="gl_container_fluid">
+    <div id="gl_header"> <span style="color: rgb(255, 255, 255); float: left; padding-left: 10px; padding-top: 5px; vertical-align: middle;">glFusion
+Documentation Project </span> <a style="float: right; padding-right: 10px; padding-top: 5px; vertical-align: middle;" href="http://www.glfusion.org/wiki/doku.php">glFusion Wiki</a>
+    </div>
+
+    <div id="gl_wrapper">
+      <div class="body-container">
+        <h1>Custom Profile Field Definitions</h1>
+        <table class="inline">
+        <tbody>
+        <th class="col0 leftalign" colspan="2">Field Definitions</th>
+        <tr class="row0">
+          <td class="col0 leftalign"><a name="desc_fieldname"></a>Field Name</td>
+          <td class="col1 leftalign">This is the name of the custom field used in the database.  It must be unique.</td>
+        </tr>
+        <tr class="row1">
+          <td class="col0 leftalign"><a name="desc_prompt"></a>Text Prompt</td>
+          <td class="col1 leftalign">This is the text that will be displayed next to the fields in forms and display screens.  For example, a custom field named "birthdate" might have a prompt of "Birth Date".</td>
+        </tr>
+        <tr class="row2">
+          <td class="col0 leftalign"><a name="desc_type"></a>Field Type</td>
+          <td class="col1 leftalign">Select the type of field to be used.  This selection will determin which of the remaining options are displayed.</td>
+        </tr>
+        <tr>
+          <td><a name="desc_length"></a>Length</td>
+          <td>(Type=text) These values determind the display length and actual maximum length of entries that can be made.</td>
+        </tr>
+        <tr>
+          <td><a name="desc_default"></a>Default Value</td>
+          <td>(Type=text, radio, checkbox) Enter the default value for this field.  For text fields, this is a simple string.  For radio buttons, enter the value corresponding to the option to be selected as default.  For checboxes, enter either 1 or 0.</td>
+        </tr>
+        <tr>
+          <td><a name="desc_mask"></a>Field Mask (TESTING)</td>
+          <td>(Type=text) Enter the mask string to be used with iMask for this field.
+<ul><li>"9" represents a digit.</li>
+<li>"A" represents a letter.</li>
+<li>"X" represents an alphanumeric character.</li></ul>
+          </td>
+        </tr>
+        <tr>
+          <td><a name="desc_showtime"></a>Show Time?</td>
+          <td>(Type=date) Check this box if the time selector is to be available on the datepicker.</td>
+        </tr>
+        <tr>
+          <td><a name="desc_24hr"></a>12 or 24-hour format?</td>
+          <td>(Type=date) Select whether times will be entered in 12-hour or 24-hour format.</td>
+        </tr>
+        <tr>
+          <td><a name="desc_format"></a>Format</td>
+          <td>(Type=date) Enter the format string to be used for the date/time.  Refer to the PHP date formats for more information.</td>
+        </tr>
+        <tr>
+          <td><a name="desc_value"></a>Value</td>
+          <td>(Type=radio, dropdown) This is a string which indicates the possible values for dropdown selections and radio buttons.  The format is "value:text;value:text;..."  For example, to have two radio buttons labeled "Red" and "Blue", which return values of "R" and "B" respectively, you would enter "R:Red;B:Blue" as the value.</td>
+        </tr>
+        <tr>
+          <td><a name="desc_readonly"></a>Readonly</td>
+          <td>Checking this box indicates that regular users cannot change the values.</td>
+        </tr>
+        <tr>
+          <td><a name="desc_enabled"></a>Enabled</td>
+          <td>Check this box to enable the field, uncheck to disable.  This allows the administrator to prevent some fields from being used without deleting them.  (Deleting a custom field also deletes all user data associated with it).</td>
+        </tr>
+        <tr>
+        <tr>
+          <td><a name="desc_required"></a>Required</td>
+          <td>Check this box to make the field required.  This also implies that the field will be displayed on the user registration page.</td>
+        </tr>
+        <tr>
+          <td><a name="desc_registration"></a>Enter at Registration?</td>
+          <td>Check this box to have the field appear on the user signup page.  This is implied if 'required' is selected.</td>
+        </tr>
+        <tr>
+          <td><a name="desc_position"></a>Position After</td>
+          <td>Select the existing custom field after which this field will appear.  New fields appear at the bottom of the list by default.  You may change the field order at any time.</td>
+        </tr>
+        </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
