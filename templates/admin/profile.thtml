@@ -2,14 +2,10 @@
 <script type="text/javascript">
 
 {!if mootools}
-window.addEvent('domready',
-{!else}
-$(document).ready(
-{!endif}
-function() {
+window.addEvent('domready', function() {
     var myValidator = new fValidator("frm1");
 });
-
+{!endif}
 function setName(x) {
     if (x.value != '') {
         x.value = x.value.replace('prf_','');
