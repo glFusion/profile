@@ -90,6 +90,8 @@ $PRF_sampledata = array(
             'a:2:{s:4:\"size\";i:2;s:9:\"maxlength\";i:2;}', 0, 3),
         (90, 'prf_zip', 'text', 1, 1, 1, 'Zip Code', 
             'a:2:{s:4:\"size\";i:10;s:9:\"maxlength\";i:10;}', 0, 3),
+        (95, 'prf_phone', 'text', 1, 0, 0, 'Phone Number', 
+            'a:5:{s:7:\"default\";s:0:\"\";s:9:\"help_text\";s:23:\"Enter your phone number\";s:4:\"size\";i:40;s:9:\"maxlength\";i:255;s:7:\"autogen\";i:0;}', 0, 3),
         (100, 'prf_favcolor', 'radio', 1, 1, 1, 'Favorite color', 
             'a:2:{s:6:\"values\";a:3:{i:1;s:3:\"Red\";i:2;s:4:\"Blue\";i:3;s:6:\"Yellow\";}s:7:\"default\";s:1:\"2\";}', 0, 3),
         (110, 'prf_birthdate', 'date', 1, 1, 1, 'BirthDate', 
