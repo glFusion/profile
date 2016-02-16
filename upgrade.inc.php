@@ -562,22 +562,26 @@ function profile_upgrade_1_1_4()
                 (42, 'sys_fname', 'fname', 0, 0, 0,
                     '{$LANG_PROFILE['fname']}', '', 1, 0)",
     );
-    // Check if a "prf_phone" column exists in the data table and
-    // add the definition if so. The def was omitted when the sample
-    // data was originally added.
+    // Check if a "prf_phone" column exists in the data table but
+    // missing from the definition table and add the definition if
+    // needed.
+    // The def was omitted when the sample data was originally added.
     $r = DB_query("SHOW COLUMNS FROM {$_TABLES['profile_data']}
             LIKE 'prf_phone'");
     if (DB_numRows($r) == 1) {
-        $sql[] = "INSERT INTO {$_TABLES['profile_def']}
-            (orderby, name, type, enabled, required, user_reg,
-            prompt, options, sys, perm_owner)
-            VALUES
-                (95, 'prf_phone', 'text', 1, 0, 0, 'Phone Number', 
-            'a:5:{s:7:\"default\";s:0:\"\";s:9:\"help_text\";\
-            s:23:\"Enter your phone number\";s:4:\"size\";\
-            i:40;s:9:\"maxlength\";i:255;s:7:\"autogen\";i:0;}', 0, 3)",
+        $r2 = DB_count($_TABLES['profile_def'], 'name', 'prf_phone');
+        if ($r2 > 0) {
+            $sql[] = "INSERT INTO {$_TABLES['profile_def']}
+                (orderby, name, type, enabled, required, user_reg,
+                prompt, options, sys, perm_owner)
+                VALUES
+                    (95, 'prf_phone', 'text', 1, 0, 0, 'Phone Number', 
+                'a:5:{s:7:\"default\";s:0:\"\";s:9:\"help_text\";\
+                s:23:\"Enter your phone number\";s:4:\"size\";\
+                i:40;s:9:\"maxlength\";i:255;s:7:\"autogen\";i:0;}', 0, 3)",
+        }
     }
- 
+
     $status = profile_do_upgrade_sql('1.1.4', $sql);
     if ($status > 0) return $status;
 
