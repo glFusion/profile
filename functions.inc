@@ -529,6 +529,7 @@ function PRF_getDefs($uid = 0, $key = '', $access = 2)
     $res = DB_query($sql, 1);
     if (DB_error()) return array();
 
+    // Get the data record for this field
     $sql = "SELECT * FROM {$_TABLES['profile_data']} WHERE puid='$uid'";
     $res1 = DB_query($sql, 1);
     if (DB_error()) return array();
@@ -541,18 +542,7 @@ function PRF_getDefs($uid = 0, $key = '', $access = 2)
             $tmp['value'] = $A[$tmp['name']];
         else
             $tmp['value'] = NULL;
-        
-        if (class_exists($classname)) {
-            $F[$tmp['name']] = new $classname($tmp, $value, $uid);
-        } else {
-            $F[$tmp['name']] = new prfText($tmp, $value, $uid);
-        }
-
-        /*$A[$name]['value_text'] = $F->FormatValue();
-        $A[$name]['value'] = $F->value;
-        $A[$name]['options'] = $F->options;
-        $A[$name]['type'] = $fields[$name]['type'];
-        $A[$name]['field'] = $F;*/
+        $F[$tmp['name']] = prfItem::getClass($tmp, $value, $uid);    
     }
     return $F;
 }
@@ -1106,6 +1096,5 @@ function PRF_isAdmin()
     }
     return $isAdmin;
 }
-
 
 ?>

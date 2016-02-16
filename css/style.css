@@ -50,3 +50,10 @@ fieldset.pluginProfileForm {
 .profile_error {
     background-color: #FF9999;
 }
+
+span.prfNewAdminItem {
+    font-style: italic;
+    font-weight: bold;
+    color: red;
+}
+

@@ -942,7 +942,8 @@ function PRF_adminMenu($page='list')
 
     if ($page == 'list') {
         $menu_arr[] = array('url' => PRF_ADMIN_URL . '/index.php?edit=x',
-            'text' => $LANG_PROFILE['add_profile_item']);
+            'text' => '<span class="prfNewAdminItem">' .
+                $LANG_PROFILE['add_profile_item'] . '</span>');
     } else {
         $menu_arr[] = array('url' => PRF_ADMIN_URL . '/index.php',
             'text' => $LANG_PROFILE['list_profiles']);
@@ -950,7 +951,8 @@ function PRF_adminMenu($page='list')
 
     if ($page == 'lists') {
         $menu_arr[] = array('url' => PRF_ADMIN_URL . '/index.php?editlist=',
-            'text' => $LANG_PROFILE['newlist']);
+            'text' => '<span class="prfNewAdminItem">' .
+                $LANG_PROFILE['newlist'] . '</span>');
     } else {
         $menu_arr[] = array('url' => PRF_ADMIN_URL . '/index.php?lists=x',
             'text' => $LANG_PROFILE['lists']);
@@ -1038,10 +1040,10 @@ function PRF_searchUsersForm()
         case 'checkbox':
             $fld = '<input type="radio" name="'. $A['name'].'" value="1">' .
                 $LANG_PROFILE['checked'] . '&nbsp;' .
-                '<input type="radio" name="'. $A['name'].'" value="0">' .
+                '<input type="radio" name="'. $A['name'].'" value="0" />' .
                 $LANG_PROFILE['unchecked'] . '&nbsp;' .
                 '<input type="radio" name="'. $A['name'].
-                    '" value="-1" ' . PRF_CHECKED . '>' . $LANG_PROFILE['any'];
+                    '" value="-1" ' . PRF_CHECKED . ' />' . $LANG_PROFILE['any'];
             break;
         case 'radio':
         case 'dropdown':
@@ -1050,11 +1052,12 @@ function PRF_searchUsersForm()
             if (isset($options['values']) && is_array($options['values'])) {
                 foreach ($options['values'] as $valname) {
                     $fld .= '<input type="radio" name="'.$A['name'] .
-                        '" value="'.$valname.'">'.$valname.'&nbsp;';
+                        '" value="'.htmlentities($valname, ENT_QUOTES) .
+                        '" />'.$valname.'&nbsp;';
                 }
             }
             $fld .= '<input type="radio" name="'.$A['name'].
-                '" value="-1" ' . PRF_CHECKED . '>' . $LANG_PROFILE['any'];
+                '" value="-1" ' . PRF_CHECKED . '/>' . $LANG_PROFILE['any'];
             break;
         case 'multicheck':
             $options = @unserialize($A['options']);
@@ -1062,11 +1065,13 @@ function PRF_searchUsersForm()
             if (isset($options['values']) && is_array($options['values'])) {
                 foreach ($options['values'] as $valname) {
                     $fld .= '<input type="checkbox" name="'.$A['name'] .
-                        '[]" value="'.$valname.'">'.$valname.'&nbsp;';
+                        '[]" value="' . htmlendities($valname, ENT_QUOTES) .
+                        '" />'.$valname.'&nbsp;';
                 }
             }
-            $fld .= '<input type="radio" name="'.$A['name'].
-                '[]" value="-1" ' . PRF_CHECKED . '>' . $LANG_PROFILE['any'];
+            $fld .= '<input type="checkbox" name="'.$A['name'].
+                '[]" value="-1" />' . $LANG_PROFILE['any'];
+            $fld_empty = 'true';    // Can be empty
             break;
         default:
             $fld = '<input type="text" size="50" name="'.$A['name'].'" value="" />';

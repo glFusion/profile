@@ -271,6 +271,26 @@ class prfItem
         else return true;
     }
 
+
+    /**
+    *   Get a class based on the type of field definition.
+    *   If the requested class doesn't exist, return prfText() object.
+    *
+    *   @param  array   $A      Row from profile_def table
+    *   @param  mixed   $value  Data value to pass to class
+    *   @param  integer $uid    User ID to pass to class
+    *   @return object          Class instsnce
+    */
+    public static function getClass($A, $value='', $uid=0)
+    {
+        $classname = 'prf' . $A['type'];
+        if (class_exists($classname)) {
+            return new $classname($A, $value, $uid);
+        } else {
+            return new prfText($A, $value, $uid);
+        }
+    }
+ 
 }   // class prfItem
 
 
@@ -933,7 +953,8 @@ class prfRadio extends prfItem
 
 
     /**
-    *   Create the data entry field
+    *   Create the data entry field.
+    *   Creates radio buttons in a line.
     *
     *   @return string  HTML for radio buttons & prompts
     */
@@ -954,9 +975,11 @@ class prfRadio extends prfItem
         $fld = '';
         foreach ($this->options['values'] as $id=>$value) {
             $sel = $this->value == $value ? PRF_CHECKED : '';
-            $fld .= "<input $this->_frmClass type=\"radio\" name=\"{$this->name}\" 
-                    id=\"{$this->name}\"
-                    value=\"" . htmlentities($value) . "\" $sel $this->_frmReadonly>$value&nbsp;\n";
+            $fld .= "<input $this->_frmClass type=\"radio\"
+                name=\"{$this->name}\" 
+                id=\"{$this->name}\"
+                value=\"" . htmlentities($value, ENT_QUOTES) .
+                "\" $sel {$this->_frmReadonly}/>$value&nbsp;\n";
         }
         return $fld;
     }

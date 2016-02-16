@@ -18,8 +18,8 @@
 <!-- END FldRow -->
 </table>
 
-<input type="submit" name="dousersearch" value="{$LANG_ADMIN['submit']}" />
-<input type="reset" name="searchreset" value="{$LANG_PROFILE['reset']}" />
+<input class="uk-button uk-button-primary" type="submit" name="dousersearch" value="{$LANG_ADMIN['submit']}" />
+<input class="uk-button" type="reset" name="searchreset" value="{$LANG_PROFILE['reset']}" />
 </form>
 
 {# end {templatelocation} #}

@@ -465,13 +465,13 @@ function multichk_insertRow(list) {
 </table>
 </fieldset>
 
-<input type="submit" name="savedef" value="{$LANG_ADMIN['submit']}" />
-<input type="reset" name="reset" value="{$LANG_PROFILE['reset']}" />
-<input type="reset" name="cancel" value="{$LANG_ADMIN['cancel']}" 
+<input class="uk-button uk-button-success" type="submit" name="savedef" value="{$LANG_ADMIN['submit']}" />
+<input class="uk-button" type="reset" name="reset" value="{$LANG_PROFILE['reset']}" />
+<input class="uk-button uk-button-primary" type="reset" name="cancel" value="{$LANG_ADMIN['cancel']}" 
     onclick="javascript:document.location.href='{site_url}/admin/plugins/profile/index.php';" />
 {!if is_sys}
 {!else}
-  <input type="submit" name="deletedef" value="{$LANG_ADMIN['delete']}" 
+  <input class="uk-button uk-button-danger" type="submit" name="deletedef" value="{$LANG_ADMIN['delete']}" 
     onclick="return confirm('Do you really want to delete this item?');" />
 {!endif}
 </form>
