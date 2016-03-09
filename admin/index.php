@@ -338,7 +338,7 @@ function PRF_adminForm($id)
         'stripmask_chk' => (isset($opts['stripmask']) && $opts['stripmask']  == 1) ? 
                         PRF_CHECKED : '',
         'group_dropdown' => SEC_getGroupDropdown($A['group_id'], 3),
-        'permissions' => SEC_getPermissionsHTML(
+        'permissions' => PRF_getPermissionsHTML(
                 $A['perm_owner'],$A['perm_group'],
                 $A['perm_members'],$A['perm_anon']),
         'plugin_options' => COM_optionList($_TABLES['plugins'], 

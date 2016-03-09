@@ -1,0 +1,63 @@
+{# begin {templatelocation} #}
+
+{# permissions block #}
+  <div class="uk-form-row">
+    <table class="uk-table uk-table-hover uk-table-striped uk-table-condensed">
+      <tr>
+        <th class="uk-text-left">Group</th>
+        <th class="uk-text-center">Read & Write</th>
+        <th class="uk-text-center">Read Only</th>
+        <th class="uk-text-center">No Access</th>
+      </tr>
+      <tr>
+        <td>{$LANG_ACCESS['owner']}</td>
+        <td class="uk-text-center">
+          <input name="perm_owner[]" type="radio" value="3" {owner_chk_3} />
+        </td>
+        <td class="uk-text-center">
+          <input name="perm_owner[]" type="radio" value="2" {owner_chk_2} />
+        </td>
+        <td class="uk-text-center">
+          <input name="perm_owner[]" type="radio" value="0" {owner_chk_0} />
+        </td>
+      </tr>
+      <tr>
+        <td>{$LANG_ACCESS['group']}</td>
+        <td class="uk-text-center">
+          <input name="perm_group[]" type="radio" value="3" {grp_chk_3} />
+        </td>
+        <td class="uk-text-center">
+          <input name="perm_group[]" type="radio" value="2" {grp_chk_2} />
+        </td>
+        <td class="uk-text-center">
+          <input name="perm_group[]" type="radio" value="0" {grp_chk_0} />
+        </td>
+      </tr>
+      <tr>
+        <td>{$LANG_ACCESS['members']}</td>
+        <td class="uk-text-center">
+          <input name="perm_members[]" type="radio" value="3" disabled="disabled" />
+        </td>
+        <td class="uk-text-center">
+          <input name="perm_members[]" type="radio" value="2" {members_chk_2} />
+        </td>
+        <td class="uk-text-center">
+          <input name="perm_members[]" type="radio" value="0" {members_chk_0} />
+        </td>
+      </tr>
+      <tr>
+        <td>{$LANG_ACCESS['anonymous']}</td>
+        <td class="uk-text-center">
+          <input name="perm_anon[]" type="radio" value="3" disabled="disabled" />
+        </td>
+        <td class="uk-text-center">
+          <input name="perm_anon[]" type="radio" value="2" {anon_chk_2} />
+        </td>
+        <td class="uk-text-center">
+          <input name="perm_anon[]" type="radio" value="0" {anon_chk_0} />
+        </td>
+      </tr>
+    </table>
+
+  </div> {# end of row #}
+{# end {templatelocation} #}

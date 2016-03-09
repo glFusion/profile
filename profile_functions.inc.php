@@ -59,6 +59,9 @@ function PRF_editForm($type = 'edit', $uid = 0, $form_id='profileform')
     // only added if there's at least one calendar field.
     $T->set_block('editform', 'QueueRow', 'qrow');
     foreach ($A as $fldname => $data) {
+/*if ($fldname == 'prf_address1') {
+var_dump($data);die;
+}*/
 
         // Could do this in SQL, but why complicate PRF_getDefs()?
         // If the field is not required and is not to appear on the signup
@@ -85,11 +88,14 @@ function PRF_editForm($type = 'edit', $uid = 0, $form_id='profileform')
 
         // Set a flag to indicate that this is a static field.  No status
         // indicators need to be shown.
-        if ($data->type == 'static') {
+        if ($data->type == 'static' || $data->type == 'system') {
             $T->set_var('is_static', 'true');
         } else {
             $T->clear_var('is_static');
         }
+/*if ($data->name == 'sys_fname') {
+var_dump($data);die;
+}*/
 
         // If POSTed form data, set the user variable to that.  Otherwise,
         // set it to the default or leave it alone.
@@ -489,7 +495,7 @@ function PRF_GroupDropdown($group_id, $access)
     $groupdd = '';
 
     if ($access == 3) {
-        $usergroups = SEC_getUserGroups();
+/*        $usergroups = SEC_getUserGroups();
 
         foreach ($usergroups as $ug_name => $ug_id) {
             $groupdd .= '<option value="' . $ug_id . '"';
@@ -497,7 +503,8 @@ function PRF_GroupDropdown($group_id, $access)
                 $groupdd .= ' ' . PRF_SELECTED;
             }
             $groupdd .= '>' . $ug_name . '</option>' . LB;
-        }
+        }*/
+        $groupdd = COM_optionList($_TABLES['groups'], 'grp_id,grp_name', $group_id);
     } else {
         // They can't set the group then
         $groupdd .= DB_getItem($_TABLES['groups'], 'grp_name',
@@ -542,5 +549,45 @@ function PRF_invokeService($type, $action, $args, &$output, &$svc_msg)
 
     return $retval;
 }
+
+
+/**
+*   Shows security control for an object
+*
+*   This will return the HTML needed to create the security control see on 
+*   screen for profile items.
+*   Taken from SEC_getPermissionsHTML() to allow for no owner access
+*
+*   @param  int     $perm_owner     Permissions the owner has 3 = read/write, 2 = read only, 0 = none
+*   @param  int     $perm_group     Permission the group has
+*   @param  int     $perm_members   Permissions logged in members have
+*   @param  int     $perm_anon      Permissions anonymous users have
+*   @return string  needed HTML (table) in HTML $perm_owner = array of permissions [edit,read], etc edit = 1 if permission, read = 2 if permission
+*/
+function PRF_getPermissionsHTML($perm_owner,$perm_group,$perm_members,$perm_anon)
+{
+    $retval = '';
+
+    // Convert "no access" permission values. GL < 1.5 used 1,2,3; 1.5+ used 0,2,3
+    if ($perm_owner == 1) $perm_owner = 0;
+    if ($perm_group == 1) $perm_group = 0;
+    if ($perm_members == 1) $perm_members = 0;
+    if ($perm_anon == 1) $perm_anon = 0;
+
+    $T = new Template(PRF_PI_PATH . 'templates/admin');
+    $T->set_file(array('editor'=>'edit_permissions.thtml'));
+
+    $T->set_var(array(
+        'owner_chk_' . $perm_owner  => PRF_CHECKED,
+        'grp_chk_' . $perm_group    => PRF_CHECKED,
+        'members_chk_' . $perm_members => PRF_CHECKED,
+        'anon_chk_' . $perm_anon => PRF_CHECKED,
+    ) );
+    $T->parse('output','editor');
+    $retval .= $T->finish($T->get_var('output'));
+
+    return $retval;
+}
+
 
 ?>
