@@ -557,10 +557,10 @@ function profile_upgrade_1_1_4()
                 (orderby, name, type, enabled, required, user_reg,
                 prompt, options, sys, perm_owner)
             VALUES
-                (41, 'sys_fname', 'fname', 0, 0, 0,
-                    '{$LANG_PROFILE['fname']}', '', 1, 0),
-                (42, 'sys_fname', 'fname', 0, 0, 0,
-                    '{$LANG_PROFILE['fname']}', '', 1, 0)",
+                (41, 'sys_fname', 'fname', 0, 0, 0, '{$LANG_PROFILE['fname']}',
+                    'a:2:{s:4:\"size\";i:40;s:9:\"maxlength\";i:80;}', 1, 2),
+                (42, 'sys_fname', 'fname', 0, 0, 0, '{$LANG_PROFILE['fname']}',
+                    'a:2:{s:4:\"size\";i:40;s:9:\"maxlength\";i:80;}', 1, 2)",
     );
     // Check if a "prf_phone" column exists in the data table but
     // missing from the definition table and add the definition if
