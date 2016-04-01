@@ -24,7 +24,10 @@ function PRF_editForm($type = 'edit', $uid = 0, $form_id='profileform')
 {
     global $_CONF, $_USER, $_TABLES, $LANG_PROFILE, $_SYSTEM;
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5936432ff1d46ec009eae6e12d88814214046f68
     // Detect uikit theme
     $tpl_path = $_SYSTEM['disable_mootools'] ? 'templates/uikit' : 'templates';
     $T = new Template(PRF_PI_PATH . $tpl_path);
@@ -126,9 +129,13 @@ var_dump($data);die;
             $T->clear_var('help_text');
         }
 
-        $T->set_var('is_visible', $data->isPublic() ? 'true' : '');
-        $T->set_var('field', $data->FormField());
-        $T->set_var('fld_class', isset($_POST['prf_errors'][$data->name]) ? 'profile_error' : '');
+        $T->set_var(array(
+            'is_visible'    => $data->isPublic() ? 'true' : '',
+            'field'         => $data->FormField(),
+            'fld_class'     => isset($_POST['prf_errors'][$data->name]) ?
+                    'profile_error' : '',
+            'fld_name'      => $data->name,
+        ) );
         $T->parse('qrow', 'QueueRow', true);
     }
     $T->parse('output', 'editform');

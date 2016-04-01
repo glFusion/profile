@@ -329,6 +329,7 @@ function plugin_profileedit_profile($uid, $panel, $fieldset)
 {
     $retval = '';
 
+/*
     if ($panel == 'privacy' && $fieldset == 'privacy') {
         $T = new Template(PRF_PI_PATH . 'templates/');
         $T->set_file('profile', 'profile_privacy.thtml');
@@ -343,6 +344,8 @@ function plugin_profileedit_profile($uid, $panel, $fieldset)
         $T->parse('output', 'profile');
         $retval .= $T->finish($T->get_var('output'));
     }
+*/
+
     if ($panel == 'useredit') {
         USES_profile_functions();
         $retval = PRF_editForm('edit', $uid);
