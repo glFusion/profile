@@ -187,13 +187,15 @@ function PRF_saveData($vals, $uid = 0, $type = 'edit')
     // If any validation errors found, return false now
     if ($validation_errs > 0) return false;
 
+    // If the "fullname" value is included, break it into first and last names.
+    // Only update DB fields that are NOT included in the form, otherwise
+    // there will be duplicate SQL fields during inserts.
     if (isset($vals['fullname'])) {
         USES_lglib_class_nameparser();
-        // Break the fullname into first and last names
         $fname = DB_escapeString(NameParser::F($vals['fullname']));
         $lname = DB_escapeString(NameParser::L($vals['fullname']));
-        $fld_sql[] = "sys_fname = '$fname'";
-        $fld_sql[] = "sys_lname = '$lname'";
+        if (!isset($vals['sys_fname'])) $fld_sql[] = "sys_fname = '$fname'";
+        if (!isset($vals['sys_lname'])) $fld_sql[] = "sys_lname = '$lname'";
     }
 
     foreach ($A as $name => $data) {
