@@ -24,10 +24,6 @@ function PRF_editForm($type = 'edit', $uid = 0, $form_id='profileform')
 {
     global $_CONF, $_USER, $_TABLES, $LANG_PROFILE, $_SYSTEM;
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 5936432ff1d46ec009eae6e12d88814214046f68
     // Detect uikit theme
     $tpl_path = $_SYSTEM['disable_mootools'] ? 'templates/uikit' : 'templates';
     $T = new Template(PRF_PI_PATH . $tpl_path);
