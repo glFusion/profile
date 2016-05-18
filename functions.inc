@@ -632,6 +632,11 @@ function plugin_itemPreSave_profile($type, $content)
         }
 
         if ($item->required == 1) {
+            // Don't validate required items on registration
+            // if the user can't fill them in.
+            if ($type == 'registration' && !$item->user_reg)
+                continue;
+
             switch ($item->type) {
             case 'date':
                 if (empty($_POST[$item->name . '_month']) ||
@@ -1100,4 +1105,6 @@ function PRF_isAdmin()
     return $isAdmin;
 }
 
+// This is temporary, and will be included in glFusion 1.6.0
+isset($_SYSTEM['framework']) || $_SYSTEM['framework'] = 'legacy';
 ?>
