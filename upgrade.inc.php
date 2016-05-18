@@ -548,20 +548,32 @@ function profile_upgrade_1_1_4()
     COM_errorLog('Performing 1.1.3 SQL updates if needed');
     profile_upgrade_1_1_3();
 
-    $sql = array(
-        "ALTER TABLE {$_TABLES['profile_data']}
-            ADD sys_lname varchar(40) AFTER sys_parent",
-        "ALTER TABLE {$_TABLES['profile_data']}
-            ADD sys_fname varchar(40) AFTER sys_parent",
-        "INSERT INTO {$_TABLES['profile_def']}
+    $sql = array();
+    $x = DB_numRows(DB_query("SHOW COLUMNS FROM {$_TABLES['profile_def']}
+        LIKE 'sys_fname'"));
+    if ($x < 1) {
+        $sql[] = "ALTER TABLE {$_TABLES['profile_data']}
+            ADD sys_fname varchar(40) AFTER sys_parent";
+        $sql[] = "INSERT INTO {$_TABLES['profile_def']}
                 (orderby, name, type, enabled, required, user_reg,
                 prompt, options, sys, perm_owner)
             VALUES
                 (41, 'sys_fname', 'fname', 0, 0, 0, '{$LANG_PROFILE['fname']}',
-                    'a:2:{s:4:\"size\";i:40;s:9:\"maxlength\";i:80;}', 1, 2),
+                    'a:2:{s:4:\"size\";i:40;s:9:\"maxlength\";i:80;}', 1, 2)";
+    }
+    $x = DB_numRows(DB_query("SHOW COLUMNS FROM {$_TABLES['profile_def']}
+        LIKE 'sys_lname'"));
+    if ($x < 1) {
+        $sql[] = "ALTER TABLE {$_TABLES['profile_data']}
+            ADD sys_lname varchar(40) AFTER sys_parent";
+        $sql[] = "INSERT INTO {$_TABLES['profile_def']}
+                (orderby, name, type, enabled, required, user_reg,
+                prompt, options, sys, perm_owner)
+            VALUES
                 (42, 'sys_fname', 'fname', 0, 0, 0, '{$LANG_PROFILE['fname']}',
-                    'a:2:{s:4:\"size\";i:40;s:9:\"maxlength\";i:80;}', 1, 2)",
-    );
+                    'a:2:{s:4:\"size\";i:40;s:9:\"maxlength\";i:80;}', 1, 2)";
+    }
+
     // Check if a "prf_phone" column exists in the data table but
     // missing from the definition table and add the definition if
     // needed.
@@ -578,7 +590,7 @@ function profile_upgrade_1_1_4()
                     (95, 'prf_phone', 'text', 1, 0, 0, 'Phone Number', 
                 'a:5:{s:7:\"default\";s:0:\"\";s:9:\"help_text\";\
                 s:23:\"Enter your phone number\";s:4:\"size\";\
-                i:40;s:9:\"maxlength\";i:255;s:7:\"autogen\";i:0;}', 0, 3)",
+                i:40;s:9:\"maxlength\";i:255;s:7:\"autogen\";i:0;}', 0, 3)";
         }
     }
 
