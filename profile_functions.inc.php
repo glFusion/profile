@@ -25,7 +25,7 @@ function PRF_editForm($type = 'edit', $uid = 0, $form_id='profileform')
     global $_CONF, $_USER, $_TABLES, $LANG_PROFILE, $_SYSTEM;
 
     // Detect uikit theme
-    $tpl_path = $_SYSTEM['disable_mootools'] ? 'templates/uikit' : 'templates';
+    $tpl_path = $_SYSTEM['framework'] == 'uikit' ? 'templates/uikit' : 'templates';
     $T = new Template(PRF_PI_PATH . $tpl_path);
 
     // Choose the correct template file based on the glFusion version
