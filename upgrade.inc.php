@@ -565,12 +565,12 @@ function profile_upgrade_1_1_4()
         LIKE 'sys_lname'"));
     if ($x < 1) {
         $sql[] = "ALTER TABLE {$_TABLES['profile_data']}
-            ADD sys_lname varchar(40) AFTER sys_parent";
+            ADD sys_lname varchar(40) AFTER sys_fname";
         $sql[] = "INSERT INTO {$_TABLES['profile_def']}
                 (orderby, name, type, enabled, required, user_reg,
                 prompt, options, sys, perm_owner)
             VALUES
-                (42, 'sys_fname', 'fname', 0, 0, 0, '{$LANG_PROFILE['fname']}',
+                (42, 'sys_lname', 'lname', 0, 0, 0, '{$LANG_PROFILE['lname']}',
                     'a:2:{s:4:\"size\";i:40;s:9:\"maxlength\";i:80;}', 1, 2)";
     }
 
