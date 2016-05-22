@@ -22,11 +22,6 @@ if (!in_array('profile', $_PLUGINS)) {
 USES_profile_functions();
 USES_profile_class_list();
 
-// Strip those annoying slashes
-if (GVERSION < '1.3.0') {
-    $_GET = PRF_stripslashes($_GET);
-}
-
 // Retrieve input variables.
 COM_setArgNames(array('listid', 'action'));
 $listid = COM_getArgument('listid');

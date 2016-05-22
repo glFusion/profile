@@ -398,26 +398,6 @@ function PRF_autogen($A, $uid=0)
 
 
 /**
-*   Strips slashes if magic_quotes_gpc is on.
-*
-*   @param  mixed   $var    Value or array of values to strip.
-*   @return mixed           Stripped value or array of values.
-*/
-function PRF_stripslashes($var)
-{
-    if (!empty($var) && get_magic_quotes_gpc()) {
-        if (is_array($var)) {
-            return array_map('PRF_stripslashes', $var);
-        } else {
-            return stripslashes($var);
-        }
-    } else {
-        return $var;
-    }
-}
-
-
-/**
 *   Show the site header, with or without left blocks according to config.
 *
 *   @since  1.0.2
