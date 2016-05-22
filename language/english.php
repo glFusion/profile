@@ -128,6 +128,7 @@ $LANG_PROFILE = array(
 'name_format0'  => 'First Last',
 'name_format1'  => 'Last, First',
 'list_footer'   => '<span class="profile_private">Highlighted</span> entries indicate members who have not elected to be listed in the member listing.',
+'save_error_title' => 'Error Saving Custom Profile',
 
 // begin membership fields
 'del_selected' => 'Delete Selected',

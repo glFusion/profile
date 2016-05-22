@@ -2,34 +2,25 @@ profile
 =======
 
 Custom Profile plugin for glFusion
-Release 1.0.0
+Release 1.1.4
 
 The Custom Profile plugin for glFusion allows the administrator to create 
-custom profile elements for user acccounts.  Prevously, this required 
+custom profile elements for user acccounts. Prevously, this required 
 significant cusom programming and template modification.
 
-Although some templates still need to be customized, and a few functions 
-added to lib-custom.php, this only needs to be done once.  After the initial 
-setup, custom fields can be created and removed at will with no further 
-site customization and no database modifications.
+This plugin requires the LGLib plugin for message handling and other
+functions. To enable messages to the user, add
+    {lglib_messages}
+shortly after the <body> tag in {layout_dir}/header.thtml. This is where
+alerts about missing or invalid field data will be displayed.
 
-NOTE: Beginning with glFusion 1.1.7, no template modifications are needed.
-However, the CUSTOM_ functions form lib-custom.php will be used if they're
-available.
-
-If you've made additional customizations and  need to modify the templates 
-manually, the affected templates are:
-    {layout_dir}/custom/memberdetail.thtml
-    {layout_dir}/users/custom/profile.thtml
-    {layout_dir}/admin/user/custom/edituser.thtml
-
-Please feel free to distribute this program.  However you must include the 
-copyright and license information.  Please don't remove the copyright 
-information within the page unless authorized.  Copyrights information in 
+Please feel free to distribute this program. However you must include the 
+copyright and license information. Please do not remove the copyright 
+information within the page unless authorized. Copyrights information in 
 acceptable form is allowed.
 
    
-Copyright (C) 2009 by Lee Garner <lee@leegarner.com>
+Copyright (C) 2009-2016 by Lee Garner <lee@leegarner.com>
 
 LICENSE:
 

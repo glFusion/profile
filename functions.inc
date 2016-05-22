@@ -3,9 +3,9 @@
 *   Functions for the Profile plugin for glFusion.
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2012 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2009-2016 Lee Garner <lee@leegarner.com>
 *   @package    profile
-*   @version    1.1.3
+*   @version    1.1.4
 *   @license    http://opensource.org/licenses/gpl-2.0.php 
 *               GNU Public License v2 or later
 *   @filesource
@@ -369,7 +369,7 @@ function plugin_profileedit_profile($uid, $panel, $fieldset)
  */
 function plugin_profilevariablesdisplay_profile($uid, &$template)
 {
-    global $LANG_PROFILE, $_TABLES, $_CONF, $_PRF_CONF, $_USER;
+    global $LANG_PROFILE, $_TABLES, $_CONF, $_PRF_CONF, $_USER, $_SYSTEM;
 
     $retval = '';
 
@@ -384,7 +384,7 @@ function plugin_profilevariablesdisplay_profile($uid, &$template)
     $T->set_file(array(
         'block' => 'profileblock.thtml',
     ));
-
+    $T->set_var('is_uikit', $_SYSTEM['framework'] == 'uikit' ? 'true' : '');
     $A = PRF_getDefs($uid);
     if (empty($A)) {
         return '';
@@ -621,8 +621,7 @@ function plugin_itemPreSave_profile($type, $content)
     if ($type != 'registration' && $type != 'useredit')
         return '';
 
-    $msg = '';
-    $errMsg = '';
+    $errors = array();
 
     $A = PRF_getDefs(0, '', 0);
     foreach ($A as $item) {
@@ -642,7 +641,7 @@ function plugin_itemPreSave_profile($type, $content)
                 if (empty($_POST[$item->name . '_month']) ||
                     empty($_POST[$item->name . '_day']) ||
                     empty($_POST[$item->name . '_year'])) {
-                    $msg = empty($item->options['help_text']) ?
+                    $errors[] = empty($item->options['help_text']) ?
                             sprintf($LANG_PROFILE['msg_fld_missing'], $item->prompt) :
                             $item->options['help_text'];
                 }
@@ -652,24 +651,25 @@ function plugin_itemPreSave_profile($type, $content)
                     //$errMsg .= $item->prompt . " is required.";
                     //$msg = 97;
                     //$msg = sprintf($LANG_PROFILE['msg_fld_missing'], $item->prompt);
-                    $msg = empty($item->options['help_text']) ?
+                    $errors[] = empty($item->options['help_text']) ?
                             sprintf($LANG_PROFILE['msg_fld_missing'], $item->prompt) :
                             $item->options['help_text'];
                 }
                 break;
             }
         }
-        if (!empty($msg)) break;    // no need to check further
     }
-    /*if (!empty($errMsg)) {
-        require_once $_CONF['path_system'] . 'lib-message.php';
-        MESSAGE_store($errMsg);
-        if ($type == 'useredit') {
-            echo COM_refresh($_CONF['site_url'] . '/usersettings.php');
-            exit;
+    if (!empty($errors)) {
+        $err_msg = '<b>' . $LANG_PROFILE['save_error_title'] . '</b><ul>';
+        foreach ($errors as $error) {
+            $err_msg .= '<li>' . $error . '</li>' . LB;
         }
-    }*/
-    return $msg;
+        $err_msg .= '</ul>' . LB;
+        LGLIB_storeMessage($err_msg,$LANG_PROFILE['save_error_title'], false);
+        return 97;      // default message value, might as well use it
+    } else {
+        return 0;   // Indicates success;
+    }
 }
 
 

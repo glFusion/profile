@@ -162,7 +162,11 @@ $LANG_PROFILE = array(
 'parent_uid' => 'Parent Account',
 'child_accounts' => 'Child Accounts',
 // END MEMBERSHIP FIELDS
-
+'add_value' => 'Add a new value',
+'show_in_profile' => 'Show in Profile',
+'save_error_title' => 'Error Saving Custom Profile',
+'displayed' => 'Displayed',
+'all_fields' => 'All Fields',
 );
 
 $PLG_profile_MESSAGE03  = 'There was an error getting the plugin version.';
@@ -205,7 +209,7 @@ $LANG_configselects['profile'] = array(
     6 => array('Normaal' => 'normal', 'Blokken' => 'blocks'),
     9 => array('Nooit' => 0, 'Indien Wachtrij' => 1, 'Altijd' => 2),
     10 => array('Nooit' => 0, 'Altijd' => 1, 'Geaccepteerd' => 2, 'Geweigerd' => 3),
-    12 => array('Geen Toegang' => 0, 'Alleen-Lezen' => 2, 'Lezen-Schrijven' => 3)
+    12 => array('Geen Toegang' => 0, 'Alleen-Lezen' => 2, 'Lezen-Schrijven' => 3),
     13 => array('Month Day Year' => 1, 'Day Month Year' => 2),
 );
 

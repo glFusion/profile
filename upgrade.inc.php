@@ -3,7 +3,7 @@
 *   Upgrade routines for the Custom Profile plugin
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2015 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2009-2016 Lee Garner <lee@leegarner.com>
 *   @package    profile
 *   @version    1.1.4
 *   @license    http://opensource.org/licenses/gpl-2.0.php 

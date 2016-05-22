@@ -3,9 +3,9 @@
 *   Class to handle individual profile items.
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2009-2016 Lee Garner <lee@leegarner.com>
 *   @package    profile
-*   @version    1.1.0
+*   @version    1.1.4
 *   @license    http://opensource.org/licenses/gpl-2.0.php 
 *               GNU Public License v2 or later
 *   @filesource
@@ -139,11 +139,12 @@ class prfItem
         global $_SYSTEM;
 
         // Check for required status.  May need to excluded dates from this...
-        if ($this->required == 1) {
-            $this->_frmClass = $_SYSTEM['disable_jquery'] ?
-                "class=\"fValidate['required']\" " :
-                'required';
-            $this->user_reg = 1;
+        // Setting 'required' on the profile page causes issues for uikit
+        // since it's not checked until submission and the user may never
+        // see the error. In that case, don't set the field as required and
+        // rely on post-submission validation.
+        if ($this->required == 1 && $_SYSTEM['framework'] == 'legacy') {
+            $this->_frmClass = "class=\"fValidate['required']\" ";
         } else {
             $this->_frmClass = '';
         }

@@ -163,7 +163,23 @@ $LANG_PROFILE = array(
 'parent_uid' => 'Parent Account',
 'child_accounts' => 'Child Accounts',
 // END MEMBERSHIP FIELDS
-
+'add_value' => 'Add a new value',
+'reset_perms' => 'Reset Permissions',
+'search_users' => 'Search Users',
+'undefined' => 'Undefined',
+'empty' => 'Empty',
+'contains' => 'Contains',
+'field' => 'Field',
+'none' => 'None',
+'q_searchable' => 'Searchable?',
+'q_sortable' => 'Sortable?',
+'hdr_text' => 'Header Text',
+'include' => 'Include',
+'def_sort' => 'Default Sort',
+'show_in_profile' => 'Show in Profile',
+'save_error_title' => 'Error Saving Custom Profile',
+'displayed' => 'Displayed',
+'all_fields' => 'All Fields',
 );
 
 $PLG_profile_MESSAGE03  = 'There was an error getting the plugin version.';
