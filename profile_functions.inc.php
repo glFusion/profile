@@ -24,19 +24,16 @@ function PRF_editForm($type = 'edit', $uid = 0, $form_id='profileform')
 {
     global $_CONF, $_USER, $_TABLES, $LANG_PROFILE, $_SYSTEM;
 
-    // Detect uikit theme
-    $tpl_path = $_SYSTEM['framework'] == 'uikit' ? 'templates/uikit' : 'templates';
-    $T = new Template(PRF_PI_PATH . $tpl_path);
-
+    
     // Choose the correct template file based on the glFusion version
     // and type of form needed
     switch ($type) {
     case 'inline':
-        $template_file = 'profile_inlineform.thtml';
+        $template_name = 'profile_inlineform';
         $access_required = 2;
         break;
     case 'registration':
-        $template_file = 'profile_registration.thtml';
+        $template_name = 'profile_registration';
         // Set no access level to profile defs since this is an anon user.
         // Otherwise, they're not allowed to even read the definitions.
         $access_required = 0;
@@ -45,12 +42,12 @@ function PRF_editForm($type = 'edit', $uid = 0, $form_id='profileform')
         // For anything but new registrations, the current user needs
         // at least read privileges.
         $access_required = 2;
-        $template_file = 'profile_usersettings.thtml';
+        $template_name = 'profile_usersettings';
         break;
     }
 
     $A = PRF_getDefs($uid, '', $access_required);
-    $T->set_file('editform', $template_file);
+    $T = PRF_getTemplate($template_name, 'editform');
     $T->set_var(array(
         'uid'       => $uid,
         'form_id'   => $form_id,

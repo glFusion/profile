@@ -25,24 +25,12 @@ if (!in_array('profile', $_PLUGINS)) {
 if (!SEC_hasRights('profile.admin')) {
     // Someone is trying to illegally access this page
     COM_errorLog("Someone has tried to illegally access the Profile Admin page.  User id: {$_USER['uid']}, Username: {$_USER['username']}, IP: $REMOTE_ADDR",1);
-    $display = COM_siteHeader();
-    $display .= COM_startBlock($LANG_PL00['access_denied']);
-    $display .= $LANG_DQ00['access_denied_msg'];
-    $display .= COM_endBlock();
-    $display .= COM_siteFooter(true);
-    echo $display;
-    exit;
+    COM_404();
 }
 
 // Import administration functions
 USES_lib_admin();
 USES_profile_functions();
-
-// Strip those annoying slashes
-if (GVERSION < '1.3.0') {
-    $_POST = PRF_stripslashes($_POST);
-    $_GET = PRF_stripslashes($_GET);
-}
 
 $expected = array('edit', 'savedef', 'deletedef', 'move',
         'movelist', 'deletelist',
@@ -235,9 +223,7 @@ function PRF_adminForm($id)
 
     $retval = '';
 
-    $T = new Template(PRF_PI_PATH . 'templates/admin');
-    $T->set_file('editform', 'profile.thtml');
-
+    $T = PRF_getTemplate('profile', 'editform', 'admin');
     $id = (int)$id;
     if ($id > 0) {
         // Existing item, retrieve it

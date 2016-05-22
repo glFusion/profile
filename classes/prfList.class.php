@@ -777,9 +777,7 @@ class prfList
         global $_CONF, $_TABLES, $LANG_PROFILE, $LANG_ACCESS, $_PLUGINS,
                 $LANG28, $LANG04, $_SYSTEM;
 
-        $T = new Template(PRF_PI_PATH . 'templates/admin/');
-        $T->set_file('editform', 'list.thtml');
-
+        $T = PRF_getTemplate('list', 'editform', 'admin');
         $T->set_var(array(
             'listid'        => $this->listid,
             'orderby'       => $this->orderby,
