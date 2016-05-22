@@ -3,9 +3,9 @@
 *   Class to handle profile lists
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2011 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2009-2016 Lee Garner <lee@leegarner.com>
 *   @package    profile
-*   @version    1.1.1
+*   @version    1.1.4
 *   @license    http://opensource.org/licenses/gpl-2.0.php 
 *               GNU Public License v2 or later
 *   @filesource
@@ -24,11 +24,11 @@ define('PRF_EXP_EXPIRED',   4);
 */
 class prfList
 {
-    private $listid;    // List identifier string
-    private $title;     // Title string
-    private $orderby;   // List order of apperarance
-    private $fields;    // Array of Fields included in this list
-    private $group_id;  // Group with View access to this list
+    protected $listid;    // List identifier string
+    protected $title;     // Title string
+    protected $orderby;   // List order of apperarance
+    protected $fields;    // Array of Fields included in this list
+    protected $group_id;  // Group with View access to this list
     private $incl_grp;  // User group included in this list
     private $incl_user_stat;    // User statuses included in list
     private $isNew = true;  // Indicate whether this is a new list or an update
@@ -51,7 +51,7 @@ class prfList
     *
     *   @param  string  $listid List ID to edit or display, empty for new list
     */
-    function __construct($listid = '')
+    public function __construct($listid = '')
     {
         global $_GROUPS, $_USER;
 
@@ -217,7 +217,7 @@ class prfList
     *   @param  array   $extras Extras field info to be used by the list func.
     *   @return string      SQL query to find users in the list
     */
-    private function _getListSQL($query='', &$extras=array('f_info'=>array()))
+    protected function _getListSQL($query='', &$extras=array('f_info'=>array()))
     {
         global $_TABLES, $_PLUGINS, $_PRF_CONF;
 
@@ -546,6 +546,8 @@ class prfList
                     $LANG_PROFILE['displayed'] . '</a> / ' .
                     '<a href="' . $exportlink_all . '">' .
                     $LANG_PROFILE['all_fields'] . '</a>';
+            $pdflink = '<a href="' . PRF_PI_URL .
+                '/list.php?action=pdf&listid=' . $this->listid . '">PDF</a>';
         } else {
             $exportlink = '';
         }
@@ -561,6 +563,7 @@ class prfList
                 $header_arr, $text_arr, $query_arr, $defsort_arr,
                 $this->pi_filter, $extras, '', $form_arr),
             'export_link'   => $exportlink,
+            'pdf_link'      => $pdflink,
             'menu'          => $menu,
             'footer'        => $footer,
         ) );
@@ -1080,7 +1083,7 @@ class prfList
     }
 
 
-    private function _getPluginFilters()
+    protected function _getPluginFilters()
     {
         global $_PLUGINS;
 
@@ -1112,7 +1115,7 @@ class prfList
     *
     *   @return string  Serialized array of field names
     */
-    private function _getAllFields()
+    protected function _getAllFields()
     {
         global $_TABLES;
         $sql = "SELECT name, prompt, type

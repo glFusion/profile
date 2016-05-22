@@ -77,6 +77,9 @@ function USES_profile_class_item()
 function USES_profile_class_list()
 {   require_once PRF_PI_PATH . 'classes/prfList.class.php';     }
 
+function USES_profile_class_pdflist()
+{   require_once PRF_PI_PATH . 'classes/pdflist.class.php';     }
+
 // Include api functions for other plugins
 require_once PRF_PI_PATH . 'services.inc.php';
 

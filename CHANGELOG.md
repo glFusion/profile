@@ -5,6 +5,7 @@ Version 1.1.4
 - Ensure that sys_fname and sys_lname fields are created during update if missing.
 - Remove realtime field validation if using uikit
 - Update README to indicate reliance on LGLib plugin and lglib_messages header var.
+- Add PDF membership list
 
 glProfile - 1.1.2 (Released 2011-11-04) [ View Issues ]
 =======================================

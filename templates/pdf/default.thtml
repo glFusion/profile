@@ -1,0 +1,10 @@
+<div style="text-align:center;margin-bottom: 20px;">
+<h1>{title}</h1>
+As of {report_date}
+</div>
+<table border="0">
+<tr><th>Full Name</th><th>City</th><th>Phone</th></tr>
+<!-- BEGIN UserRow -->
+<tr><td>{fullname}</td><td>{prf_city}</td><td>{prf_phone}</td></tr>
+<!-- END UserRow -->
+</table>

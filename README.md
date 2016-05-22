@@ -14,6 +14,10 @@ functions. To enable messages to the user, add
 shortly after the <body> tag in {layout_dir}/header.thtml. This is where
 alerts about missing or invalid field data will be displayed.
 
+Known Issues
+============
+* When exporting all fields from a membership list, fields from other plugins are not included.
+
 Please feel free to distribute this program. However you must include the 
 copyright and license information. Please do not remove the copyright 
 information within the page unless authorized. Copyrights information in 
