@@ -3,10 +3,10 @@
 *   Custom functions for including profile information into registration
 *   and account settings pages.
 *
-*   These functions may be merged or appended to lib-custom.php
+*   These functions should be includedi in private/system/lib-custom.php
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2011 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2009-2016 Lee Garner <lee@leegarner.com>
 *   @package    profile
 *   @version    1.1.0
 *   @license    http://opensource.org/licenses/gpl-2.0.php 
@@ -14,46 +14,41 @@
 *   @filesource
 */
 
-
-/*
-*   Sample autogen functions to automatically generate field values.
-*   Un-comment the functions to use them.  Otherwise, the default
-*   PRF_autogen() function is used.
-*/
-
 /**
 *   Generate content for a specific field.
-*   This function generates a string for a field named "state".
-*   The function should be named "CUSTOM_profile_autogen_{fieldname}
+*   This function generates a string for a field named "state". 
 *
-*   @return string  Field Content
+*   The function should be named "CUSTOM_profile_autogen_{fieldname}.
+*   Note that the internal field name is "prf_state", which should be used
+*   in the function name. The internal fields names are typically
+*   "prf_{name}" and can be seen in the profile item list.
+*
+*   @param  object  $A      Field Object
+*   @return string          Field Content
 */
-/*function CUSTOM_profile_autogen_state()
+/*function CUSTOM_profile_autogen_prf_state($A)
 {
     return 'CA';
-}
-*/
+}*/
 
 /**
 *   Generate content for any field.
-*   This function handles all field names and types, and it completely
-*   overrides the default PRF_autogen() function (which is to return
-*   COM_makeSID()).
+*   This function handles all field names and types that are not handled
+*   by a field-specific function (see above).
 *
-*   @param  string  $name   Field Name
-*   @param  string  $type   Field Type ('text', 'date', 'checkbox', etc).
+*   @param  object  $A      Field Object
 *   @return string          Field Content
 */
-/*function CUSTOM_profile_autogen($name='', $type='')
+/*function CUSTOM_profile_autogen($A)
 {
-    switch ($name) {
-        case 'membershipid':
+    switch ($A->name) {
+        case 'prf_membershipid':
             // Generate a random Membership ID
             return 'member' . rand(1,99);
             break;
     }
 
-    switch ($type) {
+    switch ($A->type) {
         case 'text':
             // Return a static text value
             return "I'm a text field";
@@ -63,7 +58,10 @@
             return '07/04/1776';
             break;
     }
-}
-*/
+
+    // Should always return something even if empty
+    return '';
+}*/
+
 
 ?>

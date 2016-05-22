@@ -279,11 +279,14 @@ function PRF_saveData($vals, $uid = 0, $type = 'edit')
             break;
         }
 
-        if ($type == 'registration') {
+        // Auto-Generate a value during registration, or if the value is empty
+        if ($data->options['autogen'] == 1 &&
+            ($type == 'registration' || empty($newval))) {
+        //if ($type == 'registration') {
             // Automatically generate the data item, if needed
-            if ($data->options['autogen'] == 1 && empty($newval)) {
-                $newval = PRF_autogen($item, $uid);
-            }
+            //if ($data->options['autogen'] == 1 && empty($newval)) {
+                $newval = PRF_autogen($data, $uid);
+            //}
         }
 
         if ($data->perm_owner == 3 || $isAdmin) {
@@ -367,15 +370,12 @@ function PRF_mask2vismask($mask)
 
 
 /**
-*   Automatically generate a string value.
+*   Automatically generate a field value.
 *
 *   The site admin can effectively override this function by creating a
 *   CUSTOM_profile_autogen() function which takes the field name & type
-*   as arguments, or a CUSTOM_profile_autogen_{fieldname} function which
-*   takes no arguments.  The second form takes precedence over the first.
-*
-*   All fields and values are passed to the auto-generation function so
-*   it may use them in the creation of the new value.
+*   as arguments, or a CUSTOM_profile_autogen_{fieldname} function.
+*   The second form takes precedence over the first.
 *
 *   @since  version 0.0.3
 *   @param  array   $A      Field definition and values
@@ -384,11 +384,10 @@ function PRF_mask2vismask($mask)
 */
 function PRF_autogen($A, $uid=0)
 {
-    if (!is_array($A) || empty($A)) {
+    if (!is_object($A) || empty($A)) {
         return COM_makeSID();
     }
-
-    $function = 'CUSTOM_profile_autogen_' . $A['name'];
+    $function = 'CUSTOM_profile_autogen_' . $A->name;
     if (function_exists($function)) 
         return $function($A, $uid);
     elseif (function_exists('CUSTOM_profile_autogen')) 
