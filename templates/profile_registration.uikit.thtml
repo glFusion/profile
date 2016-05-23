@@ -15,21 +15,23 @@
   {!endif}
   <div class="uk-form-controls">
   <span class="pluginProfileField">
-  {field}
-  {!if is_static}
-  {!else}
-  {!if is_visible}
-    <img src="{site_url}/profile/images/visible.png" width="16" height="16" class="gl_mootip" title="{$LANG_PROFILE['hlp_visible']}" />
-  {!else}
-    <img src="{site_url}/profile/images/invisible.png" width="16" height="16" class="gl_mootip" title="{$LANG_PROFILE['hlp_invisible']}" />
-  {!endif}
-  {!if is_required}
-    <img src="{site_url}/profile/images/required.png" width="16" height="16" class="gl_mootip" title="{$LANG_PROFILE['hlp_required']}" />
-  {!endif}
-  {!if help_text}
-    <img src="{layout_url}/images/info.png" width="16" height="16" class="gl_mootip" title="{help_text}" />
-  {!endif}
-  {!endif}
+    {field}
+    <span class="prfInfoIcons">
+      {!if is_static}
+      {!else}
+      {!if is_visible}
+      <img data-uk-tooltip src="{site_url}/profile/images/visible.png" width="16" height="16" title="{$LANG_PROFILE['hlp_visible']}" />
+      {!else}
+      <img data-uk-tooltip src="{site_url}/profile/images/invisible.png" width="16" height="16" title="{$LANG_PROFILE['hlp_invisible']}" />
+      {!endif}
+      {!if is_required}
+      <img data-uk-tooltip src="{site_url}/profile/images/required.png" width="16" height="16" title="{$LANG_PROFILE['hlp_required']}" />
+      {!endif}
+      {!if help_text}
+      <img data-uk-tooltip src="{layout_url}/images/info.png" width="16" height="16" title="{help_text}" />
+      {!endif}
+      {!endif}
+    </span>
   </span>
   </div>
   </div>

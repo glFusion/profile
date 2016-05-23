@@ -42,6 +42,15 @@ case 'export':
         exit;
         break;
     }
+case 'pdf':
+    USES_profile_class_pdflist();
+    $PL = new prfPdfList($listid);
+    $content = $PL->Render();
+    if (!empty($content)) {
+        exit;
+    }
+    break;
+
 default:
     // Display a member list
     $PL = new prfList($listid);

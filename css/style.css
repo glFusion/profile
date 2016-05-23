@@ -56,3 +56,7 @@ span.prfNewAdminItem {
     font-weight: bold;
 }
 
+prfInfoIcons {
+    display:inline-block;
+    white-space:nowrap;
+}

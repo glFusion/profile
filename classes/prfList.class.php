@@ -546,7 +546,7 @@ class prfList
                     $LANG_PROFILE['displayed'] . '</a> / ' .
                     '<a href="' . $exportlink_all . '">' .
                     $LANG_PROFILE['all_fields'] . '</a>';
-            $pdflink = '<a href="' . PRF_PI_URL .
+            $pdflink = '/' . '<a href="' . PRF_PI_URL .
                 '/list.php?action=pdf&listid=' . $this->listid . '">PDF</a>';
         } else {
             $exportlink = '';
