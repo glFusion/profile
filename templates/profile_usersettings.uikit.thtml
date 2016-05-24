@@ -11,7 +11,7 @@
         <label class="uk-form-label" for="{fld_name}">{prompt}</label>
         <div class="uk-form-controls">
           {field}
-          <div class="prfInfoIcons">
+          <span class="prfInfoIcons">
           {!if is_static}
           {!else}
             {!if is_visible}
@@ -26,7 +26,7 @@
             <img data-uk-tooltip src="{layout_url}/images/info.png" width="16" height="16" title="{help_text}" />
             {!endif}
           {!endif}
-          </div>
+          </span>
         </div>
       </div>
     <!-- END QueueRow -->
