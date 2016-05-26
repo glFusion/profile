@@ -146,7 +146,7 @@ class prfItem
         if ($this->required == 1 && $_SYSTEM['framework'] == 'legacy') {
             $this->_frmClass = "class=\"fValidate['required']\" ";
         } else {
-            $this->_frmClass = '';
+            $this->_frmClass = 'class="uk-width-1-1"';
         }
 
         // If POSTed form data, set the user variable to that.  Otherwise,
@@ -183,10 +183,10 @@ class prfItem
 
         $size = $this->options['size'];
         $maxlength = $this->options['maxlength'];
-
+        $maxlength = (int)$maxlength > 0 ? "maxlength=\"$maxlength\"" : '';
         $fld = "<input $this->_frmClass name=\"{$this->name}\" 
-                    id=\"{$this->name}\"
-                    size=\"$size\" maxlength=\"$maxlength\" 
+                    id=\"{$this->name}\" $maxlength
+                    size=\"$size\" 
                     type=\"text\" value=\"{$this->value}\" $this->_frmReadonly>\n";
 
         return $fld;
