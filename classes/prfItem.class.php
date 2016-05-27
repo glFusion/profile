@@ -146,7 +146,7 @@ class prfItem
         if ($this->required == 1 && $_SYSTEM['framework'] == 'legacy') {
             $this->_frmClass = "class=\"fValidate['required']\" ";
         } else {
-            $this->_frmClass = 'class="uk-width-1-1"';
+            $this->_frmClass = 'class="prfInputText"';
         }
 
         // If POSTed form data, set the user variable to that.  Otherwise,

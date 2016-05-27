@@ -56,7 +56,12 @@ span.prfNewAdminItem {
     font-weight: bold;
 }
 
-prfInfoIcons {
+.prfInfoIcons {
     display:inline-block;
     white-space:nowrap;
+}
+
+/* Used instead of uk-width-1-1 to leave room for the info icons */
+.prfInputText {
+    width: 80%;
 }
