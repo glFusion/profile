@@ -543,10 +543,17 @@ function profile_upgrade_1_1_3()
 */
 function profile_upgrade_1_1_4()
 {
-    global $_TABLES, $LANG_PROFILE;
+    global $_TABLES, $LANG_PROFILE, $_PRF_CONF;
 
     COM_errorLog('Performing 1.1.3 SQL updates if needed');
     profile_upgrade_1_1_3();
+
+    // New configuration item(s)
+    $c = config::get_instance();
+    if ($c->group_exists($_PRF_CONF['pi_name'])) {
+        $c->add('list_allow_pdf', $_PRF_DEFAULT['list_allow_pdf'], 
+                'select', 0, 2, 3, 20, true, $_PRF_CONF['pi_name']);
+    }
 
     $sql = array();
     $x = DB_numRows(DB_query("SHOW COLUMNS FROM {$_TABLES['profile_def']}

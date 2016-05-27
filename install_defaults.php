@@ -38,10 +38,11 @@ $_PRF_DEFAULT['showemptyvals'] = 1;
 
 // Period after dues are due that members will be in arrears, not expired
 $_PRF_DEFAULT['grace_expired'] = 30;
-
 $_PRF_DEFAULT['date_format'] = 1;
 
+// List settings
 $_PRF_DEFAULT['list_incl_admin'] = 0;
+$_PRF_DEFAULT['list_allow_pdf'] = 1;
 
 /**
  *  Initialize Profile plugin configuration
@@ -84,6 +85,8 @@ function plugin_initconfig_profile($group_id = 0)
                 $_PRF_CONF['pi_name']);
         $c->add('list_incl_admin', $_PRF_DEFAULT['list_incl_admin'], 
                 'select', 0, 2, 3, 10, true, $_PRF_CONF['pi_name']);
+        $c->add('list_allow_pdf', $_PRF_DEFAULT['list_allow_pdf'], 
+                'select', 0, 2, 3, 20, true, $_PRF_CONF['pi_name']);
 
         $c->add('fs_permissions', NULL, 'fieldset', 0, 4, NULL, 0, true, 
                 $_PRF_CONF['pi_name']);

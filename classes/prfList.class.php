@@ -534,6 +534,9 @@ class prfList
         }
 
         // Add the export link if requested.
+        $pdflink = '<a href="' . PRF_PI_URL .
+                '/list.php?action=pdf&listid=' . $this->listid . '" target="_new">PDF</a>';
+        $exportlink = '';
         if ($this->show_export) {
             $query = urlencode($this->_getQuery());
             if (!empty($query)) $query = "&amp;q=$query";
@@ -552,10 +555,9 @@ class prfList
                     $LANG_PROFILE['displayed'] . '</a> / ' .
                     '<a href="' . $exportlink_all . '">' .
                     $LANG_PROFILE['all_fields'] . '</a>';
-            $pdflink = '/' . '<a href="' . PRF_PI_URL .
-                '/list.php?action=pdf&listid=' . $this->listid . '">PDF</a>';
-        } else {
-            $exportlink = '';
+            $pdflink = '/ ' . $pdflink;
+        } elseif (!$_PRF_CONF['list_allow_pdf']) {
+            $pdflink = '';
         }
 
         // Add the menu of available lists, if requested

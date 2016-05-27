@@ -651,12 +651,7 @@ function plugin_itemPreSave_profile($type, $content)
                 break;
             default:
                 if (empty($_POST[$item->name])) {
-                    //$errMsg .= $item->prompt . " is required.";
-                    //$msg = 97;
-                    //$msg = sprintf($LANG_PROFILE['msg_fld_missing'], $item->prompt);
-                    $errors[] = empty($item->options['help_text']) ?
-                            sprintf($LANG_PROFILE['msg_fld_missing'], $item->prompt) :
-                            $item->options['help_text'];
+                    $errors[] = sprintf($LANG_PROFILE['msg_fld_missing'], $item->prompt);
                 }
                 break;
             }
