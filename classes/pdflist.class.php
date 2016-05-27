@@ -71,6 +71,7 @@ class prfPdfList extends prfList
 
         if (!is_array($this->fields)) return '';
         $sql = $this->_getListSQL();
+        //echo $sql;die;
         $result = DB_query($sql, 1);
         if (!$result || DB_numRows($result) < 1) {
             return false;
@@ -128,9 +129,9 @@ class prfPdfList extends prfList
         while ($A = DB_fetchArray($result, false)) {
             foreach ($this->fields as $field) {
                 $fldname = $field['field'];
-                $classname = $classes[$field['field']];
-                if ($classname !== NULL) {
-                    $data = $classname->FormatValue($A[$fldname]);
+                $fldClass = $classes[$field['field']];
+                if ($fldClass !== NULL) {
+                    $data = $fldClass->FormatValue($A[$fldname]);
                 } else {
                     $data = $A[$fldname];
                 }

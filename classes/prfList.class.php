@@ -423,7 +423,7 @@ class prfList
     public function Render($autotag=false)
     {
         global $_CONF, $_TABLES, $LANG_ADMIN, $LANG_PROFILE, $_PRF_CONF,
-                $LANG_ADMIN;
+                $LANG_ADMIN, $_SYSTEM;
 
         if ($this->listid == '') {
             // Get the first available list
@@ -446,9 +446,15 @@ class prfList
         if (!$this->isAdmin && 
                 ($this->listid == '' || !SEC_inGroup($this->group_id)) ) {
             if (!$autotag) {
-                $retval .= '<span class="alert">' .
+                if ($_SYSTEM['framework'] == 'uikit') {
+                    $retval .= '<div class="uk-alert uk-alert-danger">'.
+                        $LANG_PROFILE['list_none_avail'] .
+                        '</div>';
+                } else {
+                    $retval .= '<span class="alert">' .
                         $LANG_PROFILE['list_none_avail'] .
                         '</span>';
+                }
                 if (COM_isAnonUser()) {
                     // If anonymous, assume that there might be a list if they
                     // log in
