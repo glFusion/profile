@@ -394,6 +394,7 @@ function plugin_profilevariablesdisplay_profile($uid, &$template)
     }
 
     $showvisicons = $uid == $_USER['uid'] ? true : false;
+    $items = 0;     // counter to check if any items are actually displayed
     foreach ($A as $data) {
         if ($data->show_in_profile == 0) continue;
         $value = $data->FormatValue();
@@ -406,14 +407,18 @@ function plugin_profilevariablesdisplay_profile($uid, &$template)
                 'is_visible' => $showvisicons && $data->isPublic() ? 'true' : '',
             ) );
             $T->parse('prow', 'profile_row', true);
+            $items++;
         }
     }
-    $T->parse('output', 'block');
-    $existingFields = $template->get_var('plugin_fields');
-    $template->set_var('plugin_fields', 
+    // Only return the block if it's not empty
+    if ($items > 0) {
+        $T->parse('output', 'block');
+        $existingFields = $template->get_var('plugin_fields');
+        $template->set_var('plugin_fields', 
             $existingFields . $T->finish($T->get_var('output')));
-    //return $T->finish($T->get_var('output'));
-
+    } else {
+        return '';
+    }
 }
 
 
