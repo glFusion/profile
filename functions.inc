@@ -167,6 +167,21 @@ function plugin_user_move_profile($origUID, $destUID)
 
 
 /**
+*   Send a message to the user once at login if there's no email address.
+*   This can happen if they've created their account via Facebook oauth.
+*
+*   @param  integer $uid    User ID
+*/
+function plugin_user_login_profile($uid)
+{
+    global $LANG_PROFILE;
+    if (empty($_USER['email'])) {
+        LGLIB_storeMessage($LANG_PROFILE['missing_email']);
+    }
+}
+
+    
+/**
 *   Upgrade the Profile plugin
 *   @return integer Number of message to display (true = generic success msg)
 */
@@ -1135,6 +1150,4 @@ function PRF_getTemplate($name, $id, $path='')
     return $T;
 }
 
-// This is temporary, and will be included in glFusion 1.6.0
-isset($_SYSTEM['framework']) || $_SYSTEM['framework'] = 'legacy';
 ?>
