@@ -6,6 +6,7 @@ Version 1.1.4
 - Remove realtime field validation if using uikit
 - Update README to indicate reliance on LGLib plugin and lglib_messages header var.
 - Add PDF membership list
+- Shows a reminder message at login to users who have no email address.
 
 glProfile - 1.1.2 (Released 2011-11-04) [ View Issues ]
 =======================================

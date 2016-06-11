@@ -174,7 +174,7 @@ function plugin_user_move_profile($origUID, $destUID)
 */
 function plugin_user_login_profile($uid)
 {
-    global $LANG_PROFILE;
+    global $LANG_PROFILE, $_USER;
     if (empty($_USER['email'])) {
         LGLIB_storeMessage($LANG_PROFILE['missing_email']);
     }
