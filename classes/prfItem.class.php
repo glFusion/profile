@@ -788,21 +788,27 @@ function {$this->name}_onUpdate(cal)
     *   Check if a field has valid data.  Used in conjuction with the
     *   "required" flag.
     *
-    *   @param  boolean     $required   Return false only if invalid AND required
-    *   @return booldan         True if data is valid, False if not
+    *   @param  string  $value  Unused, required for inheritance
+    *   @param  array   $vals   Array of values
+    *   @return boolean     True if data is valid, False if not
     */
     public function validData($value = NULL, $vals = NULL)
     {
         // This function uses the field name and the $vals array to construct
         // month, day and year values. $value is unused
 
+        if (!is_array($vals)) {
+            // Can't be valid data
+            return false;
+        }
+
         if ($this->required) {
             $month = isset($vals[$this->name . '_month']) ?
-                    $vals[$this->name . '_month'] : 0;
+                    (int)$vals[$this->name . '_month'] : 0;
             $day = isset($vals[$this->name . '_day']) ?
-                    $vals[$this->name . '_day'] : 0;
+                    (int)$vals[$this->name . '_day'] : 0;
             $year = isset($vals[$this->name . '_year']) ?
-                    $vals[$this->name . '_year'] : 0;
+                    (int)$vals[$this->name . '_year'] : 0;
             USES_lglib_class_datecalc();
             if (!Date_Calc::isValidDate($month, $day, $year)) return false;
         }
