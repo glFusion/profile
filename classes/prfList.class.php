@@ -6,7 +6,7 @@
 *   @copyright  Copyright (c) 2009-2016 Lee Garner <lee@leegarner.com>
 *   @package    profile
 *   @version    1.1.4
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
@@ -44,7 +44,7 @@ class prfList
     private $name_format = 0;   // Fname Lname, 1 = "Lname, Fname"
     private $pi_query = '';     // Query string obtained from plugins
     private $pi_filter = '';    // Plugin-supplied search form items
- 
+
 
     /**
     *   Constructor.
@@ -64,7 +64,7 @@ class prfList
         } else {
             if (!is_array($_GROUPS))
                 $_GROUPS = SEC_getUserGroups($_USER['uid']);
-            $this->access_sql = 'WHERE group_id in (' . 
+            $this->access_sql = 'WHERE group_id in (' .
                                 implode(',', $_GROUPS) . ')';
         }
 
@@ -99,7 +99,7 @@ class prfList
 
         if ($listid == '')
             $listid = $this->listid;
-        else 
+        else
             $listid = COM_sanitizeID($listid, false);
 
         $res = DB_query("SELECT * FROM {$_TABLES['profile_lists']}
@@ -183,7 +183,7 @@ class prfList
                     $A['order'][$key] = '999';
                 $fields[$key] = array(
                     'field'     => $key,
-                    'dbfield'   => empty($A['fld_dbfield'][$key]) ? $key : 
+                    'dbfield'   => empty($A['fld_dbfield'][$key]) ? $key :
                                     $A['fld_dbfield'][$key],
                     'text'      => empty($A['fld_text'][$key]) ? $key :
                                     $A['fld_text'][$key],
@@ -200,7 +200,7 @@ class prfList
             }
             array_multisort($sortorder, SORT_ASC, $fields);
             foreach ($fields AS $key=>$data) {
-                $this->fields[] = $data;    
+                $this->fields[] = $data;
             }
         }
     }
@@ -261,7 +261,7 @@ class prfList
 
         if ($this->dir_optional && !$this->isAdmin) {
             // Let users, decide if they're to be shown
-            $where_and .= 
+            $where_and .=
                 ' AND (p.sys_directory = 1 OR p.sys_directory IS NULL) ';
         }
 
@@ -329,7 +329,7 @@ class prfList
 
         if ($this->name_format == 1) {
             $full_name = "IF (u.fullname = '' OR u.fullname IS NULL,
-                    u.fullname, 
+                    u.fullname,
                     CONCAT(SUBSTRING_INDEX(u.fullname,' ',-1), ', ',
                     SUBSTRING_INDEX(u.fullname,' ',1))) AS fullname,
                     SUBSTRING_INDEX(u.fullname,'',-1) AS lname,
@@ -339,7 +339,7 @@ class prfList
         } else {
             $full_name = "u.fullname AS fullname, 0 AS name_format";
         }
-        $sql = "SELECT u.uid, u.username, u.email, u.homepage, u.photo, 
+        $sql = "SELECT u.uid, u.username, u.email, u.homepage, u.photo,
                 {$this->name_format} AS name_format,
                 p.*, $full_name
                 $field_select,
@@ -405,7 +405,7 @@ class prfList
         return $query_fields;
     }
 
- 
+
     /**
     *   Render the list using the ADMIN_ list functions in lib-admin.php
     *   Need to have a function available outside the object to handle
@@ -427,7 +427,7 @@ class prfList
 
         if ($this->listid == '') {
             // Get the first available list
-            $sql = "SELECT * FROM {$_TABLES['profile_lists']} 
+            $sql = "SELECT * FROM {$_TABLES['profile_lists']}
                     {$this->access_sql}
                     ORDER BY orderby ASC LIMIT 1";
             //echo $sql;die;
@@ -440,10 +440,10 @@ class prfList
 
         $retval = '';
 
-        // Verify that the current user is allowed to see this list, and 
+        // Verify that the current user is allowed to see this list, and
         // check again that we have a valid list ID. If showing the list
         // in an autotag, just display nothing.
-        if (!$this->isAdmin && 
+        if (!$this->isAdmin &&
                 ($this->listid == '' || !SEC_inGroup($this->group_id)) ) {
             if (!$autotag) {
                 if ($_SYSTEM['framework'] == 'uikit') {
@@ -487,20 +487,6 @@ class prfList
         }
 
         $this->_getPluginFilters();
-        /*$filter = '';
-        $args = array('post' => $_POST, 'get' => $_GET);
-        foreach ($_PLUGINS as $pi_name) {
-            $status = LGLIB_invokeService($pi_name, 'profilefilter', $args,
-                        $pi_filter, $svc_msg);
-            if ($status == PLG_RET_OK) {
-                if (!empty($pi_filter['filter'])) {
-                    $filter .= $pi_filter['filter'];
-                }
-                if (!empty($pi_filter['get'])) {
-                    $get_parms[] = $pi_filter['get'];
-                }
-            }
-        }*/
 
         $extras = array('f_info' => array());
         $query_sql = $this->_getListSQL('', $extras);
@@ -521,21 +507,22 @@ class prfList
         $text_arr = array(
             'form_url'   => PRF_PI_URL . '/list.php?listid='.$this->listid,
         );
-        /*if (!empty($get_parms)) {
-            $this->pi_query = implode('&amp;', $get_parms);
-            $text_arr['form_url'] .= '&amp;' . $this->pi_query;
-        }*/
         if (!empty($this->pi_query)) {
             $text_arr['form_url'] .= '&amp;' . $this->pi_query;
         }
-            
+
         if (!empty($query_arr['query_fields']) && $this->hasExtras) {
             $text_arr['has_extras'] = true;
         }
 
         // Add the export link if requested.
         $pdflink = '<a href="' . PRF_PI_URL .
-                '/list.php?action=pdf&listid=' . $this->listid . '" target="_new">PDF</a>';
+                '/list.php?action=pdf&listid=' . $this->listid;
+        if (!empty($this->pi_query)) {
+            $pdflink .= '&amp;' . $this->pi_query;
+        }
+        $pdflink .= '" target="_new">PDF</a>';
+
         $exportlink = '';
         if ($this->show_export) {
             $query = urlencode($this->_getQuery());
@@ -545,13 +532,13 @@ class prfList
             $exportlink_disp = PRF_PI_URL . '/list.php?action=export' . $query .
                 '&amp;listid=' . $this->listid;
             if (isset($_GET['order'])) {
-                $exportlink_disp .= '&amp;orderby=' . 
+                $exportlink_disp .= '&amp;orderby=' .
                         $header_arr[$_GET['order']]['field'] .
                         '&amp;direction=' . $_GET['direction'];
             }
             $exportlink_all = $exportlink_disp . '&amp;allfields';
-            $exportlink = $LANG_PROFILE['export'] . 
-                    ': <a href="' . $exportlink_disp . '">' . 
+            $exportlink = $LANG_PROFILE['export'] .
+                    ': <a href="' . $exportlink_disp . '">' .
                     $LANG_PROFILE['displayed'] . '</a> / ' .
                     '<a href="' . $exportlink_all . '">' .
                     $LANG_PROFILE['all_fields'] . '</a>';
@@ -578,7 +565,6 @@ class prfList
         $T->parse('output', 'list');
         $retval = $T->finish($T->get_var('output'));
         return $retval;
-
     }
 
 
@@ -640,7 +626,7 @@ class prfList
         // If no list ID was specified, get the first available list that
         // the user can access
         if ($this->listid == '') {
-            $sql = "SELECT * FROM {$_TABLES['profile_lists']} 
+            $sql = "SELECT * FROM {$_TABLES['profile_lists']}
                     {$this->access_sql}
                     ORDER BY listid ASC LIMIT 1";
             //echo $sql;die;
@@ -655,7 +641,7 @@ class prfList
 
         // Get the requested sort field & direction, or use the default
         if (isset($_GET['order'])) {
-            $this->sortby = $_GET['order'];   
+            $this->sortby = $_GET['order'];
             $this->sortdir = $_GET['direction'];
         } else {
             foreach ($this->fields as $key=>$fld) {
@@ -754,8 +740,8 @@ class prfList
         USES_class_navbar();
 
         $menu = new navbar();
-        $sql = "SELECT * from {$_TABLES['profile_lists']} 
-                {$this->access_sql} 
+        $sql = "SELECT * from {$_TABLES['profile_lists']}
+                {$this->access_sql}
                 ORDER BY orderby ASC";
         $r = DB_query($sql, 1);
         $query = urlencode($this->_getQuery());
@@ -770,7 +756,7 @@ class prfList
         }
         while ($A = DB_fetchArray($r, false)) {
             // not using COM_buildUrl here since there may be a query string
-            $menu->add_menuitem($A['title'], PRF_PI_URL .  
+            $menu->add_menuitem($A['title'], PRF_PI_URL .
                     '/list.php?listid=' . $A['listid'] . $query);
         }
         $menu->set_selected($this->title);
@@ -801,7 +787,7 @@ class prfList
             'lang_verification' => $LANG28[107],
             'lang_approval' => $LANG28[44],
             'lang_activation' => $LANG04[116],
-            'referrer'      => isset($_POST['referrer']) ? 
+            'referrer'      => isset($_POST['referrer']) ?
                     $_POST['referrer'] : PRF_ADMIN_URL . '/index.php?lists=x',
             'doc_url'   => PRF_getDocURL('list_def.html'),
             'mootools' => $_SYSTEM['disable_mootools'] ? '' : 'true',
@@ -819,13 +805,13 @@ class prfList
             }
         }
 
-        // Add fields from the main users table             
+        // Add fields from the main users table
         $avail_fields = array(
-            'username'  => array('title' => $LANG_PROFILE['username'], 
+            'username'  => array('title' => $LANG_PROFILE['username'],
                         'field' => 'username',
                         'dbfield' => $_TABLES['users'] . '.username',
                             'perm' => 2),
-            'fullname'  => array('title' => $LANG_PROFILE['fullname'], 
+            'fullname'  => array('title' => $LANG_PROFILE['fullname'],
                         'field' => 'fullname',
                         'dbfield' => $_TABLES['users'] . '.fullname',
                             'perm' => 2),
@@ -858,8 +844,8 @@ class prfList
          foreach ($_PLUGINS as $pi_name) {
             $status = LGLIB_invokeService($pi_name, 'profilefields', $args,
                         $pi_tmp, $svc_msg);
-            if ($status == PLG_RET_OK && 
-                    isset($pi_tmp['names']) && 
+            if ($status == PLG_RET_OK &&
+                    isset($pi_tmp['names']) &&
                     is_array($pi_tmp['names'])) {
                     foreach($pi_tmp['names'] as $name=>$info) {
                         $tmp[$name] = array(
@@ -879,7 +865,7 @@ class prfList
             // Show the currently-selected fields at the top of the list
             foreach ($this->fields as $key=>$field) {
                 if ($field['field'] == 'fullname') {
-                    $fld_opt = '<select name="fld_opt[' . 
+                    $fld_opt = '<select name="fld_opt[' .
                             $field['field'] . '][disp]">' . LB;
                     $nf = isset($field['opt']['disp']) ?
                         (int)$field['opt']['disp'] : 0;
@@ -902,7 +888,7 @@ class prfList
                     'fld_text'  => $field['text'],
                     'sort_chk'  => isset($field['sort']) && $field['sort'] == true ? PRF_CHECKED : '',
                     'search_chk' => isset($field['search']) && $field['search'] == true ? PRF_CHECKED : '',
-                    'public_field' => 
+                    'public_field' =>
                     $avail_fields[$field['field']]['perm'] >= 2 ? 'true' : '',
                     'allow_sort' => $field['field'] != 'avatar' ? 'true' : '',
                     'ASC_sel'   => '',
@@ -920,7 +906,7 @@ class prfList
         // Now show the rest of the available, but unused, fields
         foreach ($avail_fields as $field => $data) {
             if ($fld_name == 'fullname') {
-                $fld_opt = '<select name="fld_opt[' . 
+                $fld_opt = '<select name="fld_opt[' .
                             $field['field'] . '][disp]">' . LB;
                 $nf = 0;
                 for ($i = 0; $i < 2; $i++) {
@@ -985,7 +971,7 @@ class prfList
             incl_exp_stat = '" . (int)$this->incl_exp_stat . "',
             fields = '" . serialize($this->fields) . "'";
         $sql = $sql_action . $sql_fields . $sql_where;
-        //echo $sql;die;   
+        //echo $sql;die;
         DB_query($sql);
         PRF_reorderDef('profile_lists', 'listid');
     }
@@ -1005,7 +991,6 @@ class prfList
         } else {
             $value = FALSE;
         }
-         
         $this->show_export = $value;
     }
 
@@ -1098,7 +1083,12 @@ class prfList
         $this->pi_filter = '';
         $this->pi_query = '';
         $get_params = array();
-        $args = array('post' => $_POST, 'get' => $_GET);
+        $args = array(
+            'post' => $_POST,
+            'get' => $_GET,
+            'exp_stat' => $this->incl_exp_stat,
+            'incl_user_stat' => $this->incl_user_stat,
+        );
         foreach ($_PLUGINS as $pi_name) {
             $status = LGLIB_invokeService($pi_name, 'profilefilter', $args,
                         $pi_filter, $svc_msg);
