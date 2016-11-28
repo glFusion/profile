@@ -644,50 +644,13 @@ function plugin_itemPreSave_profile($type, $content)
     if ($type != 'registration' && $type != 'useredit')
         return '';
 
+    USES_profile_functions();
     $errors = array();
 
-    $A = PRF_getDefs(0, '', 0);
-    foreach ($A as $item) {
-        if ($item->perm_owner < 3) {
-            // Read-only items can't be filled in, so don't validate.
-            continue;
-        }
-
-        if ($item->required == 1) {
-            // Don't validate required items on registration
-            // if the user can't fill them in.
-            if ($type == 'registration' && !$item->user_reg)
-                continue;
-
-            switch ($item->type) {
-            case 'date':
-                if (empty($_POST[$item->name . '_month']) ||
-                    empty($_POST[$item->name . '_day']) ||
-                    empty($_POST[$item->name . '_year'])) {
-                    $errors[] = empty($item->options['help_text']) ?
-                            sprintf($LANG_PROFILE['msg_fld_missing'], $item->prompt) :
-                            $item->options['help_text'];
-                }
-                break;
-            default:
-                if (empty($_POST[$item->name])) {
-                    $errors[] = sprintf($LANG_PROFILE['msg_fld_missing'], $item->prompt);
-                }
-                break;
-            }
-        }
-    }
-    if (!empty($errors)) {
-        $err_msg = '<b>' . $LANG_PROFILE['save_error_title'] . '</b><ul>';
-        foreach ($errors as $error) {
-            $err_msg .= '<li>' . $error . '</li>' . LB;
-        }
-        $err_msg .= '</ul>' . LB;
-        LGLIB_storeMessage($err_msg,$LANG_PROFILE['save_error_title'], false);
-        return 97;      // default message value, might as well use it
-    } else {
-        return 0;   // Indicates success;
-    }
+    if (!PRF_saveData($_POST, $uid))
+        return 97;
+    else
+        return 0;
 }
 
 
@@ -999,7 +962,6 @@ function plugin_getconfigelementhelp_profile($option, $doclang='english')
     }
 
     return array($doc_url, 0);
-
 }
 
 
