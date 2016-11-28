@@ -139,7 +139,7 @@ class prfPdfList extends prfList
                     $fldname    => $data,
                 ) );
             }
-            $T->parse('row', 'UserRow');
+            $T->parse('row', 'UserRow', true);
         }
 
         USES_class_date();
