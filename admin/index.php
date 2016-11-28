@@ -1057,6 +1057,17 @@ function PRF_searchUsersForm()
                 '[]" value="-1" />' . $LANG_PROFILE['any'];
             $fld_empty = 'true';    // Can be empty
             break;
+        case 'date':
+            $fld .= '<input type="radio" name="'.$A['name'].'_mod" value="=">=&nbsp;&nbsp;';
+            $fld .= '<input type="radio" name="'.$A['name'].'_mod" value="<"><&nbsp;&nbsp;';
+            $fld .= '<input type="radio" name="'.$A['name'].'_mod" value="<="><=&nbsp;&nbsp;';
+            $fld .= '<input type="radio" name="'.$A['name'].'_mod" value=">">>&nbsp;&nbsp;';
+            $fld .= '<input type="radio" name="'.$A['name'].'_mod" value=">=">>=&nbsp;&nbsp;';
+            $fld .= '<input type="radio" name="'.$A['name'].'_mod" value="<>"><>&nbsp;';
+            $F = new prfDate($A['name']);
+            $fld .= $F->FormField();
+            break;
+
         default:
             $fld = '<input type="text" size="50" name="'.$A['name'].'" value="" />';
             $fld_empty = 'true';
@@ -1094,21 +1105,41 @@ function PRF_searchUsers($vals)
     $fields = array();
     while ($A = DB_fetchArray($res, false)) {
         if ($A['type'] != 'static') {
-            $fields[] = $A['name'];
+            $fields[$A['name']] = $A['type'];
             $sql_flds[] = '`data`.`' . $A['name'] . '`';
         }
     }
     $sql_fldnames = implode(',', $sql_flds);
 
     $flds = array();
-    foreach ($fields as $field) {
-        if ($_POST[$field] == '-1') continue;   // signifies "any"
-        $field = DB_escapeString($field);
-        $value = DB_escapeString($_POST[$field]);
-        if (isset($_POST['empty'][$field])) {
-            $flds[] = "(`data`.`$field` = '' OR `data`.`$field` IS NULL)";
-        } elseif ($_POST[$field] !== '') {
-            $flds[] = "`data`.`$field` like '%{$value}%'";
+    foreach ($fields as $f_name=>$f_type) {
+        if ($_POST[$f_name] == '-1') continue;   // signifies "any"
+        $f_name = DB_escapeString($f_name);
+        switch($f_type) {
+        case 'date':
+            if (isset($_POST['empty'][$f_name])) {
+                $flds[] = "(`data`.`$f_name` = '' OR `data`.`$f_name` IS NULL OR `data`.`$f_name` LIKE '0000-00-00%')";
+            } else {
+                $mods = array('<', '<=', '>', '>=', '=', '<>');
+                $value = sprintf('%04d-%02d-%02d', $_POST[$f_name . '_year'],
+                    $_POST[$f_name . '_month'], $_POST[$f_name . '_day']);
+                if ($value == '0000-00-00') continue;
+                if (!isset($_POST[$f_name . '_mod'])) {
+                    $flds[] = "`data`.`$f_name` LIKE '%$value%'";
+                } else {
+                    $mod = in_array($_POST[$f_name . '_mod'], $mods) ? $_POST[$f_name . '_mod'] : '=';
+                    $flds[] = "`data`.`$f_name` $mod '$value'";
+                }
+            }
+            break;
+        default:
+            $value = DB_escapeString($_POST[$f_name]);
+            if (isset($_POST['empty'][$f_name])) {
+                $flds[] = "(`data`.`$f_name` = '' OR `data`.`$f_name` IS NULL)";
+            } elseif ($_POST[$f_name] !== '') {
+                $flds[] = "`data`.`$f_name` like '%{$value}%'";
+            }
+            break;
         }
     }
     if (is_array($flds) && !empty($flds))
