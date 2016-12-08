@@ -1,36 +1,30 @@
 {# begin {templatelocation} #}
-{!if 0}  <script>
-  $(function() {
-    $( document ).tooltip();
-  });
-  </script>
-{!endif}
 <!-- BEGIN QueueRow -->
   <div class="uk-form-row">
-  {!if spancols}
-  {!else}
-  {!if prompt}
+{!if spancols}
+{!else}
+{!if prompt}
     <label class="uk-form-label" for="{fld_name}">{prompt}:</label>
-  {!endif}
-  {!endif}
+{!endif}
+{!endif}
   <div class="uk-form-controls">
   <span class="pluginProfileField">
     {field}
     <span class="prfInfoIcons">
-      {!if is_static}
-      {!else}
-      {!if is_visible}
-      <img data-uk-tooltip src="{site_url}/profile/images/visible.png" width="16" height="16" title="{$LANG_PROFILE['hlp_visible']}" />
-      {!else}
-      <img data-uk-tooltip src="{site_url}/profile/images/invisible.png" width="16" height="16" title="{$LANG_PROFILE['hlp_invisible']}" />
-      {!endif}
-      {!if is_required}
-      <img data-uk-tooltip src="{site_url}/profile/images/required.png" width="16" height="16" title="{$LANG_PROFILE['hlp_required']}" />
-      {!endif}
-      {!if help_text}
-      <img data-uk-tooltip src="{layout_url}/images/info.png" width="16" height="16" title="{help_text}" />
-      {!endif}
-      {!endif}
+{!if is_static}
+{!else}
+  {!if is_visible}
+      <img class="tooltip" src="{site_url}/profile/images/visible.png" width="16" height="16" title="{$LANG_PROFILE['hlp_visible']}" />
+  {!else}
+      <img class="tooltip" src="{site_url}/profile/images/invisible.png" width="16" height="16" title="{$LANG_PROFILE['hlp_invisible']}" />
+  {!endif}
+  {!if is_required}
+      <img class="tooltip" src="{site_url}/profile/images/required.png" width="16" height="16" title="{$LANG_PROFILE['hlp_required']}" />
+  {!endif}
+  {!if help_text}
+      <img class="tooltip" src="{layout_url}/images/info.png" width="16" height="16" title="{help_text}" />
+  {!endif}
+{!endif}
     </span>
   </span>
   </div>
