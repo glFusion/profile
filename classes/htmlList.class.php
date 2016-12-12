@@ -6,7 +6,7 @@
 *   @copyright  Copyright (c) 2016 Lee Garner <lee@leegarner.com>
 *   @package    profile
 *   @version    1.1.4
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
@@ -18,14 +18,19 @@ USES_profile_class_list();
 *   @package    profile
 *   @since      1.1.4
 */
-class prfPdfList extends prfList
+class prfHtmlList extends prfList
 {
+    /**
+    *   Constructor. Simply calls the parent constructor
+    *
+    *   @param  string  $listid     Optional list ID to load
+    */
     public function __construct($listid='')
     {
         parent::__construct($listid);
     }
 
- 
+
     /**
     *   Create the report
     *
@@ -48,22 +53,10 @@ class prfPdfList extends prfList
             }
         }
 
-        if (!empty($filename)) {
-            $cache_dir = $_CONF['path'] . 'data/profile';
-            if (!is_dir($cache_dir)) {
-                mkdir($cache_dir, 0777, true);
-            }
-        }
-        $retval = '';
-
         // Verify that the current user is allowed to see this list, and
         // check again that we have a valid list ID. If showing the list
         // in an autotag, just display nothing.
         if (!$this->isAdmin) {
-            if (!empty($filename)) {
-                // Only admins can create files for later publication
-                COM_404();
-            }
             if ($this->listid == '' || !SEC_inGroup($this->group_id)) {
                 COM_404();
             }
@@ -129,11 +122,18 @@ class prfPdfList extends prfList
         while ($A = DB_fetchArray($result, false)) {
             foreach ($this->fields as $field) {
                 $fldname = $field['field'];
-                $fldClass = $classes[$field['field']];
-                if ($fldClass !== NULL) {
-                    $data = $fldClass->FormatValue($A[$fldname]);
-                } else {
-                    $data = $A[$fldname];
+                switch ($fldname) {
+                case 'avatar':
+                    $data = USER_getPhoto($A['uid'], $A['photo'], $A['email']);
+                    break;
+                default:
+                    $fldClass = $classes[$field['field']];
+                    if ($fldClass !== NULL) {
+                        $data = $fldClass->FormatValue($A[$fldname]);
+                    } else {
+                        $data = $A[$fldname];
+                    }
+                    break;
                 }
                 $T->set_var(array(
                     $fldname    => $data,
@@ -150,26 +150,9 @@ class prfPdfList extends prfList
         ) );
         $T->parse('output', 'list');
         $content = $T->finish($T->get_var('output'));
- 
-        USES_lglib_class_html2pdf();
-        try {
-            $html2pdf = new HTML2PDF('P', 'A4', 'en');
-          //$html2pdf->setModeDebug();
-            $html2pdf->setDefaultFont('Arial');
-            $html2pdf->writeHTML($content);
-            // Save the file if a filename is given, otherwise download
-            if ($filename !== '')  {
-                $html2pdf->Output($this->cache_dir . '/' . $filename, 'F');
-            } else {
-                $html2pdf->Output('memberlist.pdf', 'I');
-            }
-        } catch(HTML2PDF_exception $e) {
-            COM_errorLog($e);
-            return 2;
-        }
-
+        return $content;
     }   // function Render()
 
-}   // class PhotoCatalog
+}   // class prfHTMLList
 
 ?>

@@ -6,7 +6,7 @@
 *   @copyright  Copyright (c) 2010-2011 Lee Garner <lee@leegarner.com>
 *   @package    profile
 *   @version    1.1.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
@@ -40,13 +40,24 @@ case 'export':
         header('Content-Disposition: attachment; filename="'.$listid.'.csv"');
         echo $content;
         exit;
-        break;
     }
+    break;
+
 case 'pdf':
     USES_profile_class_pdflist();
     $PL = new prfPdfList($listid);
     $content = $PL->Render();
     if (!empty($content)) {
+        exit;
+    }
+    break;
+
+case 'html':
+    USES_profile_class_htmlList();
+    $PL = new prfHtmlList($listid);
+    $content = $PL->Render();
+    if (!empty($content)) {
+        echo $content;
         exit;
     }
     break;

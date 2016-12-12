@@ -7,7 +7,7 @@
 *   @copyright  Copyright (c) 2009-2015 Lee Garner <lee@leegarner.com>
 *   @package    profile
 *   @version    1.1.4
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
@@ -24,7 +24,7 @@ function PRF_editForm($type = 'edit', $uid = 0, $form_id='profileform')
 {
     global $_CONF, $_USER, $_TABLES, $LANG_PROFILE, $_SYSTEM;
 
-    
+
     // Choose the correct template file based on the glFusion version
     // and type of form needed
     switch ($type) {
@@ -181,6 +181,7 @@ function PRF_saveData($vals, $uid = 0, $type = 'edit')
             $validation_errs++;
         }
     }
+
     // If any validation errors found, return false now
     if ($validation_errs > 0) return false;
 
@@ -237,7 +238,7 @@ function PRF_saveData($vals, $uid = 0, $type = 'edit')
         case 'checkbox':
             $newval = $vals[$name] == '1' ? '1' : '0';
             break;
-    
+
         case 'multicheck':
             $newval = @serialize($vals[$name]);
             break;
@@ -301,16 +302,16 @@ function PRF_saveData($vals, $uid = 0, $type = 'edit')
         $new_sql = implode(', ', $fld_sql);
         $c = DB_count($_TABLES['profile_data'], 'puid', $uid);
         if ($c == 0) {
-            $sql = "INSERT INTO {$_TABLES['profile_data']} SET 
+            $sql = "INSERT INTO {$_TABLES['profile_data']} SET
                     puid = $uid, $new_sql";
         } else {
-            $sql = "UPDATE {$_TABLES['profile_data']} SET 
-                    $new_sql 
+            $sql = "UPDATE {$_TABLES['profile_data']} SET
+                    $new_sql
                     WHERE puid = $uid";
         }
         DB_query($sql, 1);
         if (DB_error()) {
-            COM_errorLog("PRF_saveData() - error execuring sql: $sql");
+            COM_errorLog("PRF_saveData() - error executing sql: $sql");
             return false;
         }
     }
@@ -388,9 +389,9 @@ function PRF_autogen($A, $uid=0)
         return COM_makeSID();
     }
     $function = 'CUSTOM_profile_autogen_' . $A->name;
-    if (function_exists($function)) 
+    if (function_exists($function))
         return $function($A, $uid);
-    elseif (function_exists('CUSTOM_profile_autogen')) 
+    elseif (function_exists('CUSTOM_profile_autogen'))
         return CUSTOM_profile_autogen($A, $uid);
     else
         return COM_makeSID();
@@ -538,7 +539,7 @@ function PRF_invokeService($type, $action, $args, &$output, &$svc_msg)
 /**
 *   Shows security control for an object
 *
-*   This will return the HTML needed to create the security control see on 
+*   This will return the HTML needed to create the security control see on
 *   screen for profile items.
 *   Taken from SEC_getPermissionsHTML() to allow for no owner access
 *

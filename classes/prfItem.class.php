@@ -6,7 +6,7 @@
 *   @copyright  Copyright (c) 2009-2016 Lee Garner <lee@leegarner.com>
 *   @package    profile
 *   @version    1.1.4
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
@@ -63,7 +63,7 @@ class prfItem
         @var boolean */
     protected $hidden;
 
- 
+
     /**
     *   Constructor.  Sets the local properties using the array $item.
     *
@@ -184,9 +184,9 @@ class prfItem
         $size = $this->options['size'];
         $maxlength = $this->options['maxlength'];
         $maxlength = (int)$maxlength > 0 ? "maxlength=\"$maxlength\"" : '';
-        $fld = "<input $this->_frmClass name=\"{$this->name}\" 
+        $fld = "<input $this->_frmClass name=\"{$this->name}\"
                     id=\"{$this->name}\" $maxlength
-                    size=\"$size\" 
+                    size=\"$size\"
                     type=\"text\" value=\"{$this->value}\" $this->_frmReadonly>\n";
 
         return $fld;
@@ -291,7 +291,7 @@ class prfItem
             return new prfText($A, $value, $uid);
         }
     }
- 
+
 }   // class prfItem
 
 
@@ -386,10 +386,10 @@ class prfLink extends prfItem
         if (empty($value))
             $value = $this->value;
 
-        if (empty($value)) 
+        if (empty($value))
             return '';
 
-        return '<a href="' . $value . '" rel="nofollow">' . 
+        return '<a href="' . $value . '" rel="nofollow">' .
             htmlspecialchars($value) . '</a>';
     }
 
@@ -460,7 +460,7 @@ class prfDate extends prfItem
         if (empty($value))
             $value = $this->value;
 
-        if (empty($value) || $value == '0000-00-00') 
+        if (empty($value) || $value == '0000-00-00')
             return '';
 
         // Explode parts from 'YYYY-MM-DD hh:mm:ss' format
@@ -489,7 +489,7 @@ class prfDate extends prfItem
 
         if ($this->options['timeformat'] != '') {
             $format = $this->options['timeformat'] == '12' ? '%I:%M %p' : '%H:%M';
-            $formatted .= ' ' . 
+            $formatted .= ' ' .
                     strftime($format, mktime($hour, $minute, $second));
         }
         /*if ($this->options['showtime'] == 1) {
@@ -513,13 +513,13 @@ class prfDate extends prfItem
     *
     *   @return string      HTML for month, day and year fields.
     */
-    public function FormField()
+    public function FormField($incl_time = true)
     {
         global $LANG_PROFILE, $_CONF;
 
         $this->_FormFieldInit();
 
-        if ($this->options['timeformat']) {
+        if ($this->options['timeformat'] && $incl_time) {
             $iFormat = '%Y-%m-%d %H:%M';
             list($date, $time) = explode(' ', $this->value);
             if ($time == NULL) $time = '00:00:00';
@@ -534,30 +534,30 @@ class prfDate extends prfItem
 
             if ($this->options['timeformat'] == '12') {
                 list($hour, $ampm_sel) = $this->hour24to12($tm[0]);
-                $ampm_fld = '&nbsp;&nbsp;' . 
+                $ampm_fld = '&nbsp;&nbsp;' .
                     self::ampmSelection($this->name . '_ampm', $ampm_sel);
             } else {
                 $ampm_fld = '';
                 $hour = $tm[0];
             }
- 
+
             $hr_fld = '<select id="' . $this->name . '_hour" ' .
                     'name="' . $this->name . '_hour" ' .
                     $this->_frmReadOnly . '>' . LB .
                 COM_getHourFormOptions($hour, $this->options['timeformat']) .
                 '</select>' . LB;
             $min_fld = '<select id="' . $this->name . '_minute" ' .
-                    'name="' . $this->name . '_minute" ' . 
+                    'name="' . $this->name . '_minute" ' .
                     $this->_frmReadOnly . '>' . LB .
                 COM_getMinuteFormOptions($tm[1]) .
                 '</select>' . LB;
-            /*$hr_fld = '<input type="text" id="' . $this->name . 
+            /*$hr_fld = '<input type="text" id="' . $this->name .
                 '_hour" size="2" maxlength="2" name="' . $this->name .
-                '_hour" value="' . $hour . '" ' . $this->_frmReadonly . 
+                '_hour" value="' . $hour . '" ' . $this->_frmReadonly .
                 '/>' . LB;
-            $min_fld = '<input type="text" id="' . $this->name . 
+            $min_fld = '<input type="text" id="' . $this->name .
                 '_minute" size="2" maxlength="2" name="' . $this->name .
-                '_minute" value="' . $tm[1] . '" ' . $this->_frmReadonly . 
+                '_minute" value="' . $tm[1] . '" ' . $this->_frmReadonly .
                 '/>' . LB;*/
         } else {
             $iFormat = '%Y-%m-%d';
@@ -586,14 +586,14 @@ class prfDate extends prfItem
         $d_fld .= COM_getDayFormOptions((int)$dt[2]) . "</select>\n";
 
         $y_fld = $LANG_PROFILE['year'] .
-            ': <input type="text" id="' . $this->name . '_year" name="' . 
-            $this->name . '_year" size="5" value="' . $dt[0] . '" ' . 
+            ': <input type="text" id="' . $this->name . '_year" name="' .
+            $this->name . '_year" size="5" value="' . $dt[0] . '" ' .
             $this->_frmReadonly . '/>' . LB;
 
         // Hidden field to hold the date in its native format
         // Required for the date picker
         $datepick = '<input type="hidden" name="f_' . $this->name .
-                '" id="f_' . $this->name . '" value="' . $this->value . 
+                '" id="f_' . $this->name . '" value="' . $this->value .
                 '"/>' . LB;
 
         if (!$this->readonly) {
@@ -649,7 +649,7 @@ function {$this->name}_onUpdate(cal)
         if ($this->options['timeformat']) {
             $fld .= '&nbsp;&nbsp;' . $hr_fld . ':' . $min_fld . $ampm_fld;
         }
- 
+
         $fld .= $datepick;
 
         return $fld;
@@ -841,7 +841,7 @@ class prfCheckbox extends prfItem
     */
     public function FormatValue($value = 0)
     {
-        global $LANG_PROFILE; 
+        global $LANG_PROFILE;
 
         if (empty($value))
             $value = $this->value;
@@ -870,9 +870,9 @@ class prfCheckbox extends prfItem
         }
 
         // _frmClass is ignored since fValidator doesn't work for checkboxes
-        $fld = "<input {$this->_frmClass} name=\"{$this->name}\" 
+        $fld = "<input {$this->_frmClass} name=\"{$this->name}\"
                     id=\"{$this->name}\"
-                    type=\"checkbox\" value=\"1\" $chk 
+                    type=\"checkbox\" value=\"1\" $chk
                     {$this->_frmReadonly}>\n";
         return $fld;
     }
@@ -970,7 +970,7 @@ class prfRadio extends prfItem
         $this->_FormFieldInit();
 
         if (empty($this->options['values'])) {
-            // Have to have some values for radio buttons 
+            // Have to have some values for radio buttons
             return '';
         }
 
@@ -983,7 +983,7 @@ class prfRadio extends prfItem
         foreach ($this->options['values'] as $id=>$value) {
             $sel = $this->value == $value ? PRF_CHECKED : '';
             $fld .= "<input $this->_frmClass type=\"radio\"
-                name=\"{$this->name}\" 
+                name=\"{$this->name}\"
                 id=\"{$this->name}\"
                 value=\"" . htmlentities($value, ENT_QUOTES) .
                 "\" $sel {$this->_frmReadonly}/>$value&nbsp;\n";
@@ -1005,7 +1005,7 @@ class prfRadio extends prfItem
             foreach ($this->options['values'] as $valname) {
                 $listinput .= '<li><input type="text" id="vName' . $i .
                         '" value="' . $valname . '" name="selvalues[]" />';
-                $sel = $this->options['default'] == $valname ? 
+                $sel = $this->options['default'] == $valname ?
                         PRF_CHECKED : '';
                 $listinput .= "<input type=\"radio\" name=\"sel_default\"
                         value=\"$i\" $sel />";
@@ -1060,7 +1060,7 @@ class prfSelect extends prfItem
 
         $this->_FormFieldInit();
 
-        $fld = "<select $this->_frmClass name=\"{$this->name}\" 
+        $fld = "<select $this->_frmClass name=\"{$this->name}\"
                     id=\"{$this->name}\" $this->_frmReadonly>\n";
         $fld .= "<option value=\"\">--{$LANG_PROFILE['select']}--</option>\n";
         foreach ($this->options['values'] as $id=>$value) {
@@ -1068,7 +1068,7 @@ class prfSelect extends prfItem
             $fld .= "<option value=\"$value\" $sel>$value</option>\n";
         }
         $fld .= "</select>\n";
-        return $fld; 
+        return $fld;
     }
 
 
@@ -1085,7 +1085,7 @@ class prfSelect extends prfItem
             foreach ($this->options['values'] as $valname) {
                 $listinput .= '<li><input type="text" id="vName' . $i .
                         '" value="' . $valname . '" name="selvalues[]" />';
-                $sel = $this->options['default'] == $valname ? 
+                $sel = $this->options['default'] == $valname ?
                         PRF_CHECKED : '';
                 $listinput .= "<input type=\"radio\" name=\"sel_default\"
                         value=\"$i\" $sel />";
@@ -1248,7 +1248,7 @@ class prfAccount extends prfItem
 
         $this->_FormFieldInit();
 
-        $fld = "<select $this->_frmClass name=\"{$this->name}\" 
+        $fld = "<select $this->_frmClass name=\"{$this->name}\"
                     id=\"{$this->name}\" $this->_frmReadonly>\n";
         $fld .= $this->AccountSelection($this->value);
         //$fld .= "<option value=\"0\">--{$LANG_PROFILE['select']}--</option>\n";
@@ -1257,7 +1257,7 @@ class prfAccount extends prfItem
             $fld .= "<option value=\"$value\" $sel>$value</option>\n";
         }*/
         $fld .= "</select>\n";
-        return $fld; 
+        return $fld;
     }
 
 
@@ -1306,7 +1306,7 @@ class prfAccount extends prfItem
         $children = array();
         $accounts = $parent;
 
-        $sql = "SELECT puid FROM {$_TABLES['profile_data']} 
+        $sql = "SELECT puid FROM {$_TABLES['profile_data']}
                 WHERE sys_parent = '{$this->uid}'";
 
         $res = DB_query($sql, 1);

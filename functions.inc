@@ -6,7 +6,7 @@
 *   @copyright  Copyright (c) 2009-2016 Lee Garner <lee@leegarner.com>
 *   @package    profile
 *   @version    1.1.4
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
@@ -29,7 +29,7 @@ define('PRF_PI_PATH', $_CONF['path'] . 'plugins/' . $_PRF_CONF['pi_dir'] . '/');
 /** Define the base public url for the plugin */
 define('PRF_PI_URL', $_CONF['site_url'] . '/' . $_PRF_CONF['pi_dir']);
 /** Define the administration url for the plugin */
-define('PRF_ADMIN_URL', 
+define('PRF_ADMIN_URL',
             $_CONF['site_admin_url'] . '/plugins/' . $_PRF_CONF['pi_dir']);
 define('PRF_CHECKED', 'checked="checked"');
 define('PRF_SELECTED', 'selected="selected"');
@@ -77,8 +77,11 @@ function USES_profile_class_item()
 function USES_profile_class_list()
 {   require_once PRF_PI_PATH . 'classes/prfList.class.php';     }
 
-function USES_profile_class_pdflist()
-{   require_once PRF_PI_PATH . 'classes/pdflist.class.php';     }
+function USES_profile_class_pdfList()
+{   require_once PRF_PI_PATH . 'classes/pdfList.class.php';     }
+
+function USES_profile_class_htmlList()
+{   require_once PRF_PI_PATH . 'classes/htmlList.class.php';     }
 
 // Include api functions for other plugins
 require_once PRF_PI_PATH . 'services.inc.php';
@@ -99,7 +102,7 @@ function plugin_chkVersion_profile()
 
 
 /**
-*   This will put an option for profile administration in the command 
+*   This will put an option for profile administration in the command
 *   and control area
 *   @return   mixed   array(title, url, icon), or false when not allowed
 */
@@ -180,7 +183,7 @@ function plugin_user_login_profile($uid)
     }
 }
 
-    
+
 /**
 *   Upgrade the Profile plugin
 *   @return integer Number of message to display (true = generic success msg)
@@ -260,7 +263,7 @@ function plugin_autouninstall_profile ()
 {
     global $_PRF_CONF;
     $out = array (
-        // give the name of the tables, without $_TABLES[] 
+        // give the name of the tables, without $_TABLES[]
         'tables' => array('profile_def',
                 'profile_data', 'profile_lists',
             ),
@@ -308,7 +311,7 @@ function plugin_getheadercss_profile()
 
     $styles = array();
     $files = array(
-        'style.css', 
+        'style.css',
     );
 
     // When looking for CSS files, we'll check in this order:
@@ -429,7 +432,7 @@ function plugin_profilevariablesdisplay_profile($uid, &$template)
     if ($items > 0) {
         $T->parse('output', 'block');
         $existingFields = $template->get_var('plugin_fields');
-        $template->set_var('plugin_fields', 
+        $template->set_var('plugin_fields',
             $existingFields . $T->finish($T->get_var('output')));
     } else {
         return '';
@@ -520,9 +523,9 @@ function PRF_setUserValues($uid=0)
 
 
 /**
-*   Retrieve all the profile definitions and data items for the current or 
+*   Retrieve all the profile definitions and data items for the current or
 *   supplied user ID.
-*   An empty array is returned in case of a database error.  The typical 
+*   An empty array is returned in case of a database error.  The typical
 *   cause would be when the code is updated and the plugin upgrade function
 *   hasn't yet been run to update the database.
 *
@@ -568,7 +571,7 @@ function PRF_getDefs($uid = 0, $key = '', $access = 2)
             $tmp['value'] = $A[$tmp['name']];
         else
             $tmp['value'] = NULL;
-        $F[$tmp['name']] = prfItem::getClass($tmp, $value, $uid);    
+        $F[$tmp['name']] = prfItem::getClass($tmp, $value, $uid);
     }
     return $F;
 }
@@ -773,7 +776,7 @@ function plugin_getmenuitems_profile()
     $menuitems = array();
 
     if (is_array($_CONF_MEMBERLIST)) {
-        $menuitems[$LANG_PROFILE['usermenu']] = 
+        $menuitems[$LANG_PROFILE['usermenu']] =
             "{$_CONF['site_url']}/{$_PRF_CONF['pi_name']}/index.php";
     }
 
@@ -794,7 +797,7 @@ function plugin_getmenuitems_profile()
 *   @param  string      $table    table name if ambiguous (e.g. in JOINs)
 *   @return string      SQL expression string (may be empty)
 */
-function PRF_getPermSQL($type = 'WHERE', $u_id = 0, $access = 2, 
+function PRF_getPermSQL($type = 'WHERE', $u_id = 0, $access = 2,
                         $table = '')
 {
     global $_USER, $_GROUPS;
@@ -839,12 +842,12 @@ function PRF_getPermSQL($type = 'WHERE', $u_id = 0, $access = 2,
             $sql .= "
             (
                 (
-                {$table}group_id IN (" . implode( ',', $UserGroups ) . ")      
-                AND 
+                {$table}group_id IN (" . implode( ',', $UserGroups ) . ")
+                AND
                 {$table}perm_group >= $access
                 )
-            OR 
-                {$table}perm_members >= $access 
+            OR
+                {$table}perm_members >= $access
             )";
         }
     } else {
@@ -978,7 +981,7 @@ function PRF_getDocURL($file='', $doclang='english')
 {
     global $_CONF, $_PRF_CONF;
 
-    $doc_path = $_CONF['path_html'] . $_PRF_CONF['pi_name'] . 
+    $doc_path = $_CONF['path_html'] . $_PRF_CONF['pi_name'] .
                 "/docs/$doclang/";
     $doc_url = '';
 
@@ -1011,8 +1014,8 @@ function PRF_reorderDef($table, $id_fld='id')
 
     $id_fld = DB_escapeString($id_fld);
 
-    $sql = "SELECT $id_fld, orderby 
-            FROM {$_TABLES[$table]} 
+    $sql = "SELECT $id_fld, orderby
+            FROM {$_TABLES[$table]}
             ORDER BY orderby ASC;";
     $result = DB_query($sql, 1);
     if (!$result) return;
@@ -1024,7 +1027,7 @@ function PRF_reorderDef($table, $id_fld='id')
 
         if ($A['orderby'] != $order) {  // only update incorrect ones
             $sql = "UPDATE {$_TABLES[$table]}
-                SET orderby = '$order' 
+                SET orderby = '$order'
                 WHERE $id_fld = '" . DB_escapeString($A[$id_fld]) . "'";
             DB_query($sql, 1);
         }

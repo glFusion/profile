@@ -1,0 +1,77 @@
+<?php
+/**
+*   Handle the printing of PDF reports using FPDF
+*
+*   @author     Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2016 Lee Garner <lee@leegarner.com>
+*   @package    profile
+*   @version    1.1.4
+*   @license    http://opensource.org/licenses/gpl-2.0.php
+*               GNU Public License v2 or later
+*   @filesource
+*/
+
+USES_profile_class_list();
+require_once dirname(__FILE__) . '/htmlList.class.php';
+
+/**
+*   Class for creating a PDF catalog
+*   @package    profile
+*   @since      1.1.4
+*/
+class prfPdfList extends prfHTMLList
+{
+    public function __construct($listid='')
+    {
+        parent::__construct($listid);
+    }
+
+
+    /**
+    *   Create the report
+    *
+    *   @param  $filename   Filename to save to disk, empty to show in browser
+    */
+    public function Render($filename = '')
+    {
+        if (!empty($filename)) {
+            $cache_dir = $_CONF['path'] . 'data/profile';
+            if (!is_dir($cache_dir)) {
+                mkdir($cache_dir, 0777, true);
+            }
+        }
+
+        // Verify that the current user is allowed to see this list, and
+        // check again that we have a valid list ID. If showing the list
+        // in an autotag, just display nothing.
+        if (!$this->isAdmin) {
+            if (!empty($filename)) {
+                // Only admins can create files for later publication
+                COM_404();
+            }
+        }
+
+        $content = parent::Render($filename);
+
+        USES_lglib_class_html2pdf();
+        try {
+            $html2pdf = new HTML2PDF('P', 'A4', 'en');
+            //$html2pdf->setModeDebug();
+            $html2pdf->setDefaultFont('Arial');
+            $html2pdf->writeHTML($content);
+            // Save the file if a filename is given, otherwise download
+            if ($filename !== '')  {
+                $html2pdf->Output($this->cache_dir . '/' . $filename, 'F');
+            } else {
+                $html2pdf->Output('memberlist.pdf', 'I');
+            }
+        } catch(HTML2PDF_exception $e) {
+            COM_errorLog($e);
+            return 2;
+        }
+
+    }   // function Render()
+
+}   // class prfPdfList
+
+?>
