@@ -77,7 +77,7 @@ $sql = "SELECT u.uid, u.fullname, u.email, u.homepage, u.photo
 
 // Add the search parameters if any were supplied
 if ($srchval != '' && !empty($_PRF_CONF['search_fields'])) {
-    $srchvals = split(' ', $srchval);
+    $srchvals = explode(' ', $srchval);
     $phrases = array();
     if (!isset($_PRF_CONF['search_fields']) ||
             !is_array($_PRF_CONF['search_fields'])) {

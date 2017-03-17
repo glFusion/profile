@@ -556,7 +556,10 @@ function PRF_getDefs($uid = 0, $key = '', $access = 2)
     }
     $sql .= " ORDER BY pd.orderby";
     $res = DB_query($sql, 1);
-    if (DB_error()) return array();
+    if (DB_error()) {
+        COM_errorLog("PRF_getDefs() error: $sql");
+        return array();
+    }
 
     // Get the data record for this field
     $sql = "SELECT * FROM {$_TABLES['profile_data']} WHERE puid='$uid'";
@@ -677,7 +680,7 @@ function PRF_getValue($key, $uid=0)
     if ($uid == 0) $uid = $_USER['uid'];
 
     $A = PRF_getDefs($uid, $key);
-    return array($A[$key]['value'], $A[$key]['value_text']);
+    return array($A[$key]->value, $A[$key]->FormatValue());
     //USES_profile_class_profile();
     //$P = new Profile($uid, $key);
     //return array($P->items[$key]->value, $P->items[$key]->value_text);
@@ -702,9 +705,9 @@ function plugin_autotags_profile($op, $content = '', $autotag = '')
         return array('profile', 'profile_list');
     } else if ($op == 'parse') {
         $item_id = COM_applyFilter($autotag['parm1']);
-        $options = split(' ', COM_applyFilter($autotag['parm2']));
+        $options = explode(' ', COM_applyFilter($autotag['parm2']));
         foreach ($options as $tmp) {
-            $opt = split(':', $tmp);
+            $opt = explode(':', $tmp);
             // This is to allow for tags like 'case', which have no options
             // and would throw a PHP error
             if (isset($opt[1])) {
@@ -727,18 +730,22 @@ function plugin_autotags_profile($op, $content = '', $autotag = '')
             // Now get the specific profile value for the user
             list($value, $text) = PRF_getValue($item_id, $uid);
 
-            // Set the $HTML variable to the value or value_text, as requested
-            if (isset($opts['value']))
-                $HTML = $value;
-            else
-                $HTML = $text;
+            // Set the $HTML variable to the value or formatted text
+            $HTML = isset($opts['value']) ? $value : $text;
 
             // Switch the text case, if requested
             if (isset($opts['case'])) {
-                if ($opts['case'] == 'l')
+                switch ($opts['case']) {
+                case 'l':
                     $HTML = strtolower($HTML);
-                else
+                    break;
+                case 'p':   // proper casing
+                    $HTML = ucwords($HTML);
+                    break;
+                default:    // upper case
                     $HTML = strtoupper($HTML);
+                    break;
+                }
             }
             break;
 
