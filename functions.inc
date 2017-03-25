@@ -720,12 +720,13 @@ function plugin_autotags_profile($op, $content = '', $autotag = '')
         switch ($autotag['tag']) {
         case 'profile':
             // We always use a userID, so if one wasn't supplied then
-            // use the current user.
+            // use the current user. Anonymous users have no profile data
+            // so just breat with $HTML empty.
             if (isset($opts['uid']))
                 $uid = (int)$opts['uid'];
             else
                 $uid = $_USER['uid'];
-            if ($uid < 2) return $retval;   // Have to have a valid user ID
+            if ($uid < 2) break;    // Have to have a valid user ID
 
             // Now get the specific profile value for the user
             list($value, $text) = PRF_getValue($item_id, $uid);
