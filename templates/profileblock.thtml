@@ -10,7 +10,7 @@
   {$LANG_PROFILE['block_title']}
 </div>
 {!endif}
-<table class="pluginProfileBlock">
+<table class="pluginProfileBlock uk-table uk-table-striped uk-table-condensed">
 <!-- BEGIN profile_row -->
   <tr><td>
     {!if descrip}
