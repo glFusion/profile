@@ -26,64 +26,64 @@ global $_CONF, $_PRF_CONF;
 */
 function profile_do_upgrade($current_ver)
 {
-    $error = 0;
+    global $_PRF_CONF, $_PLUGIN_INFO;
+    
+    if (isset($_PLUGIN_INFO[$_PRF_CONF['pi_name']])) {
+        if (is_array($_PLUGIN_INFO[$_PRF_CONF['pi_name']])) {
+            // glFusion > 1.6.5
+            $current_ver = $_PLUGIN_INFO[$_PRF_CONF['pi_name']]['pi_version'];
+        } else {
+            // legacy
+            $current_ver = $_PLUGIN_INFO[$_PRF_CONF['pi_name']];
+        }
+    } else {
+        return false;
+    }
+    $installed_ver = plugin_chkVersion_profile();
 
-    if ($current_ver < '0.0.2') {
-        // upgrade from 0.0.1 to 0.0.2
-        COM_errorLog("Updating Profile Plugin to 0.0.2");
-        $error = profile_upgrade_0_0_2();
-        if ($error)
-            return $error;
+    if (!COM_checkVersion($current_ver, '0.0.2')) {
+        $current_ver = '0.0.2';
+        if (!profile_upgrade_0_0_2()) return false;
     }
 
-    if ($current_ver < '1.0.2') {
-        // upgrade to 1.0.2
-        COM_errorLog("Updating Profile Plugin to 1.0.2");
-        $error = profile_upgrade_1_0_2();
-        if ($error)
-            return $error;
+
+    if (!COM_checkVersion($current_ver, '1.0.2')) {
+        $current_ver ='1.0.2';
+        COM_errorLog("Updating Profile Plugin to $current_ver");
+        if (!profile_upgrade_1_0_2()) return false;
     }
 
-    if ($current_ver < '1.1.0') {
-        // upgrade to 1.1.0
-        COM_errorLog("Updating Profile Plugin to 1.1.0");
-        $error = profile_upgrade_1_1_0();
-        if ($error)
-            return $error;
+    if (!COM_checkVersion($current_ver, '1.0.0')) {
+        $current_ver = '1.1.0';
+        COM_errorLog("Updating Profile Plugin to $current_ver");
+        if (!profile_upgrade_1_1_0()) return false;
     }
 
-    if ($current_ver < '1.1.1') {
-        // upgrade to 1.1.1
-        COM_errorLog("Updating Profile Plugin to 1.1.1");
-        $error = profile_upgrade_1_1_1();
-        if ($error)
-            return $error;
+    if (!COM_checkVersion($current_ver, '1.1.1')) {
+        $current_ver = '1.1.1';
+        COM_errorLog("Updating Profile Plugin to $current_ver");
+        if (!profile_upgrade_1_1_1()) return false;
     }
 
-    if ($current_ver < '1.1.2') {
-        // upgrade to 1.1.2
-        COM_errorLog("Updating Profile Plugin to 1.1.2");
-        $error = profile_upgrade_1_1_2();
-        if ($error)
-            return $error;
+    if (!COM_checkVersion($current_ver, '1.1.2')) {
+        $current_ver = '1.1.2';
+        COM_errorLog("Updating Profile Plugin to $current_ver");
+        if (!profile_upgrade_1_1_2()) return false;
     }
 
-    if ($current_ver < '1.1.3') {
-        // upgrade to 1.1.3
-        COM_errorLog("Updating Profile Plugin to 1.1.3");
-        $error = profile_upgrade_1_1_3();
-        if ($error)
-            return $error;
+    if (!COM_checkVersion($current_ver, '1.1.3')) {
+        $current_ver = '1.1.3';
+        COM_errorLog("Updating Profile Plugin to $current_ver");
+        if (!profile_upgrade_1_1_3()) return false;
     }
 
-    if ($current_ver < '1.1.4') {
-        COM_errorLog("Updating Profile Plugin to 1.1.4");
-        $error = profile_upgrade_1_1_4();
-        if ($error)
-            return $error;
+    if (!COM_checkVersion($current_ver, '1.1.3')) {
+        $current_ver = '1.1.4';
+        COM_errorLog("Updating Profile Plugin to $current_ver");
+        if (!profile_upgrade_1_1_4()) return false;
     }
 
-    return $error;
+    return true;
 }
 
 
@@ -92,19 +92,13 @@ function profile_do_upgrade($current_ver)
 *   @param string $version  Version being upgraded TO
 *   @param array  $sql      Array of SQL statement(s) to execute
 */
-function profile_do_upgrade_sql($version='Undefined', $sql='')
+function profile_do_upgrade_sql($version, $sql='')
 {
     global $_TABLES, $_PRF_CONF;
 
-    // We control this, so it shouldn't happen, but just to be safe...
-    if ($version == 'Undefined') {
-        COM_errorLog("Error updating {$_PRF_CONF['pi_name']} - Undefined Version");
-        return 1;
-    }
-
     // If no sql statements passed in, return success
     if (!is_array($sql))
-        return 0;
+        return true;
 
     // Execute SQL now to perform the upgrade
     COM_errorLOG("--Updating glProfile to version $version");
@@ -113,12 +107,40 @@ function profile_do_upgrade_sql($version='Undefined', $sql='')
         DB_query($query, 1);
         if (DB_error()) {
             COM_errorLog("SQL Error during Profile plugin update: $sql",1);
-            return 1;
+            return false;
         }
     }
 
-    return 0;
+    return true;
+}
 
+
+/**
+*   Update the plugin version number in the database.
+*   Called at each version upgrade to keep up to date with
+*   successful upgrades.
+*
+*   @param  string  $ver    New version to set
+*   @return boolean         True on success, False on failure
+*/
+function profile_do_set_version($ver)
+{
+    global $_TABLES, $_PRF_CONF;
+
+    // now update the current version number.
+    $sql = "UPDATE {$_TABLES['plugins']} SET
+            pi_version = '{$_PRF_CONF['pi_version']}',
+            pi_gl_version = '{$_PRF_CONF['gl_version']}',
+            pi_homepage = '{$_PRF_CONF['pi_url']}'
+        WHERE pi_name = '{$_PRF_CONF['pi_name']}'";
+
+    $res = DB_query($sql, 1);
+    if (DB_error()) {
+        COM_errorLog("Error updating the {$_PRF_CONF['pi_display_name']} Plugin version",1);
+        return false;
+    } else {
+        return true;
+    }
 }
 
 
@@ -127,7 +149,8 @@ function profile_upgrade_0_0_2()
 {
     global $_TABLES, $_CONF, $_PRF_CONF;
 
-    $grp_id = (int)DB_getItem($_TABLES['groups'], 'grp_id', 
+    COM_errorLog('Upgrading the profile plugin to 0.0.2');
+    $grp_id = (int)DB_getItem($_TABLES['groups'], 'grp_id',
                 "grp_name='profile Admin'");
 
     $sql[] = "ALTER TABLE {$_TABLES['profile_def']}
@@ -143,8 +166,8 @@ function profile_upgrade_0_0_2()
     if (!plugin_initconfig_profile($grp_id))
         return false;
 
-    return profile_do_upgrade_sql('0.0.2', $sql);
-
+    if (!profile_do_upgrade_sql('0.0.2', $sql)) return false;
+    return profile_do_set_version('0.0.2');
 }
 
 
@@ -182,9 +205,10 @@ function profile_upgrade_1_0_2()
         }
     }
 
-    return profile_do_upgrade_sql('1.0.2', $sql);
-
+    if (!profile_do_upgrade_sql('1.0.2', $sql)) return false;
+    return profile_do_set_version('1.0.2');
 }
+
 
 /**
 *   Upgrade to version 1.1.0
@@ -205,13 +229,13 @@ function profile_upgrade_1_1_0()
     // New configuration item(s)
     $c = config::get_instance();
     if ($c->group_exists($_PRF_CONF['pi_name'])) {
-        $c->add('sg_main', NULL, 'subgroup', 0, 0, NULL, 0, true, 
+        $c->add('sg_main', NULL, 'subgroup', 0, 0, NULL, 0, true,
                 $_PRF_CONF['pi_name']);
-        $c->add('fs_main', NULL, 'fieldset', 0, 0, NULL, 0, true, 
+        $c->add('fs_main', NULL, 'fieldset', 0, 0, NULL, 0, true,
                 $_PRF_CONF['pi_name']);
         $c->add('showemptyvals', 0, 'select', 0, 0, 3, 10, true,
                 $_PRF_CONF['pi_name']);
-        $c->add('grace_arrears', $_PRF_DEFAULT['grace_arrears'], 'text', 
+        $c->add('grace_arrears', $_PRF_DEFAULT['grace_arrears'], 'text',
                 0, 0, 0, 20, true, $_PRF_CONF['pi_name']);
         $c->add('grace_expired', $_PRF_DEFAULT['grace_expired'], 'text',
                 0, 0, 0, 30, true, $_PRF_CONF['pi_name']);
@@ -220,8 +244,8 @@ function profile_upgrade_1_1_0()
     }
 
     // Add the new profile.export feature
-    DB_query("INSERT INTO {$_TABLES['features']} 
-            (ft_name, ft_descr) 
+    DB_query("INSERT INTO {$_TABLES['features']}
+            (ft_name, ft_descr)
         VALUES (
             'profile.export',
             'Access to export user lists'
@@ -304,7 +328,7 @@ function profile_upgrade_1_1_0()
         }
         $sql .= " WHERE id='{$fldDefs[$name]['id']}'";
         DB_query($sql, 1);
-        if (DB_error()) return 1;
+        if (DB_error()) return false;
     }
 
     if (!empty($createsql)) {
@@ -322,7 +346,7 @@ function profile_upgrade_1_1_0()
             PRIMARY KEY (`puid`) )";
         //echo $sql;
         DB_query($sql, 1);
-        if (DB_error()) return 1;
+        if (DB_error()) return false;
 
     // Now get the existing values from the values table.  Go through each
     // user to create a single record containing all the values from the
@@ -331,12 +355,12 @@ function profile_upgrade_1_1_0()
     while ($A = DB_fetchArray($vRes, false)) {
         $uid = (int)$A['uid'];
         // Get the defined fields
-        $sql = "SELECT * 
+        $sql = "SELECT *
             FROM {$_TABLES['profile_values']}
             WHERE uid = $uid";
         $res = DB_query($sql);
         $colsql = array();
-        while ($U = DB_fetchArray($res, false)) { 
+        while ($U = DB_fetchArray($res, false)) {
             if (isset($fldDefs[$U['name']]) && $U['name'] != 'uid') {
                 if (is_array($old_vals[$U['name']])) {
                     if (isset($old_vals[$U['name']][$U['value']])) {
@@ -360,7 +384,7 @@ function profile_upgrade_1_1_0()
             DB_query($dsql, 1);
             if (DB_error()) {
                 COM_errorLog("Error executing $dsql");
-                 return 1;
+                 return false;
             }
         }
     }
@@ -381,15 +405,15 @@ function profile_upgrade_1_1_0()
             ADD KEY `idx_orderby` (`orderby`)",
         "INSERT INTO {$_TABLES['profile_def']} VALUES
             (0, 2, 'sys_membertype', 'text', 1, 0, 0,
-            '{$LANG_PROFILE['membertype']}', 
+            '{$LANG_PROFILE['membertype']}',
             'a:4:{s:7:\"default\";s:0:\"\";s:4:\"size\";i:40;s:9:\"maxlength\";i:255;s:7:\"autogen\";i:0;}',
             $grp_id, 0, 3, 0, 0, 1, ''),
             ( 0, 4, 'sys_expires', 'date', 1, 0, 0,
-            '{$LANG_PROFILE['expiration']}', 
+            '{$LANG_PROFILE['expiration']}',
             'a:5:{s:7:\"default\";s:0:\"\";s:8:\"showtime\";i:0;s:10:\"timeformat\";s:2:\"12\";s:6:\"format\";N;s:12:\"input_format\";s:1:\"1\";}',
             $grp_id, 0, 3, 0, 0, 1, ''),
             (0, 6, 'sys_directory', 'checkbox', 1, 0, 1,
-            '{$LANG_PROFILE['list_member_dir']}', 
+            '{$LANG_PROFILE['list_member_dir']}',
             'a:1:{s:7:\"default\";i:1;}', $grp_id, 3, 3, 0, 0, 1, '')",
         "CREATE TABLE `{$_TABLES['profile_lists']}` (
             `listid` varchar(40) NOT NULL,
@@ -400,14 +424,14 @@ function profile_upgrade_1_1_0()
             PRIMARY KEY (`listid`)
         ) ENGINE=MyISAM",
     );
-    return profile_do_upgrade_sql('1.1.0', $sql);
+    if (!profile_do_upgrade_sql('1.1.0', $sql)) return false;
+    return profile_do_set_version('1.1.0');
 }
 
 
 /**
 *   Upgrade to version 1.1.1
-*   Returns non-zero if an error is encountered at any point.
-*   @return integer     Zero for success, non-zero on error
+*   @return boolean     True on success, False on error
 */
 function profile_upgrade_1_1_1()
 {
@@ -417,8 +441,8 @@ function profile_upgrade_1_1_1()
                     "grp_name='{$_PRF_CONF['pi_name']} Admin'");
 
     // Add the new profile.export feature
-    DB_query("INSERT INTO {$_TABLES['features']} 
-            (ft_name, ft_descr) 
+    DB_query("INSERT INTO {$_TABLES['features']}
+            (ft_name, ft_descr)
         VALUES (
             'profile.viewall',
             'Access to view ALL user profiles, overriding user preferences.'
@@ -436,13 +460,14 @@ function profile_upgrade_1_1_1()
     DB_query("DROP TABLE IF EXISTS {$_TABLES['profile_values']}");
     DB_query("ALTER TABLE {$_TABLES['profile_lists']}
             ADD incl_grp int(11) unsigned default 2");
+    return profile_do_set_version('1.1.1');
 }
 
 
 /**
 *   Upgrade to version 1.1.2
 *   Returns non-zero if an error is encountered at any point.
-*   @return integer     Zero for success, non-zero on error
+*   @return boolean     True on success, False on error
 */
 function profile_upgrade_1_1_2()
 {
@@ -452,7 +477,7 @@ function profile_upgrade_1_1_2()
 
     // New configuration item(s)
     $c = config::get_instance();
-    $c->add('fs_lists', NULL, 'fieldset', 0, 2, NULL, 0, true, 
+    $c->add('fs_lists', NULL, 'fieldset', 0, 2, NULL, 0, true,
                 $_PRF_CONF['pi_name']);
     $c->add('list_incl_admin', 0, 'select', 0, 2, 3, 10, true,
                 $_PRF_CONF['pi_name']);
@@ -482,14 +507,15 @@ function profile_upgrade_1_1_2()
                 ADD incl_user_stat tinyint(2) not null default -1,
                 ADD incl_exp_stat tinyint(2) not null default 7",
     );
-    return profile_do_upgrade_sql('1.1.2', $sql);
+    if (!profile_do_upgrade_sql('1.1.2', $sql)) return false;
+    return profile_do_set_version('1.1.2');
 }
 
 
 /**
 *   Upgrade to version 1.1.3
 *   Returns non-zero if an error is encountered at any point.
-*   @return integer     Zero for success, non-zero on error
+*   @return boolean     True on success, False on error
 */
 function profile_upgrade_1_1_3()
 {
@@ -515,8 +541,7 @@ function profile_upgrade_1_1_3()
             DEFAULT 'a:4:{i:1;i:1;i:2;i:2;i:3;i:3;i:4;i:4;}'";
         $need_update = true;    // later, to execute data conversion
     }
-    $status = profile_do_upgrade_sql('1.1.3', $sql);
-    if ($status > 0) return $status;
+    if (!profile_do_upgrade_sql('1.1.3', $sql)) return false;
 
     if ($need_update) {     // updated profile_lists schema, now change data
         $sql = "SELECT listid,incl_user_stat FROM {$_TABLES['profile_lists']}";
@@ -531,15 +556,14 @@ function profile_upgrade_1_1_3()
                     incl_user_stat = '$nstat' WHERE listid='$listid'");
         }
     }
-    return $status;
+    return profile_do_set_version('1.1.3');
 }
 
 
 /**
 *   Upgrade to version 1.1.4
 *   Adds first and last name fields to the profile data
-*   Returns non-zero if an error is encountered at any point.
-*   @return integer     Zero for success, non-zero on error
+*   @return boolean     True on success, False on error
 */
 function profile_upgrade_1_1_4()
 {
@@ -589,7 +613,7 @@ function profile_upgrade_1_1_4()
             LIKE 'prf_phone'");
     if (DB_numRows($r) == 1) {
         $r2 = DB_count($_TABLES['profile_def'], 'name', 'prf_phone');
-        if ($r2 > 0) {
+        if ($r2 == 0) {
             $sql[] = "INSERT INTO {$_TABLES['profile_def']}
                 (orderby, name, type, enabled, required, user_reg,
                 prompt, options, sys, perm_owner)
@@ -601,8 +625,7 @@ function profile_upgrade_1_1_4()
         }
     }
 
-    $status = profile_do_upgrade_sql('1.1.4', $sql);
-    if ($status > 0) return $status;
+    if (!profile_do_upgrade_sql('1.1.4', $sql)) return false;
 
     USES_lglib_class_nameparser();
     $sql = "SELECT uid, fullname FROM {$_TABLES['users']}";
@@ -617,9 +640,13 @@ function profile_upgrade_1_1_4()
         $sql = "UPDATE {$_TABLES['profile_data']} SET
                 sys_fname='$fname', sys_lname='$lname'
                 WHERE puid=$uid";
-        DB_query($sql);
+        DB_query($sql, 1);
+        if (DB_error()) {
+            COM_errorLog("Error executing sql in profile 1.1.4 update: $sql");
+            return false;
+        }
     }
-    return $status;
+    return profile_do_set_version('1.1.4');
 }
 
 

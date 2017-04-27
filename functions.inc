@@ -186,64 +186,23 @@ function plugin_user_login_profile($uid)
 
 /**
 *   Upgrade the Profile plugin
-*   @return integer Number of message to display (true = generic success msg)
+*
+*   @return boolean     True on success, False on failure
 */
 function plugin_upgrade_profile()
 {
-    global $_TABLES, $_PRF_CONF;
-
-    $pi_name = $_PRF_CONF['pi_name'];
-
-    // Get the current version, compare to the version in the plugin code
-    $current_ver = DB_getItem($_TABLES['plugins'], 'pi_version',
-        "pi_name = '$pi_name'");
-    if (!$current_ver) {
-        COM_errorLog("Error getting the $pi_name Plugin version",1);
-        return '03';
-    }
-
-    // if we're at the current version, what are we doing here?
-    if ($current_ver >= $_PRF_CONF['pi_version']) {
-        COM_errorLog("Current version $current_ver is already up to date");
-        return '06';
-    }
-
-    // If we're still here, import the upgrade functions.
-    require_once 'upgrade.inc.php';
-    $error = profile_do_upgrade($current_ver);
-    if ($error) {
-        COM_errorLog("Error updating the $pi_name Plugin version",1);
-        return '04';
-    }
-
-    // now update the current version number.
-    DB_query("UPDATE
-        {$_TABLES['plugins']}
-    SET
-        pi_version = '{$_PRF_CONF['pi_version']}',
-        pi_gl_version = '{$_PRF_CONF['gl_version']}',
-        pi_homepage = '{$_PRF_CONF['pi_url']}'
-    WHERE
-        pi_name = '$pi_name';
-    ");
-
-    if (DB_error()) {
-        COM_errorLog("Error updating the $pi_name Plugin version",1);
-        return '05';
-    }
-
-    COM_errorLog("Succesfully updated the $pi_name Plugin!",1);
-    return true;
+    require_once dirname(__FILE__) . '/upgrade.inc.php';
+    return profile_do_upgrade();
 }
 
 
 /**
 *   Returns the URL of the plugin's icon
+*
 *   @return   string      URL of the icon
 */
-function plugin_geticon_profile ()
+function plugin_geticon_profile()
 {
-    global $_CONF;
     return PRF_PI_URL . '/images/profile.png';
 }
 
@@ -287,8 +246,6 @@ function plugin_autouninstall_profile ()
 */
 function plugin_getheaderjs_profile()
 {
-    global $_CONF;
-
     $pi_dir = PRF_PI_PATH . 'js/';
 
     $files = array(
@@ -332,8 +289,7 @@ function plugin_getheadercss_profile()
             $styles[] = $pi_css . $file;
         }
     }
-
-	return $styles;
+    return $styles;
 }
 
 
