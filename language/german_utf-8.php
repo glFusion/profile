@@ -132,6 +132,7 @@ $LANG_PROFILE = array(
 'list_footer'				=> 'Hervorgehobene Einträge weisen auf Benutzer hin, die nicht in die Benutzer-Liste aufgenommen wurden.',
 'save_error_title'			=> 'Erweitertes Profil konnte nicht gespeichert werden',
 'missing_email'				=> 'Deine E-Mail Adresse ist nicht in Deinem Konto hinterlegt. Dies kann passieren, wenn Du dich mit Deinem Facebook-Profil angemeldet hast. Bitte aktualisiere Deine E-Mail Adresse in Deinen <a href="' . $_CONF['site_url'] . '/usersettings.php?mode=edit">Konto Einstellungen</a> um Benachrichtigungen und Abonnements zu erhalten.',
+'select_date' => 'Click for a date picker',
 
 // begin membership fields
 'del_selected'				=> 'Ausgewählte löschen',

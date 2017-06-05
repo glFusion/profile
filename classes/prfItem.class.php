@@ -515,7 +515,7 @@ class prfDate extends prfItem
     */
     public function FormField($incl_time = true)
     {
-        global $LANG_PROFILE, $_CONF;
+        global $LANG_PROFILE, $_CONF, $_PRF_CONF;
 
         $this->_FormFieldInit();
 
@@ -598,13 +598,8 @@ class prfDate extends prfItem
 
         if (!$this->readonly) {
             // If not a readonly field, add the date picker image & js
-            $datepick .= COM_createImage(
-                    $_CONF['site_url'] . '/images/datepicker.jpg',
-                    $LANG_PROFILE['select_date'],
-                    array('id' => "{$this->name}_trigger",
-                        'style' => 'cursor: pointer;',
-                        'title' => $LANG_PROFILE['select_date'],
-                    ) );
+            $datepick .= '<i class="' . $_PRF_CONF['_iconset'] . '-calendar tooltip" title="' .
+                        $LANG_PROFILE['select_date'] . '"></i>';
             if ($this->options['timeformat']) {
                 $showtime = 'true';
                 $timeformat = $this->options['timeformat'];
