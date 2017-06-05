@@ -22,8 +22,7 @@
 */
 function PRF_editForm($type = 'edit', $uid = 0, $form_id='profileform')
 {
-    global $_CONF, $_USER, $_TABLES, $LANG_PROFILE, $_SYSTEM;
-
+    global $_CONF, $_USER, $_TABLES, $LANG_PROFILE, $_PRF_CONF;
 
     // Choose the correct template file based on the glFusion version
     // and type of form needed
@@ -52,16 +51,13 @@ function PRF_editForm($type = 'edit', $uid = 0, $form_id='profileform')
         'uid'       => $uid,
         'form_id'   => $form_id,
         'have_jquery' => $_SYSTEM['disable_jquery'] ? '' : 'true',
+        'iconset'   => $_PRF_CONF['_iconset'],
     ) );
 
     // Flag to make sure calendar javascript is added only once.  It's
     // only added if there's at least one calendar field.
     $T->set_block('editform', 'QueueRow', 'qrow');
     foreach ($A as $fldname => $data) {
-/*if ($fldname == 'prf_address1') {
-var_dump($data);die;
-}*/
-
         // Could do this in SQL, but why complicate PRF_getDefs()?
         // If the field is not required and is not to appear on the signup
         // form, then skip it.  If it is a registration field, override
@@ -92,9 +88,6 @@ var_dump($data);die;
         } else {
             $T->clear_var('is_static');
         }
-/*if ($data->name == 'sys_fname') {
-var_dump($data);die;
-}*/
 
         // If POSTed form data, set the user variable to that.  Otherwise,
         // set it to the default or leave it alone.
@@ -503,40 +496,6 @@ function PRF_GroupDropdown($group_id, $access)
 
 
 /**
-*   Invoke a service from another plugin.
-*   This is our own version of PLG_invokeService() so web services doesn't
-*   have to be enabled in the invoked plugin.
-*
-*   @param  string  $type   Plugin name
-*   @param  string  $action Plugin function
-*   @param  array   $args   Array of arguments to pass to the plugin
-*   @param  mixed   &$output    Pointer to output values
-*   @param  mixed   &$svc_msg   Service message (unused)
-*   @return integer Return value, see lib-plugins.php
-*/
-function PRF_invokeService($type, $action, $args, &$output, &$svc_msg)
-{
-    global $_CONF;
-
-    $retval = PLG_RET_ERROR;
-
-    $output  = '';
-    $svc_msg = '';
-
-    // Check if the plugin type and action are valid
-    $function = 'service_' . $action . '_' . $type;
-    if (function_exists($function)) {
-        if (!isset($args['gl_svc'])) {
-            $args['gl_svc'] = false;
-        }
-        $retval = $function($args, $output, $svc_msg);
-    }
-
-    return $retval;
-}
-
-
-/**
 *   Shows security control for an object
 *
 *   This will return the HTML needed to create the security control see on
@@ -573,6 +532,5 @@ function PRF_getPermissionsHTML($perm_owner,$perm_group,$perm_members,$perm_anon
 
     return $retval;
 }
-
 
 ?>

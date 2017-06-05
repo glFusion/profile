@@ -60,6 +60,8 @@ if (is_array($_PLUGINS) && in_array('profile', $_PLUGINS)) {
 }
 
 $_PRF_CONF['now'] = date('Y-m-d H:i:s');
+$_PRF_CONF['_is_uikit'] = $_SYSTEM['framework'] == 'uikit' ? true : false;
+$_PRF_CONF['_iconset'] = $_PRF_CONF['_is_uikit'] ? 'uk-icon' : 'fa fa';
 
 // Import plugin-specific functions
 function USES_profile_functions()
@@ -346,7 +348,7 @@ function plugin_profileedit_profile($uid, $panel, $fieldset)
  */
 function plugin_profilevariablesdisplay_profile($uid, &$template)
 {
-    global $LANG_PROFILE, $_TABLES, $_CONF, $_PRF_CONF, $_USER, $_SYSTEM;
+    global $LANG_PROFILE, $_TABLES, $_CONF, $_PRF_CONF, $_USER;
 
     $retval = '';
 
@@ -361,7 +363,7 @@ function plugin_profilevariablesdisplay_profile($uid, &$template)
     $T->set_file(array(
         'block' => 'profileblock.thtml',
     ));
-    $T->set_var('is_uikit', $_SYSTEM['framework'] == 'uikit' ? 'true' : '');
+    $T->set_var('is_uikit', $_PRF_CONF['_is_uikit']);
     $A = PRF_getDefs($uid);
     if (empty($A)) {
         return '';
@@ -474,7 +476,6 @@ function PRF_setUserValues($uid=0)
     } else {
         return $A;
     }
-
 }
 
 
@@ -1068,10 +1069,10 @@ function PRF_isAdmin()
 */
 function PRF_getTemplate($name, $id, $path='')
 {
-    global $_SYSTEM;
+    global $_PRF_CONF;
 
     // May use "switch" later, for now there are only two options
-    $tpltype = $_SYSTEM['framework'] == 'uikit' ? '.uikit' : '';
+    $tpltype = $_PRF_CONF['_is_uikit'] ? '.uikit' : '';
     $filename = "$name$tpltype.thtml";
     if (substr($path, 0, 9) != 'templates') {
         $path = 'templates/' . $path;
