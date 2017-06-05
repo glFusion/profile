@@ -65,3 +65,22 @@ span.prfNewAdminItem {
 .prfInputText {
     width: 80%;
 }
+
+.prf-icon-ok {
+    color: green;
+}
+.prf-icon-danger {
+    color: red;
+}
+.prf-icon-warning {
+    color: #FFD300;
+}
+.prf-icon-info {
+    color: #0077dd;
+}
+.prf-icon-unknown {
+    color: #530E53;
+}
+.prf-icon-disabled {
+    color: #666;
+}
