@@ -20,15 +20,15 @@
     {!if is_static}
     {!else}
     {!if is_visible}
-    <img src="{site_url}/profile/images/visible.png" width="16" height="16" class="tooltip gl_mootip" title="{$LANG_PROFILE['hlp_visible']}" />
+    <i class="{iconset}-user prf-icon-info tooltip" title="{$LANG_PROFILE['hlp_visible']}"></i>
     {!else}
-    <img src="{site_url}/profile/images/invisible.png" width="16" height="16" class="tooltip gl_mootip" title="{$LANG_PROFILE['hlp_invisible']}" />
+    <i class="{iconset}-user-secret prf-icon-disabled tooltip" title="{$LANG_PROFILE['hlp_invisible']}"></i>
     {!endif}
     {!if is_required}
-    <img src="{site_url}/profile/images/required.png" width="16" height="16" class="tooltip gl_mootip" title="{$LANG_PROFILE['hlp_required']}" />
+    <i class="{iconset}-warning prf-icon-danger tooltip" title="{$LANG_PROFILE['hlp_required']}"></i>
     {!endif}
     {!if help_text}
-    <img src="{layout_url}/images/info.png" width="16" height="16" class="tooltip gl_mootip" title="{help_text}" />
+    <i class="{iconset}-question-circle prf-icon-info tooltip" title="{help_text}"></i>
     {!endif}
     {!endif}
     </span>
