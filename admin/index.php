@@ -522,7 +522,7 @@ function PRF_listFields()
 */
 function PRF_getField_profile($fieldname, $fieldvalue, $A, $icon_arr)
 {
-    global $_CONF, $LANG_ACCESS;
+    global $_CONF, $LANG_ACCESS, $_PRF_CONF;
 
     $retval = '';
 
@@ -533,7 +533,8 @@ function PRF_getField_profile($fieldname, $fieldvalue, $A, $icon_arr)
         break;
 
     case 'edit':
-        $retval = COM_createLink($icon_arr['edit'],
+        $retval = COM_createLink('<i class="' . $_PRF_CONF['_iconset'] .
+                '-edit prf-icon-info"></i>',
                 PRF_ADMIN_URL . '/index.php?edit=x&amp;id=' . $A['id']);
        break;
 
@@ -545,10 +546,8 @@ function PRF_getField_profile($fieldname, $fieldvalue, $A, $icon_arr)
     case 'delete':
         if (!$A['sys']) {
             $retval = COM_createLink(
-                "<img src=\"{$_CONF['layout_url']}/images/admin/delete.png\"
-                    height=\"16\" width=\"16\" border=\"0\"
-                    onclick=\"return confirm('Do you really want to delete this item?');\"
-                    >",
+                '<i class="' . $_PRF_CONF['_iconset'] . '-trash-o prf-icon-danger" ' .
+                    "onclick=\"return confirm('Do you really want to delete this item?');\"></i>",
                 PRF_ADMIN_URL . '/index.php?deletedef=x&id=' . $A['id']
             );
         }
@@ -567,7 +566,7 @@ function PRF_getField_profile($fieldname, $fieldvalue, $A, $icon_arr)
         $retval =
                 "<input name=\"{$fieldname}_{$A['id']}\" " .
                 "type=\"checkbox\" $chk " .
-                "onclick='PRFtoggleEnabled(this, \"{$A['id']}\", \"{$fieldname}\", \"{$_CONF['site_url']}\");' ".
+                "onclick='PRFtoggleEnabled(this, \"{$A['id']}\", \"{$fieldname}\");' ".
                 ">\n";
     break;
 
@@ -580,7 +579,7 @@ function PRF_getField_profile($fieldname, $fieldvalue, $A, $icon_arr)
         $retval =
                 "<input name=\"{$fieldname}_{$A['id']}\" " .
                 "type=\"checkbox\" $chk " .
-                "onclick='PRFtoggleEnabled(this, \"{$A['id']}\", \"{$fieldname}\", \"{$_CONF['site_url']}\");' ".
+                "onclick='PRFtoggleEnabled(this, \"{$A['id']}\", \"{$fieldname}\");' ".
                 ">\n";
         break;
 

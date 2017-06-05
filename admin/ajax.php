@@ -22,19 +22,21 @@ if (!SEC_hasRights('profile.admin')) {
     exit;
 }
 
-$base_url = $_CONF['site_url'];
-
-switch ($_GET['action']) {
+switch ($_POST['action']) {
 case 'toggleEnabled':
-    $newval = $_REQUEST['newval'] == 1 ? 1 : 0;
-    $type = trim($_GET['type']);
-    $id = (int)$_REQUEST['id'];
+    $oldval = $_POST['oldval'] == 0 ? 0 : 1;
+    $newval = $oldval == 0 ? 1 : 0;
+    $type = DB_escapeString($_POST['type']);
+    $id = (int)$_POST['id'];
 
     switch ($type) {
     case 'required':
     case 'enabled':
     case 'user_reg':
         // Toggle the is_origin flag between 0 and 1
+COM_errorLog("UPDATE {$_TABLES['profile_def']}
+                SET $type = '$newval'
+                WHERE id='$id'");
         DB_query("UPDATE {$_TABLES['profile_def']}
                 SET $type = '$newval'
                 WHERE id='$id'", 1);
@@ -59,20 +61,19 @@ case 'toggleEnabled':
      default:
         exit;
     }
-    
-    header('Content-Type: text/xml');
-    header("Cache-Control: no-cache, must-revalidate");
-    //A date in the past
-    header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+    if (DB_error()) {
+        // Reset newval to flag that the update wasn't done.
+        $newval = $oldval;
+        COM_errorLog("Error: $sql");
+    }
 
-    echo '<?xml version="1.0" encoding="ISO-8859-1"?>
-    <info>'. "\n";
-    echo "<newval>$newval</newval>\n";
-    echo "<id>{$id}</id>\n";
-    echo "<type>{$type}</type>\n";
-    echo "<baseurl>{$base_url}</baseurl>\n";
-    echo "</info>\n";
-    break;
+    $result = array(
+        'statusMessage' => $newval == $oldval ? $LANG_PROFILE['toggle_failure'] :
+            $LANG_PROFILE['toggle_success'],
+        'newval' => $newval,
+    );
+    echo json_encode($result);
+    exit;
 
 default:
     exit;

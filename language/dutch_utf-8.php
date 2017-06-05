@@ -126,6 +126,8 @@ $LANG_PROFILE = array(
 'list_footer'   => '<span class="profile_private">Highlighted</span> entries indicate members who have not elected to be listed in the member listing.',
 'missing_email' => 'Your email address is not included in your account profile. This may happen if you log in using the Facebook link. Please visit <a href="' . $_CONF['site_url'] . '/usersettings.php?mode=edit">your account settings</a> to update your email address so you will receive notifications and subscriptions.',
 'select_date' => 'Click for a date picker',
+'toggle_success' => 'Item has been updated.',
+'toggle_failure' => 'Error updating item.',
 
 // begin membership fields
 'del_selected' => 'Delete Selected',
