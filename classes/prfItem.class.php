@@ -598,8 +598,10 @@ class prfDate extends prfItem
 
         if (!$this->readonly) {
             // If not a readonly field, add the date picker image & js
-            $datepick .= '<i class="' . $_PRF_CONF['_iconset'] . '-calendar tooltip" title="' .
-                        $LANG_PROFILE['select_date'] . '"></i>';
+            $datepick .= '<i class="' . $_PRF_CONF['_iconset'] .
+                    '-calendar tooltip" title="' .
+                    $LANG_PROFILE['select_date'] . '" id="' .
+                    $this->name . '_trigger"></i>';
             if ($this->options['timeformat']) {
                 $showtime = 'true';
                 $timeformat = $this->options['timeformat'];
