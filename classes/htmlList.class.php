@@ -142,7 +142,6 @@ class prfHtmlList extends prfList
             $T->parse('row', 'UserRow', true);
         }
 
-        USES_class_date();
         $dt = new Date('now', $_CONF['timezone']);
         $T->set_var(array(
             'title'         => $this->title,

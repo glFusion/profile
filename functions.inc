@@ -890,7 +890,6 @@ function plugin_templatesetvars_profile($templatename, &$template)
         $pluginFields = $existingPluginFields . PRF_editForm('registration');
         $template->set_var('plugin_fields', $pluginFields);
     }
-
 }
 
 
