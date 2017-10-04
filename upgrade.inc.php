@@ -83,6 +83,10 @@ function profile_do_upgrade($current_ver)
         if (!profile_upgrade_1_1_4()) return false;
     }
 
+    // Catch any final version update needed for code-only upgrades
+    if (!COM_checkVersion($current_ver, $installed_ver)) {
+        if (!profile_do_set_version($installed_ver)) return false;
+    }
     return true;
 }
 
