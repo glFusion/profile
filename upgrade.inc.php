@@ -343,7 +343,8 @@ function profile_upgrade_1_1_0()
             sys_expires date DEFAULT NULL,
             sys_directory tinyint(1) NOT NULL DEFAULT '1',
             $createsql_str
-            PRIMARY KEY (`puid`) )";
+            PRIMARY KEY (`puid`)
+        ) ENGINE=MyISAM";
         //echo $sql;
         DB_query($sql, 1);
         if (DB_error()) return false;

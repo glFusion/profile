@@ -34,7 +34,7 @@ $_SQL['profile_def'] = "CREATE TABLE {$_TABLES['profile_def']} (
   `plugin` varchar(255) COLLATE utf8_unicode_ci DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `idx_orderby` (`orderby`)
-)";
+) ENGINE=MyISAM";
 
 $_SQL['profile_data'] = "CREATE TABLE {$_TABLES['profile_data']} (
   `puid` int(11) unsigned NOT NULL,
@@ -46,7 +46,7 @@ $_SQL['profile_data'] = "CREATE TABLE {$_TABLES['profile_data']} (
   `sys_lname` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY  (`puid`),
   KEY `lname` (`sys_lname`,`sys_fname`)
-)";
+) ENGINE=MyISAM";
 
 $_SQL['profile_lists'] = "CREATE TABLE `{$_TABLES['profile_lists']}` (
   `listid` varchar(40) NOT NULL,
@@ -58,7 +58,7 @@ $_SQL['profile_lists'] = "CREATE TABLE `{$_TABLES['profile_lists']}` (
   `incl_user_stat` varchar(64) NOT NULL DEFAULT 'a:4:{i:1;i:1;i:2;i:2;i:3;i:3;i:4;i:4;}',
   `incl_exp_stat` tinyint(2) not null default 7,
   PRIMARY KEY (`listid`)
-)";
+) ENGINE=MyISAM";
 
 global $PRF_sampledata;
 $PRF_sampledata = array(
