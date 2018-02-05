@@ -404,6 +404,8 @@ function plugin_profilevariablesdisplay_profile($uid, &$template)
 */
 function plugin_profilesave_profile($uid=0)
 {
+    global $_USER;
+
     if (COM_isAnonUser()) {
         return;
     }
@@ -531,7 +533,7 @@ function PRF_getDefs($uid = 0, $key = '', $access = 2)
             $tmp['value'] = $A[$tmp['name']];
         else
             $tmp['value'] = NULL;
-        $F[$tmp['name']] = prfItem::getClass($tmp, $value, $uid);
+        $F[$tmp['name']] = prfItem::getClass($tmp, $tmp['value'], $uid);
     }
     return $F;
 }

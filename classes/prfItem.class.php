@@ -474,6 +474,9 @@ class prfDate extends prfItem
             $second = '00';
         }
 
+        if (!isset($this->options['input_format'])) {
+            $this->options['input_format'] = 0;
+        }
         switch ($this->options['input_format']) {
         case '2':
             $formatted = sprintf('%02d/%02d/%04d', $day, $month, $year);
@@ -521,7 +524,12 @@ class prfDate extends prfItem
 
         if ($this->options['timeformat'] && $incl_time) {
             $iFormat = '%Y-%m-%d %H:%M';
-            list($date, $time) = explode(' ', $this->value);
+            if (strpos($this->value, ' ')) {
+                list($date, $time) = explode(' ', $this->value);
+            } else {
+                $date = $this->value;
+                $time = NULL;
+            }
             if ($time == NULL) $time = '00:00:00';
             $dt = explode('-', $date);
             $tm = explode(':', $time);
@@ -541,14 +549,15 @@ class prfDate extends prfItem
                 $hour = $tm[0];
             }
 
+            $fld_disabled = $this->readonly ? 'disabled="disabled"' : '';
             $hr_fld = '<select id="' . $this->name . '_hour" ' .
                     'name="' . $this->name . '_hour" ' .
-                    $this->_frmReadOnly . '>' . LB .
+                    $fld_disabled . '>' . LB .
                 COM_getHourFormOptions($hour, $this->options['timeformat']) .
                 '</select>' . LB;
             $min_fld = '<select id="' . $this->name . '_minute" ' .
                     'name="' . $this->name . '_minute" ' .
-                    $this->_frmReadOnly . '>' . LB .
+                    $fld_disabled . '>' . LB .
                 COM_getMinuteFormOptions($tm[1]) .
                 '</select>' . LB;
             /*$hr_fld = '<input type="text" id="' . $this->name .
@@ -579,11 +588,13 @@ class prfDate extends prfItem
 
         $m_fld = "<select id=\"{$this->name}_month\" name=\"{$this->name}_month\" {$this->_frmReadonly}>\n";
         $m_fld .= "<option value=\"0\">--{$LANG_PROFILE['month']}--</option>\n";
-        $m_fld .= COM_getMonthFormOptions((int)$dt[1]) . "</select>\n";
+        $sel = isset($dt[1]) ? (int)$dt[1] : '';
+        $m_fld .= COM_getMonthFormOptions($sel) . "</select>\n";
 
         $d_fld = "<select id=\"{$this->name}_day\" name=\"{$this->name}_day\" {$this->_frmReadonly}>\n";
         $d_fld .= "<option value=\"0\">--{$LANG_PROFILE['day']}--</option>\n";
-        $d_fld .= COM_getDayFormOptions((int)$dt[2]) . "</select>\n";
+        $sel = isset($dt[2]) ? (int)$dt[2] : '';
+        $d_fld .= COM_getDayFormOptions($sel) . "</select>\n";
 
         $y_fld = $LANG_PROFILE['year'] .
             ': <input type="text" id="' . $this->name . '_year" name="' .
@@ -632,6 +643,9 @@ function {$this->name}_onUpdate(cal)
         }
 
         // Place the date components according to m/d/y or d/m/y format
+        if (!isset($this->options['input_format'])) {
+            $this->options['input_format'] = 0;
+        }
         switch ($this->options['input_format']) {
         case 2:
             $fld = $d_fld . ' ' . $m_fld . ' ' . $y_fld;
@@ -741,7 +755,7 @@ function {$this->name}_onUpdate(cal)
         if (isset($_CONF['hour_mode'] ) && ( $_CONF['hour_mode'] == 24 )) {
             $retval = '';
         } else {
-            $retval .= '<select id="' . $name . '" name="' . $name . '">' .LB;
+            $retval = '<select id="' . $name . '" name="' . $name . '">' .LB;
             $retval .= '<option value="0" ';
             if ($selected == '0' || $selected = 'am') {
                 $retval .= PRF_SELECTED;

@@ -190,6 +190,12 @@ $PLG_profile_MESSAGE104 = 'Ungültiger Feldname angegeben.';
 
 $LANG_MYACCOUNT['pe_profileprefs'] = 'Erweitertes Profil';
 
+/** Language strings for the plugin configuration section */
+$LANG_configsections['profile'] = array(
+    'label' => 'Profile',
+    'title' => 'Custom Profile Configuration'
+);
+
 $LANG_configsubgroups['profile'] = array(
     'sg_main' => 'Haupteinstellungen'
 );

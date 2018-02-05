@@ -22,7 +22,7 @@
 */
 function PRF_editForm($type = 'edit', $uid = 0, $form_id='profileform')
 {
-    global $_CONF, $_USER, $_TABLES, $LANG_PROFILE, $_PRF_CONF;
+    global $_CONF, $_USER, $_TABLES, $LANG_PROFILE, $_PRF_CONF, $_SYSTEM;
 
     // Choose the correct template file based on the glFusion version
     // and type of form needed
@@ -50,7 +50,7 @@ function PRF_editForm($type = 'edit', $uid = 0, $form_id='profileform')
     $T->set_var(array(
         'uid'       => $uid,
         'form_id'   => $form_id,
-        'have_jquery' => $_SYSTEM['disable_jquery'] ? '' : 'true',
+        'have_jquery' => isset($_SYSTEM['disable_jquery']) && $_SYSTEM['disable_jquery'] ? '' : 'true',
         'iconset'   => $_PRF_CONF['_iconset'],
     ) );
 
@@ -163,6 +163,7 @@ function PRF_saveData($vals, $uid = 0, $type = 'edit')
     foreach ($A as $name => $data) {
         // Now make changes based on the type of data and applicable options.
         // Managers can override normal validations.
+        if (!isset($vals[$name])) continue;
         if (!$data->validData($vals[$name], $vals) && !PRF_isManager()) {
             // We could just return false here, but instead continue checking so
             // we can show the user all the errors, not just the first.
@@ -194,7 +195,12 @@ function PRF_saveData($vals, $uid = 0, $type = 'edit')
         case 'date':
             $def_value = empty($data->value) ? $data->options['default'] :
                         $data->value;
-            list($dt, $tm) = explode(' ', $def_value);
+            if (strpos($def_value, ' ')) {
+                list($dt, $tm) = explode(' ', $def_value);
+            } else {
+                $dt = $def_value;
+                $tm = NULL;
+            }
             if (empty($tm)) $tm = '00:00:00';
             $time = '';
             $date = '';
@@ -249,7 +255,7 @@ function PRF_saveData($vals, $uid = 0, $type = 'edit')
                 isset($data->options['values']['default'])) {
                 $vals[$name] = $data->options['values']['default'];
             }
-            $newval = $vals[$name];
+            $newval = isset($vals[$name]) ? $vals[$name] : '';
             break;
 
         case 'static':
@@ -274,13 +280,10 @@ function PRF_saveData($vals, $uid = 0, $type = 'edit')
         }
 
         // Auto-Generate a value during registration, or if the value is empty
-        if ($data->options['autogen'] == 1 &&
-            ($type == 'registration' || empty($newval))) {
-        //if ($type == 'registration') {
-            // Automatically generate the data item, if needed
-            //if ($data->options['autogen'] == 1 && empty($newval)) {
-                $newval = PRF_autogen($data, $uid);
-            //}
+        if (isset($data->options['autogen']) &&
+                $data->options['autogen'] == 1 &&
+                ($type == 'registration' || empty($newval))) {
+            $newval = PRF_autogen($data, $uid);
         }
 
         if ($data->perm_owner == 3 || $isAdmin) {
