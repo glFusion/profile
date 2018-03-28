@@ -38,6 +38,7 @@ $expected = array('edit', 'savedef', 'deletedef', 'move',
             'searchusers', 'dousersearch',
             'lists', 'editlist', 'savelist', 'cancellist',
             'mode');
+$action = '';
 foreach($expected as $provided) {
     if (isset($_POST[$provided])) {
         $action = $provided;
@@ -52,7 +53,8 @@ foreach($expected as $provided) {
 $view = isset($_GET['view']) ? $_GET['view'] : $action;
 $id = isset($_POST['id']) ? $_POST['id'] :
         (isset($_GET['id']) ? $_GET['id'] : '');
-
+$content = '';
+$msg = '';
 switch ($action) {
 case 'permreset':
     $view = 'resetpermform';
@@ -503,7 +505,7 @@ function PRF_listFields()
         'query_fields' => array('name', 'type', 'value'),
         'default_filter' => '',
     );
-
+    $form_arr = array();
     $retval .= ADMIN_list('profile', 'PRF_getField_profile', $header_arr,
                     $text_arr, $query_arr, $defsort_arr, '', '', '', $form_arr);
     $retval .= COM_endBlock(COM_getBlockTemplate('_admin_block', 'footer'));

@@ -93,8 +93,10 @@ function PRF_editForm($type = 'edit', $uid = 0, $form_id='profileform')
         // set it to the default or leave it alone.
         if (isset($_POST[$data->name])) {
             $data->value = $_POST[$data->name];
-        } elseif (is_null($data->value)) {
+        } elseif (is_null($data->value) && isset($data->options['default'])) {
             $data->value = $data->options['default'];
+        } else {
+            $data->value = '';
         }
 
         if (isset($data->options['spancols'])) {
@@ -235,7 +237,7 @@ function PRF_saveData($vals, $uid = 0, $type = 'edit')
             break;
 
         case 'checkbox':
-            $newval = $vals[$name] == '1' ? '1' : '0';
+            $newval = isset($vals[$name]) && $vals[$name] == '1' ? '1' : '0';
             break;
 
         case 'multicheck':
