@@ -118,15 +118,14 @@ function plugin_postinstall_profile()
 
     // Create data records for each user and populate first and
     // last name fields
-    USES_lglib_class_nameparser();
     $sql = "SELECT uid, username, fullname FROM {$_TABLES['users']}";
     $res = DB_query($sql);
     while ($A = DB_fetchArray($res, false)) {
         // use username if fullname is empty
         // fullname may be empty, but username can't be
         if ($A['fullname'] == '') $A['fullname'] = $A['username'];
-        $fname = DB_escapeString(NameParser::F($A['fullname']));
-        $lname = DB_escapeString(NameParser::L($A['fullname']));
+        $fname = DB_escapeString(LGLib\NameParser::F($A['fullname']));
+        $lname = DB_escapeString(LGLib\NameParser::L($A['fullname']));
         $uid = (int)$A['uid'];
         $value_arr[] = "($uid, '$fname', '$lname')";
     }

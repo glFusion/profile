@@ -185,9 +185,8 @@ function PRF_saveData($vals, $uid = 0, $type = 'edit')
     // Only update DB fields that are NOT included in the form, otherwise
     // there will be duplicate SQL fields during inserts.
     if (isset($vals['fullname'])) {
-        USES_lglib_class_nameparser();
-        $fname = DB_escapeString(NameParser::F($vals['fullname']));
-        $lname = DB_escapeString(NameParser::L($vals['fullname']));
+        $fname = DB_escapeString(LGLib\NameParser::F($vals['fullname']));
+        $lname = DB_escapeString(LGLib\NameParser::L($vals['fullname']));
         if (!isset($vals['sys_fname'])) $fld_sql[] = "sys_fname = '$fname'";
         if (!isset($vals['sys_lname'])) $fld_sql[] = "sys_lname = '$lname'";
     }
@@ -410,7 +409,9 @@ function PRF_siteHeader($subject='', $meta='')
     global $_PRF_CONF, $LANG_PROFILE;
 
     $retval = '';
-
+    if (!isset($_PRF_CONF['displayblocks'])) {
+        $_PRF_CONF['displayblocks'] = 0;
+    }
     switch($_PRF_CONF['displayblocks']) {
     case 2:     // right only
     case 0:     // none
