@@ -94,7 +94,7 @@ class prfItem
         }
         if (!empty($A)) {
             $this->name = $A['name'];
-            $this->value = $A['value'];
+            $this->value = isset($A['value']) ? $A['value'] : '';
             $this->options = @unserialize($A['options']);
             $this->user_reg = $A['user_reg'] == 1 ? 1 : 0;
             $this->orderby = (int)$A['orderby'];

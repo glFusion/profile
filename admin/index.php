@@ -378,11 +378,10 @@ function PRF_listLists()
         'query_fields' => array('title'),
         'default_filter' => ''
     );
-
+    $form_arr = '';
     $retval .= ADMIN_list('profile', 'PRF_getField_list', $header_arr,
                     $text_arr, $query_arr, $defsort_arr, '', '', '', $form_arr);
     $retval .= COM_endBlock(COM_getBlockTemplate('_admin_block', 'footer'));
-
     return $retval;
 }
 

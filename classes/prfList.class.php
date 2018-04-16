@@ -470,6 +470,7 @@ class prfList
 
         $header_arr = $this->fields;
         $query_fields = $this->_setQueryFields();
+        $form_arr = array();
         $this->_setFullnameFormat();
 
         if ($this->isAdmin) {
@@ -490,12 +491,13 @@ class prfList
 
         $extras = array('f_info' => array());
         $query_sql = $this->_getListSQL('', $extras);
+
         if (!empty($this->sortby)) {
             $defsort_arr = array('field' => $this->sortby,
                 'direction' => $this->sortdir == 'DESC' ? 'DESC' : 'ASC',
             );
         } else {
-            $defsort_arr = array();
+            $defsort_arr = NULL;
         }
         $query_arr = array('table' => 'profile_lists',
             'sql' => $query_sql,
@@ -855,6 +857,7 @@ class prfList
                     isset($pi_tmp['names']) &&
                     is_array($pi_tmp['names'])) {
                     foreach($pi_tmp['names'] as $name=>$info) {
+                        if (!isset($info['title']) || !isset($info['field'])) continue;
                         $tmp[$name] = array(
                                 'title' => $info['title'],
                                 'field' => $info['field'],
@@ -912,7 +915,7 @@ class prfList
 
         // Now show the rest of the available, but unused, fields
         foreach ($avail_fields as $field => $data) {
-            if ($fld_name == 'fullname') {
+            if ($field == 'fullname') {
                 $fld_opt = '<select name="fld_opt[' .
                             $field['field'] . '][disp]">' . LB;
                 $nf = 0;
