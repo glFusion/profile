@@ -55,7 +55,7 @@ if (file_exists(PRF_PI_PATH . 'config.php')) {
 
 // Set the custom values into the $_USER array.  Check that this plugin
 // is enabled as an extra safety check.
-if (is_array($_PLUGINS) && in_array('profile', $_PLUGINS)) {
+if (isset($_PLUGINS) && is_array($_PLUGINS) && in_array('profile', $_PLUGINS)) {
     PRF_setUserValues();
 }
 
