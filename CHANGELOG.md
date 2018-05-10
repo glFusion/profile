@@ -2,6 +2,7 @@
 
 ## Version 1.1.4
 Release TBD
+- Add privacy_export function
 - Require LGLib 1.0.7+ for NameParser class
 - Ensure that sys_fname and sys_lname fields are created during update if missing.
 - Remove realtime field validation if using uikit

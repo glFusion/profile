@@ -514,6 +514,7 @@ function PRF_getDefs($uid = 0, $key = '', $access = 2)
         $sql .= PRF_getPermSQL('AND', $uid, $access, 'pd');
     }
     $sql .= " ORDER BY pd.orderby";
+
     $res = DB_query($sql, 1);
     if (DB_error()) {
         COM_errorLog("PRF_getDefs() error: $sql");
@@ -931,6 +932,35 @@ function plugin_getconfigelementhelp_profile($option, $doclang='english')
     }
 
     return array($doc_url, 0);
+}
+
+
+/**
+*   Export user data when requested.
+*
+*   @param  integer $uid        User ID
+*   @param  string  $email      User Email Address (not used)
+*   @param  string  $username   User Name (not used)
+*   @param  string  $ip         IP address (not used)
+*   @return string              XML-formatted data
+*/
+function plugin_privacy_export_profile($uid,$email='',$username='',$ip='')
+{
+    $tmp = PRF_getDefs($uid);
+
+    $retval = "<profile>\n";
+    foreach ($tmp as $name => $data) {
+        $d = addSlashes(htmlentities($data->FormatValue()));
+        if (!empty($d)) {
+            $retval .= '<'.$data->prompt.'>'.$d.'</'.$data->prompt.">\n";
+        }
+    }
+    $retval .= "</profile>\n";
+
+    if ( function_exists('tidy_repair_string')) {
+        $retval = tidy_repair_string($retval, ['input-xml' => 1]);
+    }
+    return $retval;
 }
 
 
