@@ -138,16 +138,22 @@ class prfItem
     {
         global $_SYSTEM;
 
+        $classes = array();     // collect CSS classes to apply
+
         // Check for required status.  May need to excluded dates from this...
         // Setting 'required' on the profile page causes issues for uikit
         // since it's not checked until submission and the user may never
         // see the error. In that case, don't set the field as required and
         // rely on post-submission validation.
-        if ($this->required == 1 && $_SYSTEM['framework'] == 'legacy') {
-            $this->_frmClass = "class=\"fValidate['required']\" ";
-        } else {
-            $this->_frmClass = 'class="prfInputText"';
+        $classes[] = 'prfInputText';
+        if ($this->required == 1) {
+            if ($_SYSTEM['framework'] == 'legacy') {
+                $classes[] = "fValidate['required']";
+            } else {
+                $classes[] = 'required error';
+            }
         }
+        $this->_frmClass = 'class="' . implode(' ', $classes) . '"';
 
         // If POSTed form data, set the user variable to that.  Otherwise,
         // set it to the default or leave it alone.
