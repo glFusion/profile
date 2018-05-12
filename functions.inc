@@ -952,7 +952,9 @@ function plugin_privacy_export_profile($uid,$email='',$username='',$ip='')
     foreach ($tmp as $name => $data) {
         $d = addSlashes(htmlentities($data->FormatValue()));
         if (!empty($d)) {
-            $retval .= '<'.$data->prompt.'>'.$d.'</'.$data->prompt.">\n";
+            $p = str_replace(' ', '_', $data->prompt);
+            $p = preg_replace("/[^A-Za-z0-9_]/", '', $p);
+            $retval .= '<'.$p.'>'.$d.'</'.$p.">\n";
         }
     }
     $retval .= "</profile>\n";
