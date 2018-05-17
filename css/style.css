@@ -62,8 +62,8 @@ span.prfNewAdminItem {
 }
 
 /* Used instead of uk-width-1-1 to leave room for the info icons */
-.prfInputText {
-    width: 80%;
+.prfInput_text {
+    max-width: 80%;
 }
 
 .prf-icon-ok {

@@ -3,13 +3,14 @@
 *   Class to handle profile lists
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2016 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
 *   @package    profile
-*   @version    1.1.4
+*   @version    1.2.0
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
+namespace Profile;
 
 /** Import user library for USER_getPhoto() */
 USES_lib_user();
@@ -32,7 +33,7 @@ class prfList
     private $incl_grp;  // User group included in this list
     private $incl_user_stat;    // User statuses included in list
     private $isNew = true;  // Indicate whether this is a new list or an update
-    private $isAdmin = false;   // Indicate whether this user is an admin
+    protected $isAdmin = false;   // Indicate whether this user is an admin
     private $showMenu = false;  // Indicate whether the menu should be shown
     private $show_export = false;  // Indicate whether to show the Export link
     private $hasExtras = false; // Indicate whether to show the search form
@@ -349,7 +350,8 @@ class prfList
                 ON u.uid = p.puid
                 $addjoin
                 WHERE u.uid > $noshow_uid
-                $where_and $exp_where";
+                $where_and $exp_where
+                GROUP BY u.uid";
         //echo $sql;die;
         return $sql;
     }
@@ -558,11 +560,11 @@ class prfList
         // Add the menu of available lists, if requested
         $menu = $this->showMenu ? $this->_getListMenu() : '';
 
-        $T = new Template(PRF_PI_PATH . 'templates/');
+        $T = new \Template(PRF_PI_PATH . 'templates/');
         $T->set_file('list', 'memberlist.thtml');
 
         $T->set_var(array(
-            'list_contents' => ADMIN_list('membership', 'PRF_getListField',
+            'list_contents' => ADMIN_list('membership', __NAMESPACE__ . '\PRF_getListField',
                 $header_arr, $text_arr, $query_arr, $defsort_arr,
                 $this->pi_filter, $extras, '', $form_arr),
             'export_link'   => $exportlink,
@@ -697,7 +699,7 @@ class prfList
             case 'username':
             case 'email':
             case 'fullname':
-                $classes[$fieldinfo['field']] = new prfText($fieldinfo['field']);
+                $classes[$fieldinfo['field']] = new prfItem_text($fieldinfo['field']);
                 break;
             default:
                 $tmp[] = "'" . DB_escapeString($fieldinfo['field']) . "'";
@@ -710,12 +712,13 @@ class prfList
                     WHERE name in ($tmp)";
             $r = DB_query($q);
             while ($z = DB_fetchArray($r, false)) {
-                $classname = 'prf' . $z['type'];
+                $classes[$z['name']] = prfItem::getInstance($z);
+                /*$classname = 'prf' . $z['type'];
                 if (class_exists($classname)) {
                     $classes[$z['name']] = new $classname($z['name']);
                 } else {
-                    $classes[$z['name']] = new prfText($z['name']);
-                }
+                    $classes[$z['name']] = new prfItem_text($z['name']);
+                }*/
             }
         }
 
@@ -748,7 +751,7 @@ class prfList
 
         USES_class_navbar();
 
-        $menu = new navbar();
+        $menu = new \navbar();
         $sql = "SELECT * from {$_TABLES['profile_lists']}
                 {$this->access_sql}
                 ORDER BY orderby ASC";
@@ -1278,7 +1281,7 @@ function PRF_getListField($fieldname, $fieldvalue, $A, $icon_arr, $extras)
             $status = 'current';
         }
 
-        $F = new prfDate($fieldname, $fieldvalue);
+        $F = new prfItem_date($fieldname, $fieldvalue);
         $fieldvalue = $F->FormatValue();
         $retval = "<span class=\"profile_$status\">{$fieldvalue}</span>";
         break;
@@ -1305,12 +1308,13 @@ function PRF_getListField($fieldname, $fieldvalue, $A, $icon_arr, $extras)
             }
             if ($custflds[$fieldname]) {
                 // A custom profile field was found.
-                $classname = 'prf' . $custflds[$fieldname]['type'];
+                /*$classname = 'prf' . $custflds[$fieldname]['type'];
                 if (class_exists($classname)) {
                     $F = new $classname($custflds[$fieldname], $fieldvalue, $A['uid']);
                 } else {
                     $F = new prfText($custflds[$fieldname], $fieldvalue, $A['uid']);
-                }
+                }*/
+                $F = prfItem::getInstance($custflds[$fieldname], $fieldvalue, $A['uid']);
                 $retval = $F->FormatValue();
             } else {
                 // The field is probably from a plugin.

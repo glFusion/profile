@@ -1,7 +1,9 @@
 # Custom Profile Plugin - Change Log
 
-## Version 1.1.4
+## Version 1.2.0
 Release TBD
+- Implement caching for glFusion 1.8.0+
+- Refactor profile field classes by type
 - Add privacy_export function
 - Require LGLib 1.0.7+ for NameParser class
 - Ensure that sys_fname and sys_lname fields are created during update if missing.

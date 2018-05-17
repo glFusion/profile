@@ -3,9 +3,9 @@
 *   Display and export the custom member lists for the Custom Profile plugin.
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2010-2011 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2010-2018 Lee Garner <lee@leegarner.com>
 *   @package    profile
-*   @version    1.1.1
+*   @version    1.2.0
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
@@ -20,7 +20,7 @@ if (!in_array('profile', $_PLUGINS)) {
 }
 
 USES_profile_functions();
-USES_profile_class_list();
+//USES_profile_class_list();
 
 // Retrieve input variables.
 COM_setArgNames(array('listid', 'action'));
@@ -30,7 +30,7 @@ $action = COM_getArgument('action');
 switch ($action) {
 case 'export':
     // Export member list to csv
-    $PL = new prfList($listid);
+    $PL = new Profile\prfList($listid);
     $content = $PL->Export();
     //$content = PRF_memberList_export($listid);
     if (!empty($content)) {
@@ -44,8 +44,8 @@ case 'export':
     break;
 
 case 'pdf':
-    USES_profile_class_pdflist();
-    $PL = new prfPdfList($listid);
+    //USES_profile_class_pdflist();
+    $PL = new Profile\pdfList($listid);
     $content = $PL->Render();
     if (!empty($content)) {
         exit;
@@ -53,8 +53,8 @@ case 'pdf':
     break;
 
 case 'html':
-    USES_profile_class_htmlList();
-    $PL = new prfHtmlList($listid);
+    //USES_profile_class_htmlList();
+    $PL = new Profile\htmlList($listid);
     $content = $PL->Render();
     if (!empty($content)) {
         echo $content;
@@ -64,7 +64,7 @@ case 'html':
 
 default:
     // Display a member list
-    $PL = new prfList($listid);
+    $PL = new Profile\prfList($listid);
     $PL->showExport();      // show the export link to qualified users
     $PL->showMenu();        // show the tabbed menu of lists
     $PL->hasExtras();       // show the search form & query limit selector
