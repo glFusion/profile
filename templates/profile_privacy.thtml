@@ -1,3 +1,4 @@
+{# begin {templatelocation} #}
 <tr>
   <td style="width:100px;">
     <label for="sys_directory">{prf_prompt}:</label>
@@ -6,4 +7,4 @@
     {prf_field}
   </td>
 </tr>
-
+{# end {templatelocation} #}

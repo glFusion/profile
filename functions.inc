@@ -320,37 +320,20 @@ function plugin_profileedit_profile($uid, $panel, $fieldset)
 {
     $retval = '';
 
-/*
     if ($panel == 'privacy' && $fieldset == 'privacy') {
-        $T = new Template(PRF_PI_PATH . 'templates/');
-        $T->set_file('profile', 'profile_privacy.thtml');
-        USES_profile_functions();
-        $A = PRF_getDefs(0, 'sys_directory');
-        if (!isset($A['sys_directory']))
-            return;
-        $T->set_var(array(
-            'prf_prompt'    => $A['sys_directory']->prompt,
-            'prf_field'     => $A['sys_directory']->FormField(),
-        ) );
-        $T->parse('output', 'profile');
-        $retval .= $T->finish($T->get_var('output'));
-    }
-*/
-
-    /*if ($panel == 'useredit') {
-        USES_profile_functions();
-        $retval = PRF_editForm('edit', $uid);
-    } elseif ($panel == '' && $fieldset == '') {
-        USES_profile_functions();
-        $retval = PRF_editForm('edit', $uid);
-        //USES_profile_class_profile();
-        //$P = new Profile($uid);
-        //$retval = $P->EditForm('edit');
-    }*/
-
-    if ( ($panel == 'useredit') || ($panel == '' && $fieldset == '') ) {
+        $T = PRF_getTemplate('profile_privacy', 'profile');
         $P = Profile\Profile::getInstance($uid);
-        $retval = $P->Edit('edit', $uid);
+        if (isset($P->fields['sys_directory'])) {
+            $T->set_var(array(
+                'prf_prompt'    => $P->fields['sys_directory']->prompt,
+                'prf_field'     => $P->fields['sys_directory']->FormField(),
+            ) );
+            $T->parse('output', 'profile');
+            $retval .= $T->finish($T->get_var('output'));
+        }
+    } elseif ( ($panel == 'useredit') || ($panel == '' && $fieldset == '') ) {
+        $P = Profile\Profile::getInstance($uid);
+        $retval .= $P->Edit('edit', $uid);
     }
     return $retval;
 }
