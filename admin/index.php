@@ -359,12 +359,29 @@ function PRF_listLists()
     $retval = '';
 
     $header_arr = array(
-        array('text' => $LANG_ADMIN['edit'], 'field' => 'edit', 'sort' => false),
-        array('text' => $LANG_PROFILE['orderby'], 'field' => 'orderby',
-                'sort' => false, 'align' => 'center'),
-        array('text' => $LANG_PROFILE['listid'], 'field' => 'listid', 'sort' => true),
-        array('text' => $LANG_PROFILE['title'], 'field' => 'title', 'sort' => true),
-        array('text' => $LANG_ADMIN['delete'], 'field' => 'delete', 'sort' => false),
+        array('text' => $LANG_ADMIN['edit'],
+            'field' => 'edit',
+            'sort' => false,
+            'align'=>'center',
+        ),
+        array('text' => $LANG_PROFILE['orderby'],
+            'field' => 'orderby',
+            'sort' => false,
+            'align' => 'center',
+        ),
+        array('text' => $LANG_PROFILE['listid'],
+            'field' => 'listid',
+            'sort' => true,
+        ),
+        array('text' => $LANG_PROFILE['title'],
+            'field' => 'title',
+            'sort' => true,
+        ),
+        array('text' => $LANG_ADMIN['delete'],
+            'field' => 'delete',
+            'sort' => false,
+            'align' => 'center',
+        ),
     );
 
     $defsort_arr = array('field' => 'orderby', 'direction' => 'asc');
@@ -402,36 +419,32 @@ function PRF_listLists()
 */
 function PRF_getField_list($fieldname, $fieldvalue, $A, $icon_arr)
 {
-    global $_CONF, $LANG_ACCESS;
+    global $_CONF, $LANG_ACCESS, $LANG_PROFILE, $LANG_ADMIN;
 
     $retval = '';
 
     switch($fieldname) {
     case 'edit':
-        /*if ($A['enabled'] == 1) {
-            $ena_icon = 'on.png';
-            $enabled = 0;
-            $ena_icon_txt = 'Click to disable';
-        } else {
-            $ena_icon = 'off.png';
-            $enabled = 1;
-            $ena_icon_txt = 'Click to enable';
-        }*/
-
         $retval =
             COM_createLink(
-                $icon_arr['edit'],
-                PRF_ADMIN_URL . '/index.php?editlist=' . $A['listid']
+                '<i class="uk-icon uk-icon-edit"></i>',
+                PRF_ADMIN_URL . '/index.php?editlist=' . $A['listid'],
+                array(
+                    'title' => $LANG_ADMIN['edit'],
+                    'data-uk-tooltip' => '',
+                )
             );
        break;
 
     case 'delete':
         $retval = COM_createLink(
-                "<img src=\"{$_CONF['layout_url']}/images/admin/delete.png\"
-                    height=\"16\" width=\"16\" border=\"0\"
-                    onclick=\"return confirm('Do you really want to delete this item?');\"
-                    >",
-                PRF_ADMIN_URL . '/index.php?deletelist=' . $A['listid']
+                '<i class="uk-icon uk-icon-trash-o prf-icon-danger"></i>',
+                PRF_ADMIN_URL . '/index.php?deletelist=' . $A['listid'],
+                array(
+                    'title' => $LANG_ADMIN['delete'],
+                    'data-uk-tooltip' => '',
+                    'onclick' => "return confirm('{$LANG_PROFILE['q_conf_del']}');",
+                )
             );
         break;
 
@@ -445,12 +458,20 @@ function PRF_getField_list($fieldname, $fieldvalue, $A, $icon_arr)
         $retval = COM_createLink(
                 '<img src="' . PRF_PI_URL .
                 '/images/up.png" height="16" width="16" border="0" />',
-                PRF_ADMIN_URL . '/index.php?movelist=up&id=' . $A['listid']
+                PRF_ADMIN_URL . '/index.php?movelist=up&id=' . $A['listid'],
+                array(
+                    'title' => $LANG_PROFILE['move_up'],
+                    'data-uk-tooltip' => '',
+                )
             ) .
             COM_createLink(
                 '<img src="' . PRF_PI_URL .
                     '/images/down.png" height="16" width="16" border="0" />',
-                PRF_ADMIN_URL . '/index.php?movelist=down&id=' . $A['listid']
+                PRF_ADMIN_URL . '/index.php?movelist=down&id=' . $A['listid'],
+                array(
+                    'title' => $LANG_PROFILE['move_dn'],
+                    'data-uk-tooltip' => '',
+                )
             );
         break;
 
@@ -529,7 +550,7 @@ function PRF_listFields()
 */
 function PRF_getField_profile($fieldname, $fieldvalue, $A, $icon_arr)
 {
-    global $_CONF, $LANG_ACCESS, $_PRF_CONF;
+    global $_CONF, $LANG_ACCESS, $_PRF_CONF, $LANG_ADMIN, $LANG_PROFILE;
 
     $retval = '';
 
@@ -541,7 +562,7 @@ function PRF_getField_profile($fieldname, $fieldvalue, $A, $icon_arr)
 
     case 'edit':
         $retval = COM_createLink('<i class="' . $_PRF_CONF['_iconset'] .
-                '-edit prf-icon-info"></i>',
+                '-edit prf-icon-info" data-uk-tooltip title="' . $LANG_ADMIN['edit'] . '"></i>',
                 PRF_ADMIN_URL . '/index.php?edit=x&amp;id=' . $A['id']);
        break;
 
@@ -554,7 +575,8 @@ function PRF_getField_profile($fieldname, $fieldvalue, $A, $icon_arr)
         if (!$A['sys']) {
             $retval = COM_createLink(
                 '<i class="' . $_PRF_CONF['_iconset'] . '-trash-o prf-icon-danger" ' .
-                    "onclick=\"return confirm('Do you really want to delete this item?');\"></i>",
+                    "onclick=\"return confirm('{$LANG_PROFILE['q_conf_del']}');\"" .
+                    'title="' . $LANG_ADMIN['delete'] . '" data-uk-tooltip></i>',
                 PRF_ADMIN_URL . '/index.php?deletedef=x&id=' . $A['id']
             );
         }
@@ -573,6 +595,7 @@ function PRF_getField_profile($fieldname, $fieldvalue, $A, $icon_arr)
         $retval =
                 "<input name=\"{$fieldname}_{$A['id']}\" " .
                 "type=\"checkbox\" $chk " .
+                'data-uk-tooltip title="' . $LANG_PROFILE['click_to_change'] . '" ' .
                 "onclick='PRFtoggleEnabled(this, \"{$A['id']}\", \"{$fieldname}\");' ".
                 ">\n";
     break;
@@ -597,12 +620,14 @@ function PRF_getField_profile($fieldname, $fieldvalue, $A, $icon_arr)
     case 'orderby':
         $retval = COM_createLink(
                 '<img src="' . PRF_PI_URL .
-                '/images/up.png" height="16" width="16" border="0" />',
+                    '/images/up.png" height="16" width="16" border="0" ' .
+                    'data-uk-tooltip title="' . $LANG_PROFILE['move_up'] . '"/>',
                 PRF_ADMIN_URL . '/index.php?move=up&id=' . $A['id']
             ) .
             COM_createLink(
                 '<img src="' . PRF_PI_URL .
-                    '/images/down.png" height="16" width="16" border="0" />',
+                    '/images/down.png" height="16" width="16" border="0" ' .
+                    'data-uk-tooltip title="' . $LANG_PROFILE['move_dn'] . '"/>',
                 PRF_ADMIN_URL . '/index.php?move=down&id=' . $A['id']
             );
         break;
@@ -973,9 +998,7 @@ function PRF_permResetForm()
     $T->parse('output', 'bulkperms');
 
     //$retval = PRF_adminMenu('', 'hlp_reset_perms');
-    $retval .= $T->finish($T->get_var('output'));
-
-    return $retval;
+    return $T->finish($T->get_var('output'));
 }
 
 
@@ -1021,64 +1044,6 @@ function PRF_searchUsersForm()
     while ($A = DB_fetchArray($res, false)) {
         $F = Profile\prfItem::getInstance($A);
         $T->set_block('searchform', 'FldRow', 'frow');
-        /*$fld = '';
-        $fld_empty = '';
-        switch ($A['type']) {
-        case 'Xcheckbox':
-            $fld = '<input type="radio" name="'. $A['name'].'" value="1">' .
-                $LANG_PROFILE['checked'] . '&nbsp;' .
-                '<input type="radio" name="'. $A['name'].'" value="0" />' .
-                $LANG_PROFILE['unchecked'] . '&nbsp;' .
-                '<input type="radio" name="'. $A['name'].
-                    '" value="-1" ' . PRF_CHECKED . ' />' . $LANG_PROFILE['any'];
-            break;
-        case 'Xradio':
-        case 'Xdropdown':
-            $options = @unserialize($A['options']);
-            if (!$options) $options = array();
-            if (isset($options['values']) && is_array($options['values'])) {
-                foreach ($options['values'] as $valname) {
-                    $fld .= '<input type="radio" name="'.$A['name'] .
-                        '" value="'.htmlentities($valname, ENT_QUOTES) .
-                        '" />'.$valname.'&nbsp;';
-                }
-            }
-            $fld .= '<input type="radio" name="'.$A['name'].
-                '" value="-1" ' . PRF_CHECKED . '/>' . $LANG_PROFILE['any'];
-            break;
-        case 'Xmulticheck':
-            $options = @unserialize($A['options']);
-            if (!$options) $options = array();
-            if (isset($options['values']) && is_array($options['values'])) {
-                foreach ($options['values'] as $valname) {
-                    $fld .= '<input type="checkbox" name="'.$A['name'] .
-                        '[]" value="' . htmlendities($valname, ENT_QUOTES) .
-                        '" />'.$valname.'&nbsp;';
-                }
-            }
-            $fld .= '<input type="checkbox" name="'.$A['name'].
-                '[]" value="-1" />' . $LANG_PROFILE['any'];
-            $fld_empty = 'true';    // Can be empty
-            break;
-        case 'Xdate':
-            $fld .= '<input type="radio" name="'.$A['name'].'_mod" value="=">=&nbsp;&nbsp;';
-            $fld .= '<input type="radio" name="'.$A['name'].'_mod" value="<"><&nbsp;&nbsp;';
-            $fld .= '<input type="radio" name="'.$A['name'].'_mod" value="<="><=&nbsp;&nbsp;';
-            $fld .= '<input type="radio" name="'.$A['name'].'_mod" value=">">>&nbsp;&nbsp;';
-            $fld .= '<input type="radio" name="'.$A['name'].'_mod" value=">=">>=&nbsp;&nbsp;';
-            $fld .= '<input type="radio" name="'.$A['name'].'_mod" value="<>"><>&nbsp;';
-            $F = new Profile\prfDate($A['name']);
-            $fld .= $F->FormField(false);
-            $fld_empty = 'true';    // Can be empty
-            break;
-
-        default:
-            $fld = $F->searchFormOpts();
-            //$fld = '<input type="text" size="50" name="'.$A['name'].'" value="" />';
-            $fld_empty = 'true';
-            break;
-        }*/
-
         $T->set_var(array(
             'fld_prompt'    => $F->prompt,
             'fld_name'      => $F->name,
