@@ -179,7 +179,7 @@ class prfItem_date extends prfItem
                     '-calendar tooltip" title="' .
                     $LANG_PROFILE['select_date'] . '" id="' .
                     $this->name . '_trigger"></i>';
-            if ($this->options['timeformat']) {
+            if ($this->options['timeformat'] && $incl_time) {
                 $showtime = 'true';
                 $timeformat = $this->options['timeformat'];
             } else {
@@ -222,13 +222,11 @@ function {$this->name}_onUpdate(cal)
             break;
         }
 
-        //if ($this->options['showtime']) {
-        if ($this->options['timeformat']) {
+        if ($this->options['timeformat'] && $incl_time) {
             $fld .= '&nbsp;&nbsp;' . $hr_fld . ':' . $min_fld . $ampm_fld;
         }
 
         $fld .= $datepick;
-
         return $fld;
     }
 
