@@ -34,9 +34,6 @@ case 'toggleEnabled':
     case 'enabled':
     case 'user_reg':
         // Toggle the is_origin flag between 0 and 1
-COM_errorLog("UPDATE {$_TABLES['profile_def']}
-                SET $type = '$newval'
-                WHERE id='$id'");
         DB_query("UPDATE {$_TABLES['profile_def']}
                 SET $type = '$newval'
                 WHERE id='$id'", 1);
@@ -65,6 +62,9 @@ COM_errorLog("UPDATE {$_TABLES['profile_def']}
         // Reset newval to flag that the update wasn't done.
         $newval = $oldval;
         COM_errorLog("Error: $sql");
+    } else {
+        // Have to clear the cache if there were any changes
+        Profile\Cache::clear();
     }
 
     $result = array(
