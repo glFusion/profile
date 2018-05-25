@@ -130,6 +130,10 @@ $LANG_PROFILE = array(
 'select_date' => 'Click for a date picker',
 'toggle_success' => 'Item has been updated.',
 'toggle_failure' => 'Error updating item.',
+'q_conf_del' => 'Do you really want to delete this item?',
+'move_up'   => 'Move Up',
+'move_dn'   => 'Move Down',
+'click_to_change' => 'Click to change',
 
 // begin membership fields
 'del_selected' => 'Delete Selected',
