@@ -18,14 +18,17 @@
   {!else}
       <i class="{iconset}-user-secret prf-icon-disabled tooltip" title="{$LANG_PROFILE['hlp_invisible']}"></i>
   {!endif}
-  {!if is_required}
-      <i class="{iconset}-warning prf-icon-danger tooltip" title="{$LANG_PROFILE['hlp_required']}"></i>
-  {!endif}
   {!if help_text}
       <i class="{iconset}-question-circle prf-icon-info tooltip" title="{help_text}"></i>
   {!endif}
+  {!if is_required}
+      <i class="{iconset}-warning prf-icon-danger tooltip" title="{$LANG_PROFILE['hlp_required']}"></i>
+  {!endif}
 {!endif}
     </span>
+{!if is_required}
+<br /><label for="{fld_name}" generated="true" class="error"></label>
+{!endif}
   </span>
   </div>
   </div>

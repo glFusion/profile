@@ -3,22 +3,21 @@
 *   Handle the printing of PDF reports using FPDF
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2016 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2016-2018 Lee Garner <lee@leegarner.com>
 *   @package    profile
-*   @version    1.1.4
+*   @version    1.2.0
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
-
-USES_profile_class_list();
+namespace Profile;
 
 /**
 *   Class for creating a PDF catalog
 *   @package    profile
 *   @since      1.1.4
 */
-class prfHtmlList extends prfList
+class htmlList extends prfList
 {
     /**
     *   Constructor. Simply calls the parent constructor
@@ -87,7 +86,7 @@ class prfHtmlList extends prfList
             case 'username':
             case 'email':
             case 'fullname':
-                $classes[$fieldinfo['field']] = new prfText($fieldinfo['field']);
+                $classes[$fieldinfo['field']] = new prfItem_text($fieldinfo['field']);
                 break;
             default:
                 $tmp[] = "'" . DB_escapeString($fieldinfo['field']) . "'";
@@ -96,21 +95,22 @@ class prfHtmlList extends prfList
         }
         if (!empty($tmp)) {
             $tmp = implode(',', $tmp);
-            $q = "SELECT name, type FROM {$_TABLES['profile_def']}
+            $q = "SELECT * FROM {$_TABLES['profile_def']}
                     WHERE name in ($tmp)";
             $r = DB_query($q);
             while ($z = DB_fetchArray($r, false)) {
+                $classes[$z['name']] = prfItem::getInstance($z);
                 $classname = 'prf' . $z['type'];
                 if (class_exists($classname)) {
                     $classes[$z['name']] = new $classname($z['name']);
                 } else {
-                    $classes[$z['name']] = new prfText($z['name']);
+                    $classes[$z['name']] = new prfItem_text($z['name']);
                 }
             }
         }
 
         // Open template
-        $T = new Template(PRF_PI_PATH . 'templates/pdf');
+        $T = new \Template(PRF_PI_PATH . 'templates/pdf');
         if (file_exists(PRF_PI_PATH . "templates/pdf/{$this->listid}.thtml")) {
             $T->set_file('list', $this->listid . '.thtml');
         } else {
@@ -142,7 +142,7 @@ class prfHtmlList extends prfList
             $T->parse('row', 'UserRow', true);
         }
 
-        $dt = new Date('now', $_CONF['timezone']);
+        $dt = new \Date('now', $_CONF['timezone']);
         $T->set_var(array(
             'title'         => $this->title,
             'report_date'   => $dt->format($_CONF['date'], true),
@@ -152,6 +152,6 @@ class prfHtmlList extends prfList
         return $content;
     }   // function Render()
 
-}   // class prfHTMLList
+}   // class hTMLList
 
 ?>

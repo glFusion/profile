@@ -8,7 +8,7 @@
         <label class="uk-form-label" for="{fld_name}">{prompt}</label>
         <div class="uk-form-controls">
           {field}
-          <span class="prfInfoIcons">
+          <span class="prfInfoIcons">&nbsp;
 {!if is_static}
 {!else}
   {!if is_visible}

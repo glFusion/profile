@@ -3,23 +3,21 @@
 *   Handle the printing of PDF reports using FPDF
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2016 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2016-2018 Lee Garner <lee@leegarner.com>
 *   @package    profile
-*   @version    1.1.4
+*   @version    1.2.0
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
-
-USES_profile_class_list();
-require_once dirname(__FILE__) . '/htmlList.class.php';
+namespace Profile;
 
 /**
-*   Class for creating a PDF catalog
+*   Class for creating a PDF member list
 *   @package    profile
 *   @since      1.1.4
 */
-class prfPdfList extends prfHTMLList
+class pdfList extends htmlList
 {
     public function __construct($listid='')
     {
@@ -55,7 +53,7 @@ class prfPdfList extends prfHTMLList
 
         USES_lglib_class_html2pdf();
         try {
-            $html2pdf = new HTML2PDF('P', 'A4', 'en');
+            $html2pdf = new \HTML2PDF('P', 'A4', 'en');
             //$html2pdf->setModeDebug();
             $html2pdf->setDefaultFont('Arial');
             $html2pdf->writeHTML($content);
@@ -72,6 +70,6 @@ class prfPdfList extends prfHTMLList
 
     }   // function Render()
 
-}   // class prfPdfList
+}   // class pdfList
 
 ?>

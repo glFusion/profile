@@ -234,8 +234,8 @@ function service_renderForm_profile($args, &$output, &$svc_msg)
     if (COM_isAnonUser()) return PLG_RET_ERROR;
     $uid = isset($args['uid']) ? $args['uid'] : $_USER['uid'];
     $form_id = isset($args['form_id']) ? $args['form_id'] : '';
-    USES_profile_functions();
-    $output = PRF_editForm('inline', $uid, $form_id);
+    $P = Profile\Profile::getInstance($uid);
+    $output = $P->Edit('inline', $form_id);
     return PLG_RET_OK;
 }
 
@@ -260,8 +260,8 @@ function service_saveData_profile($args, &$output, &$svc_msg)
         return PLG_RET_ERROR;
     }
 
-    USES_profile_functions();
-    $status = PRF_saveData($args['data'], $args['uid']);
+    $P = Profile\Profile::getInstance($args['uid']);
+    $status = $P->Save($args['data']);;
     if ($status) return PLG_RET_OK;
     else return PLG_RET_ERROR;
 }

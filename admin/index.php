@@ -87,7 +87,8 @@ case 'deletelist':
 
 case 'savedef':
     // Save or update a profile definition
-    $msg = PRF_saveDefs($_POST);
+    $F = Profile\prfItem::getInstance($_POST);
+    $F->saveDef($_POST);
     $view = 'listfields';
     break;
 
@@ -136,8 +137,7 @@ case 'savelist':
         $listid = $_POST['listid'];
     }
     if (!empty($listid)) {
-        USES_profile_class_list();
-        $L = new prfList($listid);
+        $L = new Profile\prfList($listid);
         $L->Save($_POST);
     }
     $view = 'lists';
@@ -158,7 +158,8 @@ case 'dousersearch':
 switch ($view) {
 case 'editform':
     // Edit a single definition
-    $content .= PRF_adminForm($id);
+    $F = Profile\prfItem::getInstance($id);
+    $content .= $F->Edit();
     break;
 
 case 'lists':
@@ -166,9 +167,8 @@ case 'lists':
     break;
 
 case 'editlist':
-    USES_profile_class_list();
     //$content .= PRF_adminMenu('list_edit_help');
-    $L = new prfList($actionval);
+    $L = new Profile\prfList($actionval);
     $content .= $L->Edit();
     break;
 
@@ -216,22 +216,24 @@ exit;
 *   Displays a form for editing a profile definition.
 *   @param  integer $id     Database ID of item to edit, 0 for new item
 *   @return string          HTML for the form
+*   @deprecated 1.2.0
 */
-function PRF_adminForm($id)
+function X_PRF_adminForm($id)
 {
     global $_TABLES, $_CONF, $LANG_PROFILE, $LANG_ADMIN, $_PRF_CONF;
 
     $retval = '';
 
-    $T = PRF_getTemplate('profile', 'editform', 'admin');
     $id = (int)$id;
-    if ($id > 0) {
+    $F = Profile\prfItem::getInstance($id);
+    $T = PRF_getTemplate('profile', 'editform', 'admin');
+    /*if ($id > 0) {
         // Existing item, retrieve it
         $sql = "SELECT *
                 FROM {$_TABLES['profile_def']}
                 WHERE id='$id'";
         $result = DB_query($sql);
-        if (DB_numRows($result != 1)) return '';
+        if (DB_numRows($result) != 1) return '';
         $A = DB_fetchArray($result, false);
 
         $is_sys = (int)$A['sys'];
@@ -259,13 +261,16 @@ function PRF_adminForm($id)
         $T->set_var('editing', '');
     }
 
+    $F = Profile\prfItem::getInstance($A);
+    */
+
     // Instantiate a class to handle default values
-    $classname = 'prf' . $A['type'];
+    /*$classname = 'prf' . $A['type'];
     if (class_exists($classname)) {
         $F = new $classname($A['name'], $A['value']);
     } else {
         $F = new prfText($A['name'], $A['value']);
-    }
+    }*/
 
     // Create the selection list for the "Position After" dropdown.
     // Include all options *except* the current one, and select the last one
@@ -297,28 +302,29 @@ function PRF_adminForm($id)
     }
 
     // Populate the options specific to certain field types
-    $opts = PRF_getOpts($A['options']);
+    $opts = isset($A['options']) ? PRF_getOpts($A['options']) : array();
 
     // Set up the field-specific inputs for value selection or default value
     $T->set_var($F->editValues());
 
+    if (!isset($opts['input_format'])) $opts['input_format'] = '';
     $T->set_var(array(
-        'id'        => $A['id'],
-        'name'      => $A['name'],
-        'type'      => $A['type'],
-        'oldtype'   => $A['type'],
-        'prompt'    => $A['prompt'],
-        'ena_chk'   => $A['enabled'] == 1 ? PRF_CHECKED : '',
-        'user_reg_chk' => $A['user_reg'] == 1 ? PRF_CHECKED : '',
-        'req_chk'   => $A['required'] == 1 ? PRF_CHECKED : '',
-        'in_prf_chk' => $A['show_in_profile'] == 1 ? PRF_CHECKED : '',
-        'spancols_chk' => $opts['spancols'] == 1 ? PRF_CHECKED : '',
+        'id'        => isset($A['id']) ? $A['id'] : 0,
+        'name'      => isset($A['name']) ? $A['name'] : '',
+        'type'      => isset($A['type']) ? $A['type'] : 'text',
+        'oldtype'   => isset($A['type']) ? $A['type'] : 'text',
+        'prompt'    => isset($A['prompt']) ? $A['prompt'] : '',
+        'ena_chk'   => (isset($A['enabled']) && $A['enabled'] == 1) ? PRF_CHECKED : '',
+        'user_reg_chk' => (isset($A['user_reg']) && $A['user_reg'] == 1) ? PRF_CHECKED : '',
+        'req_chk'   => (isset($A['required']) && $A['required'] == 1) ? PRF_CHECKED : '',
+        'in_prf_chk' => (isset($A['show_in_profile']) && $A['show_in_profile'] == 1) ? PRF_CHECKED : '',
+        'spancols_chk' => (isset($opts['spancols']) && $opts['spancols'] == 1) ? PRF_CHECKED : '',
         'orderby'   => $A['orderby'],
-        'format'    => $opts['format'],
-        'input_format' => prfDate::DateFormatSelect($opts['input_format']),
+        'format'    => isset($opts['format']) ? $opts['format'] : '',
+        'input_format' => Profile\prfItem_date::DateFormatSelect($opts['input_format']),
         'doc_url'   => PRF_getDocURL('profile_def.html'),
-        'mask'      => $opts['mask'],
-        'vismask'   => $opts['vismask'],
+        'mask'      => isset($opts['mask']) ? $opts['mask'] : '',
+        'vismask'   => isset($opts['vismask']) ? $opts['vismask'] : '',
         'autogen_chk' => (isset($opts['autogen']) && $opts['autogen'] == 1) ?
                         PRF_CHECKED : '',
         'stripmask_chk' => (isset($opts['stripmask']) && $opts['stripmask']  == 1) ?
@@ -331,7 +337,7 @@ function PRF_adminForm($id)
                         'pi_name,pi_name', $A['plugin'], 0, 'pi_enabled=1'),
         'help_text' => isset($opts['help_text']) ?
                 htmlspecialchars($opts['help_text']) : '',
-        'dt_input_format' => prfDate::DateFormatSelect($opts['input_format']),
+        'dt_input_format' => Profile\prfItem_date::DateFormatSelect($opts['input_format']),
         'orderby_selection' => $orderby_options,
         'type_options' => $type_options,
     ) );
@@ -920,7 +926,7 @@ function PRF_adminMenu($page='list')
     if ($page == '')
         $page = 'list';
 
-    $help_text = $LANG_PROFILE['help'][$page];
+    $help_text = isset($LANG_PROFILE['help'][$page]) ? $LANG_PROFILE['help'][$page] : '';
 
     if ($page == 'list') {
         $menu_arr[] = array('url' => PRF_ADMIN_URL . '/index.php?edit=x',
@@ -949,7 +955,7 @@ function PRF_adminMenu($page='list')
     $menu_arr[] = array('url' => $_CONF['site_admin_url'],
             'text' => $LANG01[53]);
 
-    $retval = ADMIN_createMenu($menu_arr, $LANG_PROFILE['help'][$page],
+    $retval = ADMIN_createMenu($menu_arr, $help_text,
                     plugin_geticon_profile());
     return $retval;
 }
@@ -1005,7 +1011,7 @@ function PRF_searchUsersForm()
     $T = new Template(PRF_PI_PATH . 'templates/admin');
     $T->set_file('searchform', 'search.thtml');
 
-    $sql = "SELECT name, prompt, type, options
+    $sql = "SELECT *
             FROM {$_TABLES['profile_def']}
             WHERE enabled = 1
             AND type <> 'static' " .
@@ -1013,11 +1019,12 @@ function PRF_searchUsersForm()
             ' ORDER BY orderby ASC';
     $res = DB_query($sql);
     while ($A = DB_fetchArray($res, false)) {
+        $F = Profile\prfItem::getInstance($A);
         $T->set_block('searchform', 'FldRow', 'frow');
-        $fld = '';
+        /*$fld = '';
         $fld_empty = '';
         switch ($A['type']) {
-        case 'checkbox':
+        case 'Xcheckbox':
             $fld = '<input type="radio" name="'. $A['name'].'" value="1">' .
                 $LANG_PROFILE['checked'] . '&nbsp;' .
                 '<input type="radio" name="'. $A['name'].'" value="0" />' .
@@ -1025,8 +1032,8 @@ function PRF_searchUsersForm()
                 '<input type="radio" name="'. $A['name'].
                     '" value="-1" ' . PRF_CHECKED . ' />' . $LANG_PROFILE['any'];
             break;
-        case 'radio':
-        case 'dropdown':
+        case 'Xradio':
+        case 'Xdropdown':
             $options = @unserialize($A['options']);
             if (!$options) $options = array();
             if (isset($options['values']) && is_array($options['values'])) {
@@ -1039,7 +1046,7 @@ function PRF_searchUsersForm()
             $fld .= '<input type="radio" name="'.$A['name'].
                 '" value="-1" ' . PRF_CHECKED . '/>' . $LANG_PROFILE['any'];
             break;
-        case 'multicheck':
+        case 'Xmulticheck':
             $options = @unserialize($A['options']);
             if (!$options) $options = array();
             if (isset($options['values']) && is_array($options['values'])) {
@@ -1053,29 +1060,30 @@ function PRF_searchUsersForm()
                 '[]" value="-1" />' . $LANG_PROFILE['any'];
             $fld_empty = 'true';    // Can be empty
             break;
-        case 'date':
+        case 'Xdate':
             $fld .= '<input type="radio" name="'.$A['name'].'_mod" value="=">=&nbsp;&nbsp;';
             $fld .= '<input type="radio" name="'.$A['name'].'_mod" value="<"><&nbsp;&nbsp;';
             $fld .= '<input type="radio" name="'.$A['name'].'_mod" value="<="><=&nbsp;&nbsp;';
             $fld .= '<input type="radio" name="'.$A['name'].'_mod" value=">">>&nbsp;&nbsp;';
             $fld .= '<input type="radio" name="'.$A['name'].'_mod" value=">=">>=&nbsp;&nbsp;';
             $fld .= '<input type="radio" name="'.$A['name'].'_mod" value="<>"><>&nbsp;';
-            $F = new prfDate($A['name']);
+            $F = new Profile\prfDate($A['name']);
             $fld .= $F->FormField(false);
             $fld_empty = 'true';    // Can be empty
             break;
 
         default:
-            $fld = '<input type="text" size="50" name="'.$A['name'].'" value="" />';
+            $fld = $F->searchFormOpts();
+            //$fld = '<input type="text" size="50" name="'.$A['name'].'" value="" />';
             $fld_empty = 'true';
             break;
-        }
+        }*/
 
         $T->set_var(array(
-            'fld_prompt'    => $A['prompt'],
-            'fld_name'      => $A['name'],
-            'fld_input'     => $fld,
-            'fld_empty'     => $fld_empty,
+            'fld_prompt'    => $F->prompt,
+            'fld_name'      => $F->name,
+            'fld_input'     => $F->searchFormOpts(),
+            'fld_empty'     => true,
         ) );
         $T->parse('frow', 'FldRow', true);
     }
@@ -1096,24 +1104,25 @@ function PRF_searchUsers($vals)
 {
     global $_TABLES, $LANG_ADMIN, $LANG_PROFILE;
 
-    $sql = "SELECT name,type FROM {$_TABLES['profile_def']}
+    $sql = "SELECT * FROM {$_TABLES['profile_def']}
             WHERE enabled=1 " . COM_getPermSQL('AND', 0, 2);
     $res = DB_query($sql);
     $fields = array();
     while ($A = DB_fetchArray($res, false)) {
         if ($A['type'] != 'static') {
-            $fields[$A['name']] = $A['type'];
+            $fields[$A['name']] = $A;
             $sql_flds[] = '`data`.`' . $A['name'] . '`';
         }
     }
     $sql_fldnames = implode(',', $sql_flds);
 
     $flds = array();
-    foreach ($fields as $f_name=>$f_type) {
-        if ($_POST[$f_name] == '-1') continue;   // signifies "any"
+    foreach ($fields as $f_name=>$fld) {
+        if (!isset($_POST[$f_name]) || $_POST[$f_name] == '-1') continue;   // signifies "any"
+        $F = Profile\prfItem::getInstance($fld);
         $f_name = DB_escapeString($f_name);
-        switch($f_type) {
-        case 'date':
+        switch($F->type) {
+        case 'Xdate':
             if (isset($_POST['empty'][$f_name])) {
                 $flds[] = "(`data`.`$f_name` = '' OR `data`.`$f_name` IS NULL OR `data`.`$f_name` LIKE '0000-00-00%')";
             } else {
@@ -1130,15 +1139,20 @@ function PRF_searchUsers($vals)
             }
             break;
         default:
-            $value = DB_escapeString($_POST[$f_name]);
+            $x = $F->createSearchSQL($_POST);
+            if (!empty($x)) {
+                $flds[] = $x;
+            }
+/*            $value = DB_escapeString($_POST[$f_name]);
             if (isset($_POST['empty'][$f_name])) {
                 $flds[] = "(`data`.`$f_name` = '' OR `data`.`$f_name` IS NULL)";
             } elseif ($_POST[$f_name] !== '') {
                 $flds[] = "`data`.`$f_name` like '%{$value}%'";
-            }
+            }*/
             break;
         }
     }
+
     if (is_array($flds) && !empty($flds))
         $fld_sql = implode(' OR ', $flds);
     else
@@ -1163,10 +1177,11 @@ function PRF_searchUsers($vals)
     );
 
     $data_arr = array();
+    $text_arr = array();
     while ($A = DB_fetchArray($res, false)) {
         $data_arr[] = $A;
     }
-    $retval = ADMIN_simpleList(PRF_getField_profile, $header_arr, $text_arr,
+    $retval = ADMIN_simpleList('PRF_getField_profile', $header_arr, $text_arr,
             $data_arr, '', '', '');
     return $retval;
 }

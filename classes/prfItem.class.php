@@ -3,13 +3,14 @@
 *   Class to handle individual profile items.
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2016 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
 *   @package    profile
-*   @version    1.1.4
+*   @version    1.2.0
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
+namespace Profile;
 
 /**
 *   Class for profile items
@@ -18,33 +19,10 @@
 */
 class prfItem
 {
-    /** User ID
-        @var integer */
-    var $uid;
-
-    /** Variable Name
-        @var string */
-    var $name;
-
-    /** Variable Value
-        @var mixed */
-    var $value;
-
-    /** Formatted Value, for dates and numbers
-        @var string */
-    var $formattedvalue;
-
     /** Options for this item
+        Public, but should be accessed via getOption()
         @var array */
-    var $options = array();
-
-    /** Required flag
-        @var boolean */
-    var $required;
-
-    /** Does this item appear on the registration form?
-        @var boolean */
-    var $user_reg;
+    public $options = array();
 
     /** CSS class to use on the entry form
         @var string */
@@ -54,10 +32,9 @@ class prfItem
         @var string */
     protected $_frmReadonly = '';
 
-    /** This indicates a readonly field, just for convenience where it
-        might be checked.
-        @var boolean */
-    protected $readonly;
+    /** Properties array
+        @var array */
+    private $properties = array();
 
     /** Easily indicate a hidden field.
         @var boolean */
@@ -73,7 +50,7 @@ class prfItem
     */
     public function __construct($item, $value='', $uid = '')
     {
-        global $_USER, $_TABLES;
+        global $_USER, $_TABLES, $_PRF_CONF;
 
         if (empty($uid)) $uid = $_USER['uid'];
         $this->uid = (int)$uid;
@@ -93,21 +70,27 @@ class prfItem
             $A = DB_fetchArray($res, false);
         }
         if (!empty($A)) {
-            $this->name = $A['name'];
+            $this->setVars($A, true);
+            /*$this->id = isset($A['id']) ? $A['id'] : 0;
+            $this->name = isset($A['name']) ? $A['name'] : '';
             $this->value = isset($A['value']) ? $A['value'] : '';
             $this->options = @unserialize($A['options']);
-            $this->user_reg = $A['user_reg'] == 1 ? 1 : 0;
-            $this->orderby = (int)$A['orderby'];
-            $this->type = $A['type'];
-            $this->enabled = $A['enabled'] == 1 ? 1 : 0;
-            $this->required = $A['required'] == 1 ? 1 : 0;
-            $this->show_in_profile = $A['show_in_profile'] == 1 ? 1 : 0;
-            $this->prompt = $A['prompt'];
-            $this->group_id = (int)$A['group_id'];
-            $this->perm_owner = (int)$A['perm_owner'];
-            $this->perm_group = (int)$A['perm_group'];
-            $this->perm_members = (int)$A['perm_members'];
-            $this->perm_anon = (int)$A['perm_anon'];
+            $this->user_reg = isset($A['user_reg']) ? $A['user_reg'] : 0;
+            $this->orderby = isset($A['orderby']) ? $A['orderby'] : 999;
+            $this->type = isset($A['type']) ? $A['type'] : 'text';
+            $this->enabled = isset($A['enabled']) ? $A['enabled'] : 0;
+            $this->required = isset($A['required']) ? $A['required'] : 0;
+            $this->show_in_profile = isset($A['show_in_profile']) ? $A['show_in_profile'] : 0;
+            $this->prompt = isset($A['prompt']) ? $A['prompt'] : '';
+            $this->group_id = isset($A['group_id']) ? $A['group_id'] : $_PRF_CONF['group_id'];
+            $this->perm_owner = isset($A['perm_owner']) ? $A['perm_owner'] :
+                    $_PRF_CONF['default_permissions'][0];
+            $this->perm_group = isset($A['perm_group']) ? $A['perm_group'] :
+                    $_PRF_CONF['default_permissions'][1];
+            $this->perm_members = isset($A['perm_members']) ? $A['perm_members']:
+                    $_PRF_CONF['default_permissions'][2];
+            $this->perm_anon = isset($A['perm_anon']) ? $A['perm_anon'] :
+                    $_PRF_CONF['default_permissions'][3];*/
         }
 
         // Override the item's value if one is provided.
@@ -115,6 +98,97 @@ class prfItem
 
         // If the unserialization failed, provide an empty array
         if (!$this->options) $this->options = array();
+    }
+
+
+    private function setVars($A, $from_db = true)
+    {
+        $this->id = isset($A['id']) ? $A['id'] : 0;
+        $this->sys = isset($A['sys']) ? $A['sys'] : 0;
+        $this->name = isset($A['name']) ? $A['name'] : '';
+        $this->value = isset($A['value']) ? $A['value'] : '';
+        $this->user_reg = isset($A['user_reg']) ? $A['user_reg'] : 0;
+        $this->orderby = isset($A['orderby']) ? $A['orderby'] : 999;
+        $this->type = isset($A['type']) ? $A['type'] : 'text';
+        $this->enabled = isset($A['enabled']) ? $A['enabled'] : 0;
+        $this->required = isset($A['required']) ? $A['required'] : 0;
+        $this->show_in_profile = isset($A['show_in_profile']) ? $A['show_in_profile'] : 0;
+        $this->prompt = isset($A['prompt']) ? $A['prompt'] : '';
+        $this->group_id = isset($A['group_id']) ? $A['group_id'] : $_PRF_CONF['group_id'];
+        if ($from_db) {
+            $this->perm_owner = isset($A['perm_owner']) ? $A['perm_owner'] :
+                $_PRF_CONF['default_permissions'][0];
+            $this->perm_group = isset($A['perm_group']) ? $A['perm_group'] :
+                    $_PRF_CONF['default_permissions'][1];
+            $this->perm_members = isset($A['perm_members']) ? $A['perm_members']:
+                    $_PRF_CONF['default_permissions'][2];
+            $this->perm_anon = isset($A['perm_anon']) ? $A['perm_anon'] :
+                    $_PRF_CONF['default_permissions'][3];
+            $this->options = @unserialize($A['options']);
+        } else {
+            if (isset($A['perm_owner'])) {
+                $perms = SEC_getPermissionValues($A['perm_owner'],
+                    $A['perm_group'], $A['perm_members'],
+                    $A['perm_anon']);
+                $this->perm_owner   = $perms[0];
+                $this->perm_group   = $perms[1];
+                $this->perm_members = $perms[2];
+                $this->perm_anon    = $perms[3];
+            }
+            $this->options = array();
+        }
+    }
+
+
+    /**
+    *   Set a property's value
+    *
+    *   @param  string  $key    Name of property
+    *   @param  mixed   $value  Value of property
+    */
+    public function __set($key, $value)
+    {
+        switch ($key) {
+        case 'enabled':
+        case 'show_in_profile':
+        case 'user_reg':
+        case 'sys':
+        case 'readonly':
+        case 'required':
+            $this->properties[$key] = $value == 0 ? 0 : 1;
+            break;
+        case 'type':
+        case 'name':
+        case 'prompt':
+        case 'value':
+            $this->properties[$key] = $value;
+            break;
+        case 'id':
+        case 'orderby':
+        case 'group_id':
+        case 'perm_owner':
+        case 'perm_group':
+        case 'perm_members':
+        case 'perm_anon':
+            $this->properties[$key] = (int)$value;
+            break;
+        }
+    }
+
+
+    /**
+    *   Get the value of a property, NULL if undefined
+    *
+    *   @param  string  $key    Name of property
+    *   @return mixed           Value of property
+    */
+    public function __get($key)
+    {
+        if (array_key_exists($key, $this->properties)) {
+            return $this->properties[$key];
+        } else {
+            return NULL;
+        }
     }
 
 
@@ -133,39 +207,48 @@ class prfItem
 
     /**
     *   Initialize common form field requirements.
+    *   This can be called by child classes in their FormField() function
     */
     protected function _FormFieldInit()
     {
         global $_SYSTEM;
+
+        // collect CSS classes to apply
+        $classes = array(
+            'prfInput_' . $this->type,
+        );
 
         // Check for required status.  May need to excluded dates from this...
         // Setting 'required' on the profile page causes issues for uikit
         // since it's not checked until submission and the user may never
         // see the error. In that case, don't set the field as required and
         // rely on post-submission validation.
-        if ($this->required == 1 && $_SYSTEM['framework'] == 'legacy') {
-            $this->_frmClass = "class=\"fValidate['required']\" ";
-        } else {
-            $this->_frmClass = 'class="prfInputText"';
+        if ($this->required == 1 && !PRF_isManager()) {
+            if ($_SYSTEM['framework'] == 'legacy') {
+                $classes[] = "fValidate['required']";
+            } else {
+                $classes[] = 'required error';
+            }
         }
+        $this->_frmClass = 'class="' . implode(' ', $classes) . '"';
 
         // If POSTed form data, set the user variable to that.  Otherwise,
         // set it to the default or leave it alone.
         if (isset($_POST[$this->name])) {
             $this->value = $_POST[$this->name];
         } elseif (is_null($this->value)) {
-            $this->value = $this->options['default'];
+            $this->value = $this->getOption('default');
         }
 
         // Check for read-only status on the field.  Admins can always
         // edit user values.
         $this->_frmReadonly = '';
-        $this->readonly = false;
+        //$this->readonly = false;
         $this->hidden = false;
         if ($this->perm_owner < 3 &&
                 !SEC_hasRights('profile.admin, profile.manage', 'OR')) {
             $this->_frmReadonly = ' disabled="disabled" ';
-            $this->readonly = true;
+        //    $this->readonly = true;
             $this->hidden = $this->perm_owner < 2 ? true : false;
         }
     }
@@ -228,6 +311,7 @@ class prfItem
     */
     public function isPublic()
     {
+        return $this->show_in_profile ? true : false;
         return ($this->perm_members > 1 || $this->perm_anon > 1) ? TRUE : FALSE;
     }
 
@@ -252,1091 +336,409 @@ class prfItem
     public function editValues()
     {
         return array(
-            'defvalue'  =>$this->options['default'],
-            'maxlength' => $this->options['maxlength'],
-            'size'      => $this->options['size'],
+            'defvalue'  => isset($this->options['default']) ? $this->options['default'] : '',
+            'maxlength' => isset($this->options['maxlength']) ? $this->options['maxlength'] : 0,
+            'size'      => isset($this->options['size']) ? $this->options['size'] : 0,
         );
+    }
+
+
+    /**
+    *   Get a value from the options array, returning a default if not set.
+    *   This is just a helper function to avoid "invalid index" errors for
+    *   options that aren't set.
+    *
+    *   @param  string  $name       Name of option
+    *   @param  mixed   $default    Default return value
+    *   @return mixed       Option value, or default if not set
+    */
+    public function getOption($name, $default='')
+    {
+        return isset($this->options[$name]) ? $this->options[$name] : $default;
     }
 
 
     /**
     *   Check if a field has valid data.  Used in conjuction with the "required" flag.
     *
-    *   @param  boolean     $required   Return false only if invalid AND required
+    *   @param  array   $vals   Array of name->value pairs
     *   @return booldan         True if data is valid, False if not
     */
-    public function validData($value = NULL)
+    public function validData($vals)
     {
-        $val = $value !== NULL ? $value : $this->value;
-        if ($this->required && empty($val)) return false;
-        else return true;
+        if (isset($vals[$this->name])) {
+            $val = $vals[$this->name] !== NULL ? $vals[$this->name] : $this->value;
+        } else {
+            $val = '';
+        }
+        if ($this->required && empty($val)) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
 
     /**
-    *   Get a class based on the type of field definition.
-    *   If the requested class doesn't exist, return prfText() object.
+    *   Get an instance of the class based on the type of field definition.
+    *   If the requested class doesn't exist, return a prfItem_text() object.
+    *   If an array is passed in, get the type from it. Otherwise read the
+    *   definition record to get the correct type.
     *
     *   @param  array   $A      Row from profile_def table
     *   @param  mixed   $value  Data value to pass to class
     *   @param  integer $uid    User ID to pass to class
     *   @return object          Class instsnce
     */
-    public static function getClass($A, $value='', $uid=0)
+    public static function getInstance($A, $value='', $uid=0)
     {
-        $classname = 'prf' . $A['type'];
-        if (class_exists($classname)) {
-            return new $classname($A, $value, $uid);
+        global $_TABLES;
+        static $defs = array();
+
+        if (!is_array($A)) {
+            // Need to retrieve the field to find the type
+            $id = (int)$A;
+            $sql = "SELECT * FROM {$_TABLES['profile_def']}
+                    WHERE id = '$id'";
+            $res = DB_query($sql);
+            $A = DB_fetchArray($res, false);
+        }
+        if (is_array($A)) {
+            $id = (int)$A['id'];
+            $type = $A['type'];
         } else {
-            return new prfText($A, $value, $uid);
+            $id = 0;
+            $type = 'text';
         }
-    }
-
-}   // class prfItem
-
-
-/**
-*   Class for text input fields
-*   The base class has all the functionality for text fields, this is a stub.
-*   @package    profile
-*/
-class prfText extends prfItem
-{
-}
-
-
-/**
-*   Class for textarea input fields
-*
-*   @package    profile
-*/
-class prfTextarea extends prfItem
-{
-    public function FormField()
-    {
-        global $LANG_PROFILE, $_CONF;
-
-        $this->_FormFieldInit();
-
-        // Textareas get width attributes from the layout CSS, so counteract
-        // by setting the width
-        $fld = '<textarea style="width:90%;" ' .
-                "{$this->_frmClass} name=\"{$this->name}\" " .
-                "rows=\"{$this->options['rows']}\" " .
-                "cols=\"{$this->options['cols']}\" " .
-                "id=\"{$this->name}\" {$this->_frmReadonly}>" .
-                $this->value . "</textarea>\n";
-        return $fld;
-    }
-
-
-    /**
-    *   Return the value formatted for display.
-    *
-    *   @param  string  $value  Optional value, current value if empty
-    *   @return         Formatted value for display.
-    */
-    public function FormatValue($value = '')
-    {
-        if (empty($value))
-            $value = $this->value;
-
-        return nl2br(htmlspecialchars($value));
-    }
-
-
-    /**
-    *   Sanitize multi-line input.
-    *   Don't call COM_checkHTML() since that will remove newlines.
-    *   Our FormatValue() function escapes all HTML anyway.
-    *
-    *   @param  string  $val    Original value
-    *   @return string          Sanitized version.
-    */
-    public function Sanitize($val)
-    {
-        return COM_checkWords($val);
-    }
-
-    public function editValues()
-    {
-        return array(
-            'default'   => $this->options['default'],
-            'rows'      => $this->options['rows'],
-            'cols'      => $this->options['cols'],
-            'help_txt'  => $this->options['help_text'],
-        );
-    }
-
-}
-
-
-/**
-*   Class for link input fields
-*   @package    profile
-*/
-class prfLink extends prfItem
-{
-    public function FormatValue($value = '')
-    {
-        global $_PRF_CONF, $_CONF;
-
-        // Convert the sql date to a timestamp, then output it according
-        // the field'd display format
-        if (empty($value))
-            $value = $this->value;
-
-        if (empty($value))
-            return '';
-
-        return '<a href="' . $value . '" rel="nofollow">' .
-            htmlspecialchars($value) . '</a>';
-    }
-
-    public function Sanitize($val)
-    {
-        $val = parent::Sanitize($val);
-        $val = COM_sanitizeURL($val);
-        return $val;
-    }
-}
-
-
-/**
-*   Class for static text fields
-*   @package    profile
-*/
-class prfStatic extends prfItem
-{
-    public function __construct($item, $value='', $uid='')
-    {
-        parent::__construct($item, $value, $uid);
-        $this->value = $this->options['value'];
-    }
-
-
-    /**
-    *   Returns the static text
-    *
-    *   @return string  HTML for data entry field
-    */
-    public function FormField()
-    {
-        return $this->options['value'];
-    }
-
-
-    /**
-    *   Create the form elements for editing the value selections
-    *   Returns the default value for single-value fields (text, textarea, etc)
-    *
-    *   @return array   Array of name=>value pairs for Template::set_var()
-    */
-    public function editValues()
-    {
-        return array('valuestr' => $this->options['value']);
-    }
-}
-
-
-/**
-*   Class for date fields
-*   @package    profile
-*/
-class prfDate extends prfItem
-{
-    /**
-    *   Get the value formatted for display, depending on the field's format.
-    *
-    *   @param  string  $value  Value to display, current value by default
-    *   @return string  HTML for formatted field value
-    */
-    public function FormatValue($value = '')
-    {
-        global $_PRF_CONF, $_CONF;
-
-        // Convert the sql date to a timestamp, then output it according
-        // the field'd display format
-        if (empty($value))
-            $value = $this->value;
-
-        if (empty($value) || $value == '0000-00-00')
-            return '';
-
-        // Explode parts from 'YYYY-MM-DD hh:mm:ss' format
-        $dt_tm = explode(' ', $value);
-        list($year, $month, $day) = explode('-', $dt_tm[0]);
-        if (isset($dt_tm[1])) {
-            list($hour, $minute, $second) = explode(':', $dt_tm[1]);
-        } else {
-            $hour = '00';
-            $minute = '00';
-            $second = '00';
-        }
-
-        if (!isset($this->options['input_format'])) {
-            $this->options['input_format'] = 0;
-        }
-        switch ($this->options['input_format']) {
-        case '2':
-            $formatted = sprintf('%02d/%02d/%04d', $day, $month, $year);
-            break;
-        case '1':
-            $formatted = sprintf('%02d/%02d/%04d', $month, $day, $year);
-            break;
-        default:
-            // use sql date only: YYYY-MM-DD
-            $formatted = $dt_tm[0];
-            break;
-        }
-
-        if ($this->options['timeformat'] != '') {
-            $format = $this->options['timeformat'] == '12' ? '%I:%M %p' : '%H:%M';
-            $formatted .= ' ' .
-                    strftime($format, mktime($hour, $minute, $second));
-        }
-        /*if ($this->options['showtime'] == 1) {
-            if ($_CONF['hour_mode'] == 12) {
-                //$format = ' %I:%M:%S %p';
-                $format = ' %I:%M %p';
+        if (!isset($defs[$id])) {
+            if (is_array($A)) {     // should be array at this point
+                $classname = 'Profile\prfItem_' . $type;
+                if (class_exists($classname)) {
+                    $cls = new $classname($A, '', $uid);
+                } else {
+                    // so there's a default if the type isn't defined
+                    $cls = new prfItem_text($A, '', $uid);
+                }
             } else {
-                //$format = ' %H:%M:%S';
-                $format = ' %H:%S';
+                $cls = NULL;
             }
-            $ts = mktime($hour, $minute, $second);
-            $formatted .= strftime($format, $ts);
-        }*/
-
-        return $formatted;
+            $defs[$id] = $cls;  // save for subsequent requests
+        }
+        // Always set the value if defined, allows for repeated calls
+        // for different users, e.g. in a profile list.
+        $defs[$id]->value = $value;
+        return $defs[$id];
     }
 
 
     /**
-    *   Create the form entry field.
+    *   Displays a form for editing a profile definition.
     *
-    *   @return string      HTML for month, day and year fields.
+    *   @param  integer $id     Database ID of item to edit, 0 for new item
+    *   @return string          HTML for the form
     */
-    public function FormField($incl_time = true)
+    public function Edit()
     {
-        global $LANG_PROFILE, $_CONF, $_PRF_CONF;
+        global $_TABLES, $_CONF, $LANG_PROFILE, $LANG_ADMIN, $_PRF_CONF;
 
-        $this->_FormFieldInit();
+        $T = PRF_getTemplate('profile', 'editform', 'admin');
 
-        if ($this->options['timeformat'] && $incl_time) {
-            $iFormat = '%Y-%m-%d %H:%M';
-            if (strpos($this->value, ' ')) {
-                list($date, $time) = explode(' ', $this->value);
+        $sql = "SELECT id, orderby, name
+                FROM {$_TABLES['profile_def']}
+                ORDER BY orderby ASC";
+        $res1 = DB_query($sql);
+        $orderby_options = '';
+        $current = $this->orderby - 10;
+        while ($B = DB_fetchArray($res1, false)) {
+            if ($B['id'] == $this->id) continue;    // skip this item
+            $orderby = (int)$B['orderby'] + 1;
+            if ($this->id > 0) {
+                $sel = $B['orderby'] == $current ? PRF_SELECTED : '';
             } else {
-                $date = $this->value;
-                $time = NULL;
+                $sel = '';
             }
-            if ($time == NULL) $time = '00:00:00';
-            $dt = explode('-', $date);
-            $tm = explode(':', $time);
-            if (isset($_POST)) {
-                if (isset($_POST[$this->name . '_hour']))
-                    $tm[0] = $_POST[$this->name . '_hour'];
-                if (isset($_POST[$this->name . '_minute']))
-                    $tm[1] = $_POST[$this->name . '_minute'];
-            }
-
-            if ($this->options['timeformat'] == '12') {
-                list($hour, $ampm_sel) = $this->hour24to12($tm[0]);
-                $ampm_fld = '&nbsp;&nbsp;' .
-                    self::ampmSelection($this->name . '_ampm', $ampm_sel);
-            } else {
-                $ampm_fld = '';
-                $hour = $tm[0];
-            }
-
-            $fld_disabled = $this->readonly ? 'disabled="disabled"' : '';
-            $hr_fld = '<select id="' . $this->name . '_hour" ' .
-                    'name="' . $this->name . '_hour" ' .
-                    $fld_disabled . '>' . LB .
-                COM_getHourFormOptions($hour, $this->options['timeformat']) .
-                '</select>' . LB;
-            $min_fld = '<select id="' . $this->name . '_minute" ' .
-                    'name="' . $this->name . '_minute" ' .
-                    $fld_disabled . '>' . LB .
-                COM_getMinuteFormOptions($tm[1]) .
-                '</select>' . LB;
-            /*$hr_fld = '<input type="text" id="' . $this->name .
-                '_hour" size="2" maxlength="2" name="' . $this->name .
-                '_hour" value="' . $hour . '" ' . $this->_frmReadonly .
-                '/>' . LB;
-            $min_fld = '<input type="text" id="' . $this->name .
-                '_minute" size="2" maxlength="2" name="' . $this->name .
-                '_minute" value="' . $tm[1] . '" ' . $this->_frmReadonly .
-                '/>' . LB;*/
-        } else {
-            $iFormat = '%Y-%m-%d';
-            $dt = explode('-', $this->value);
-            $tm = NULL;
-            $hr_fld = '';
-            $min_fld = '';
+            $orderby_options .= "<option value=\"$orderby\" $sel>{$B['name']}</option>\n";
         }
 
-        if (isset($_POST)) {
-            // Get the values from $_POST, if set.
-            if (isset($_POST[$this->name . '_month']))
-                $dt[1] = $_POST[$this->name . '_month'];
-            if (isset($_POST[$this->name . '_day']))
-                $dt[2] = $_POST[$this->name . '_day'];
-            if (isset($_POST[$this->name . '_year']))
-                $dt[0] = $_POST[$this->name . '_year'];
+        // Create the "Field Type" dropdown.  This is disabled for system items
+        // in the template
+        $type_options = '';
+        foreach ($LANG_PROFILE['fld_types'] as $option => $opt_desc) {
+            $sel = $this->type == $option ? PRF_SELECTED : '';
+            $type_options .= "<option value=\"$option\" $sel>$opt_desc</option>\n";
         }
 
-        $m_fld = "<select id=\"{$this->name}_month\" name=\"{$this->name}_month\" {$this->_frmReadonly}>\n";
-        $m_fld .= "<option value=\"0\">--{$LANG_PROFILE['month']}--</option>\n";
-        $sel = isset($dt[1]) ? (int)$dt[1] : '';
-        $m_fld .= COM_getMonthFormOptions($sel) . "</select>\n";
+        // Set up the field-specific inputs for value selection or default value
+        $T->set_var($this->editValues());
 
-        $d_fld = "<select id=\"{$this->name}_day\" name=\"{$this->name}_day\" {$this->_frmReadonly}>\n";
-        $d_fld .= "<option value=\"0\">--{$LANG_PROFILE['day']}--</option>\n";
-        $sel = isset($dt[2]) ? (int)$dt[2] : '';
-        $d_fld .= COM_getDayFormOptions($sel) . "</select>\n";
-
-        $y_fld = $LANG_PROFILE['year'] .
-            ': <input type="text" id="' . $this->name . '_year" name="' .
-            $this->name . '_year" size="5" value="' . $dt[0] . '" ' .
-            $this->_frmReadonly . '/>' . LB;
-
-        // Hidden field to hold the date in its native format
-        // Required for the date picker
-        $datepick = '<input type="hidden" name="f_' . $this->name .
-                '" id="f_' . $this->name . '" value="' . $this->value .
-                '"/>' . LB;
-
-        if (!$this->readonly) {
-            // If not a readonly field, add the date picker image & js
-            $datepick .= '<i class="' . $_PRF_CONF['_iconset'] .
-                    '-calendar tooltip" title="' .
-                    $LANG_PROFILE['select_date'] . '" id="' .
-                    $this->name . '_trigger"></i>';
-            if ($this->options['timeformat']) {
-                $showtime = 'true';
-                $timeformat = $this->options['timeformat'];
-            } else {
-                $showtime = 'false';
-                $timeformat = 0;
-            }
-            $datepick .= LB . "<script type=\"text/javascript\">
-Calendar.setup({
-inputField :   \"f_{$this->name}\",
-ifFormat   :   \"$iFormat\",
-showsTime  :    $showtime,
-timeFormat :    \"{$timeformat}\",
-button     :   \"{$this->name}_trigger\",
-onUpdate   :   {$this->name}_onUpdate
-});
-function {$this->name}_onUpdate(cal)
-{
-    var d = cal.date;
-
-    if (cal.dateClicked && d) {
-        PRF_updateDate(d, \"{$this->name}\", \"$timeformat\");
-    }
-    return true;
-}
-</script>" . LB;
-
-        }
-
-        // Place the date components according to m/d/y or d/m/y format
-        if (!isset($this->options['input_format'])) {
-            $this->options['input_format'] = 0;
-        }
-        switch ($this->options['input_format']) {
-        case 2:
-            $fld = $d_fld . ' ' . $m_fld . ' ' . $y_fld;
-            break;
-        case 1:
-        default:
-            $fld = $m_fld . ' ' . $d_fld . ' ' . $y_fld;
-            break;
-        }
-
-        //if ($this->options['showtime']) {
-        if ($this->options['timeformat']) {
-            $fld .= '&nbsp;&nbsp;' . $hr_fld . ':' . $min_fld . $ampm_fld;
-        }
-
-        $fld .= $datepick;
-
-        return $fld;
+        if (!isset($opts['input_format'])) $opts['input_format'] = '';
+        $T->set_var(array(
+            'is_sys'    => $this->sys,
+            'id'        => $this->id,
+            'name'      => $this->name,
+            'type'      => $this->type,
+            'oldtype'   => $this->type,
+            'prompt'    => $this->prompt,
+            'ena_chk'   => $this->enabled == 1 ? PRF_CHECKED : '',
+            'user_reg_chk' => $this->user_reg == 1 ? PRF_CHECKED : '',
+            'req_chk'   => $this->required == 1 ? PRF_CHECKED : '',
+            'in_prf_chk' => $this->show_in_profile == 1 ? PRF_CHECKED : '',
+            'spancols_chk' => $this->getOption('spancols', 0),
+            'orderby'   => $this->orderby,
+            'format'    => $this->getOption('format'),
+            'input_format' => prfItem_date::DateFormatSelect($this->getOption('input_format')),
+            'doc_url'   => PRF_getDocURL('profile_def.html'),
+            'mask'      => $this->getOption('mask'),
+            'vismask'   => $this->getOption('vismask'),
+            'autogen_chk' => $this->getOption('autogen', 0) == 1 ? PRF_CHECKED : '',
+            'stripmask_chk' => $this->getOption('stripmask', 0) == 1 ? PRF_CHECKED : '',
+            'group_dropdown' => SEC_getGroupDropdown($this->group_id, 3),
+            'permissions' => PRF_getPermissionsHTML(
+                $this->perm_owner, $this->perm_group,
+                $this->perm_members, $this->perm_anon),
+            'plugin_options' => COM_optionList($_TABLES['plugins'],
+                        'pi_name,pi_name', $this->plugin, 0, 'pi_enabled=1'),
+            'help_text' => htmlspecialchars($this->getOption('help_text')),
+            'dt_input_format' => prfItem_date::DateFormatSelect($this->getOption('input_format')),
+            'orderby_selection' => $orderby_options,
+            'type_options' => $type_options,
+        ) );
+        $T->parse('output', 'editform');
+        return $T->finish($T->get_var('output'));
     }
 
 
     /**
-    *   Get the available date formats
-    *
-    *   @return array   Array of date formats
+    *   Saves the current form entries as a new or existing record
+    *   @param  array   $A          Array of all values from the submitted form
     */
-    public function DateFormats()
-    {
-        global $LANG_PROFILE;
-        $_formats = array(
-            1 => $LANG_PROFILE['month'].' '.$LANG_PROFILE['day'].' '.$LANG_PROFILE['year'],
-            2 => $LANG_PROFILE['day'].' '.$LANG_PROFILE['month'].' '.$LANG_PROFILE['year'],
-        );
-        return $_formats;
-    }
-
-
-    /**
-    *   Create the date format selector for use in defining the field
-    *   Doesn't include the <select></select> tags, just the options.
-    *
-    *   @param  integer $cur    Currently-selected format
-    *   @return string          HTML for date format seleection options.
-    */
-    public function DateFormatSelect($cur=0)
-    {
-        $retval = '';
-        $_formats = prfDate::DateFormats();
-        foreach ($_formats as $key => $string) {
-            $sel = $cur == $key ? PRF_SELECTED : '';
-            $retval .= "<option value=\"$key\" $sel>$string</option>\n";
-        }
-        return $retval;
-    }
-
-
-    /**
-    *   Convert an hour from 24-hour to 12-hour format for display.
-    *
-    *   @param  integer $hour   Hour to convert
-    *   @return array       array(new_hour, ampm_indicator)
-    */
-    public function hour24to12($hour)
-    {
-        if ($hour >= 12) {
-            $ampm = 'pm';
-            if ($hour > 12) $hour -= 12;
-        } else {
-            $ampm = 'am';
-            if ($hour == 0) $hour = 12;
-        }
-        return array($hour, $ampm);
-    }
-
-
-    /**
-    *   Convert an hour from 12-hour to 24-hour format.
-    *
-    *   @param  integer $hour   Hour to convert
-    *   @param  boolean $pm     True if 'pm' is set
-    *   @return integer     New hour
-    */
-    public function hour12to24($hour, $pm)
-    {
-        if ($pm) {
-            if ($hour < 12) $hour += 12;
-        } else {
-            if ($hour == 12) $hour = 0;
-        }
-        return $hour;
-    }
-
-
-    /**
-    *   Get the AM/PM selection.
-    *   This is exactly like COM_getAmPmFormSelection(), but
-    *   adds the "id" to the selection so javascript can update it.
-    *
-    *   @param  string  $name       Field name
-    *   @param  string  $selected   Which option is selected, am or pm?
-    *   @return string      HTML for selection
-    */
-    private function ampmSelection($name, $selected)
-    {
-        global $_CONF;
-
-        if (isset($_CONF['hour_mode'] ) && ( $_CONF['hour_mode'] == 24 )) {
-            $retval = '';
-        } else {
-            $retval = '<select id="' . $name . '" name="' . $name . '">' .LB;
-            $retval .= '<option value="0" ';
-            if ($selected == '0' || $selected = 'am') {
-                $retval .= PRF_SELECTED;
-            }
-            $retval .= '>am</option>' . LB . '<option value="1" ';
-            if ($selected == '1' || $selected = 'pm') {
-                $retval .= PRF_SELECTED;
-            }
-            $retval .= '>pm</option>' . LB . '</select>' . LB;
-        }
-
-        return $retval;
-    }
-
-
-    /**
-    *   Create the form elements for editing the value selections
-    *
-    *   @return array   Array of name=>value pairs for Template::set_var()
-    */
-    public function editValues()
-    {
-        $opts = array(
-            'shtime_chk' => $this->options['showtime'] == 1 ? PRF_CHECKED : '',
-        );
-        switch ($this->options['timeformat']) {
-        case '24':
-            $opts['24h_sel'] = PRF_CHECKED;
-            break;
-        case '12':
-            $opts['12h_sel'] = PRF_CHECKED;
-            break;
-        default:
-            $opts['tm_none_sel'] = PRF_CHECKED;
-            break;
-        }
-        return $opts;
-    }
-
-    /**
-    *   Check if a field has valid data.  Used in conjuction with the
-    *   "required" flag.
-    *
-    *   @param  string  $value  Unused, required for inheritance
-    *   @param  array   $vals   Array of values
-    *   @return boolean     True if data is valid, False if not
-    */
-    public function validData($value = NULL, $vals = NULL)
-    {
-        // This function uses the field name and the $vals array to construct
-        // month, day and year values. $value is unused
-
-        if (!is_array($vals)) {
-            // Can't be valid data
-            return false;
-        }
-
-        if ($this->required) {
-            $month = isset($vals[$this->name . '_month']) ?
-                    (int)$vals[$this->name . '_month'] : 0;
-            $day = isset($vals[$this->name . '_day']) ?
-                    (int)$vals[$this->name . '_day'] : 0;
-            $year = isset($vals[$this->name . '_year']) ?
-                    (int)$vals[$this->name . '_year'] : 0;
-            USES_lglib_class_datecalc();
-            if (!Date_Calc::isValidDate($month, $day, $year)) return false;
-        }
-        return true;
-    }
-
-}
-
-
-/**
-*   Class for Checkbox items
-*/
-class prfCheckbox extends prfItem
-{
-    /**
-    *   Constructor.
-    *   Set up the options array
-    */
-    public function __construct($item, $value='', $uid='')
-    {
-        parent::__construct($item, $value, $uid);
-    }
-
-
-    /**
-    *   Return the formatted string value.
-    *
-    *   @param  integer $value  Optional value.  "1" = on, "0" = off
-    *   @return string          String corresponding to value.
-    */
-    public function FormatValue($value = 0)
-    {
-        global $LANG_PROFILE;
-
-        if (empty($value))
-            $value = $this->value;
-
-        $formatted = $value == 1 ? $LANG_PROFILE['yes'] : $LANG_PROFILE['no'];
-
-        return $formatted;
-    }
-
-
-    /**
-    *   Create the data entry field
-    *
-    *   @return string  HTML for checkbox field, with prompt string
-    */
-    public function FormField()
-    {
-        $this->_FormFieldInit();
-
-        if (is_null($this->value)) {
-            $chk = $this->options['default'] == 1 ? PRF_CHECKED : '';
-        } elseif ($this->value == 1) {
-            $chk = PRF_CHECKED;
-        } else {
-            $chk = '';
-        }
-
-        // _frmClass is ignored since fValidator doesn't work for checkboxes
-        $fld = "<input {$this->_frmClass} name=\"{$this->name}\"
-                    id=\"{$this->name}\"
-                    type=\"checkbox\" value=\"1\" $chk
-                    {$this->_frmReadonly}>\n";
-        return $fld;
-    }
-
-
-    /**
-    *   Sanitize this field for storage
-    *
-    *   @param  integer $val    Starting value
-    *   @return integer         Sanitized value, either 1 or 0
-    */
-    public function Sanitize($val)
-    {
-        $val = $val == 1 ? 1 : 0;
-        return $val;
-    }
-
-
-    /**
-    *   Special handling for "required" setting for checkboxes.
-    *   FValidator doesn't work right, so don't use it and allow
-    *   the submission handling to deal with empty checkboxes.
-    */
-    protected function _FormFieldInit()
-    {
-        parent::_FormFieldInit();
-        $this->_frmClass = '';
-    }
-
-
-    /**
-    *   Create the form elements for editing the value selections
-    *
-    *   @return array   Array of name=>value pairs for Template::set_var()
-    */
-    public function editValues()
-    {
-        return array(
-            'chkdefault_chk' =>
-                $this->options['default'] == 1 ? PRF_CHECKED : '',
-        );
-    }
-
-
-    /**
-    *   Check if a field has valid data.  Used in conjuction with the "required" flag.
-    *
-    *   @param  boolean     $required   Return false only if invalid AND required
-    *   @return booldan         True if data is valid, False if not
-    */
-    public function validData($value = NULL)
-    {
-        $val = $value !== NULL ? $value : $this->value;
-        if ($this->required && $val != 1) return false;
-        else return true;
-    }
-
-}
-
-
-/**
-*   Class for radio button items.
-*   @package    profile
-*/
-class prfRadio extends prfItem
-{
-    /**
-    *   Constructor
-    *   Set up the array of value options
-    *
-    *   @param  mixed   $item   Name of item, or array of info
-    *   @param  string  $value  Optional value to assign, serialized array
-    *   @param  integer $uid    Optional user ID, current user by default
-    */
-    public function __construct($item, $value='', $uid='')
-    {
-        parent::__construct($item, $value, $uid);
-        if (!isset($this->options['values'])) {
-            $this->options['values'] = array();
-        } elseif (!is_array($this->options['values'])) {
-            $this->options['values'] = @unserialize($this->options['values']);
-            if (!$this->options['values']) $this->options['values'] = array();
-        }
-    }
-
-
-    /**
-    *   Create the data entry field.
-    *   Creates radio buttons in a line.
-    *
-    *   @return string  HTML for radio buttons & prompts
-    */
-    public function FormField()
-    {
-        $this->_FormFieldInit();
-
-        if (empty($this->options['values'])) {
-            // Have to have some values for radio buttons
-            return '';
-        }
-
-        // If no current value, use the defined default
-        if (is_null($this->value)) {
-            $this->value = $this->options['default'];
-        }
-
-        $fld = '';
-        foreach ($this->options['values'] as $id=>$value) {
-            $sel = $this->value == $value ? PRF_CHECKED : '';
-            $fld .= "<input $this->_frmClass type=\"radio\"
-                name=\"{$this->name}\"
-                id=\"{$this->name}\"
-                value=\"" . htmlentities($value, ENT_QUOTES) .
-                "\" $sel {$this->_frmReadonly}/>$value&nbsp;\n";
-        }
-        return $fld;
-    }
-
-
-    /**
-    *   Create the form elements for editing the value selections
-    *
-    *   @return array   Array of name=>value pairs for Template::set_var()
-    */
-    public function editValues()
-    {
-        $listinput = '';
-        $i = 0;
-        if (!empty($this->options['values'])) {
-            foreach ($this->options['values'] as $valname) {
-                $listinput .= '<li><input type="text" id="vName' . $i .
-                        '" value="' . $valname . '" name="selvalues[]" />';
-                $sel = $this->options['default'] == $valname ?
-                        PRF_CHECKED : '';
-                $listinput .= "<input type=\"radio\" name=\"sel_default\"
-                        value=\"$i\" $sel />";
-                $listinput .= '</li>' . "\n";
-                $i++;
-            }
-        } else {
-            $thie->options['values'] = array();
-            $listinput = '<li><input type="text" id="vName0" value=""
-                name="selvalues[]" /></li>' . "\n";
-        }
-        return array('list_input'=>$listinput);
-    }
-
-}
-
-
-/**
-*   Class for dropdown selections
-*   @package    profile
-*/
-class prfSelect extends prfItem
-{
-    /**
-    *   Constructor.
-    *   Set up the values array
-    *
-    *   @param  mixed   $item   Name of item, or array of info
-    *   @param  mixed   $value  Optional value to assign
-    *   @param  integer $uid    Optional user ID, current user by default
-    */
-    public function __construct($item, $value='', $uid='')
-    {
-        parent::__construct($item, $value, $uid);
-        if (!isset($this->options['values'])) {
-            $this->options['values'] = array();
-        } elseif (!is_array($this->options['values'])) {
-            $this->options['values'] = @unserialize($this->options['values']);
-            if (!$this->options['values']) $this->options['values'] = array();
-        }
-    }
-
-
-    /**
-    *   Create the data entry field
-    *
-    *   @return string  HTML for selection dropdown.  Included <select> tags.
-    */
-    public function FormField()
-    {
-        global $LANG_PROFILE;
-
-        $this->_FormFieldInit();
-
-        $fld = "<select $this->_frmClass name=\"{$this->name}\"
-                    id=\"{$this->name}\" $this->_frmReadonly>\n";
-        $fld .= "<option value=\"\">--{$LANG_PROFILE['select']}--</option>\n";
-        foreach ($this->options['values'] as $id=>$value) {
-            $sel = $this->value == $value ? PRF_SELECTED : '';
-            $fld .= "<option value=\"$value\" $sel>$value</option>\n";
-        }
-        $fld .= "</select>\n";
-        return $fld;
-    }
-
-
-    /**
-    *   Create the form elements for editing the value selections
-    *
-    *   @return array   Array of name=>value pairs for Template::set_var()
-    */
-    public function editValues()
-    {
-        $listinput = '';
-        $i = 0;
-        if (!empty($this->options['values'])) {
-            foreach ($this->options['values'] as $valname) {
-                $listinput .= '<li><input type="text" id="vName' . $i .
-                        '" value="' . $valname . '" name="selvalues[]" />';
-                $sel = $this->options['default'] == $valname ?
-                        PRF_CHECKED : '';
-                $listinput .= "<input type=\"radio\" name=\"sel_default\"
-                        value=\"$i\" $sel />";
-                $listinput .= '</li>' . "\n";
-                $i++;
-            }
-        } else {
-            $thie->options['values'] = array();
-            $listinput = '<li><input type="text" id="vName0" value=""
-                name="selvalues[]" /></li>' . "\n";
-        }
-        return array('list_input'=>$listinput);
-    }
-}
-
-
-/**
-*   Class for multiple checkboxes
-*   @package    profile
-*/
-class prfMultiCheck extends prfItem
-{
-    /**
-    *   Constructor.
-    *   Set up the values array
-    *
-    *   @param  mixed   $item   Name of item, or array of info
-    *   @param  mixed   $value  Optional value to assign
-    *   @param  integer $uid    Optional user ID, current user by default
-    */
-    public function __construct($item, $value='', $uid='')
-    {
-        parent::__construct($item, $value, $uid);
-        // One more unserialization needed for multicheck values
-        //$this->options['values'] = @unserialize($this->options['values']);
-        if (!empty($this->value) && is_string($this->value))
-            $this->value = @unserialize($this->value);
-        if (is_null($this->value)) $this->value = $this->options['default'];
-        /*if (!is_array($this->options['values'])) {
-            $this->options['values'] = @unserialize($value->options['values']);
-            if (!$this->options['values']) $this->options['values'] = array();
-        }*/
-    }
-
-
-    /**
-    *   Create the data entry field
-    *
-    *   @return string  HTML for radio buttons & prompts
-    */
-    public function FormField()
-    {
-        $this->_FormFieldInit();
-
-        if (empty($this->options['values'])) {
-            // Have to have some values for checkboxes
-            return '';
-        }
-        // If no current value, use the defined default
-        if (is_null($this->value)) {
-            $this->value = $this->options['values'];
-        }
-
-        $fld = '';
-        $i = 0;
-        if (!is_array($this->value)) $this->value = @unserialize($this->value);
-        if (!is_array($this->value)) $this->value = array();
-        foreach ($this->options['values'] as $id=>$value) {
-            $sel = in_array($value, $this->value) ? PRF_CHECKED : '';
-            $fld .= '<span style="white-space:nowrap">' .
-                    "<input {$this->_frmClass} type=\"checkbox\" " .
-                    "name=\"{$this->name}[$id]\" id=\"{$this->name}_$id\" " .
-                    "value=\"$value\" $sel {$this->_frmReadonly} />&nbsp;" .
-                    $value . '</span>' . LB;
-            $i++;
-        }
-        return $fld;
-    }
-
-
-    /**
-    *   Return the formatted string value.
-    *
-    *   @param  integer $value  Not used, just for consistency
-    *   @return string          String corresponding to value.
-    */
-    public function FormatValue($value = '')
-    {
-        if (is_string($value)) $value = @unserialize($value);
-        if (!is_array($value)) $value = $this->value;
-        if (is_array($value)) $formatted = implode(', ', $value);
-        else $formatted = '';
-        return $formatted;
-    }
-
-
-    public function setVals($vals)
-    {
-        $this->values = array();
-        foreach ($this->options['values'] as $key=>$option) {
-            if (isset($vals[$key]) && $vals[$key]== 1) {
-                $this->values[] = $option['value'];
-            }
-        }
-    }
-
-
-    public function prepareForDB()
-    {
-        return serialize($this->values);
-    }
-
-
-    /**
-    *   Create the form elements for editing the value selections
-    *
-    *   @return array   Array of name=>value pairs for Template::set_var()
-    */
-    public function editValues()
-    {
-        if (!empty($this->options['values'])) {
-            $multichk_input = '';
-            $defaults = $this->options['default'];
-            if (!is_array($defaults)) $defaults = array();
-            foreach ($this->options['values'] as $key=>$valdata) {
-                $multichk_input .= '<li><input type="text" id="multiName' . $key .
-                        '" value="' . $valdata. '" name="multichk_values['.$key.']" />';
-                $sel = in_array($valdata, $defaults) ? PRF_CHECKED : '';
-                $multichk_input .= "<input type=\"checkbox\" name=\"multichk_default[$key]\"
-                        value=\"$valdata\" $sel />";
-                $multichk_input .= '</li>' . "\n";
-                $i++;
-            }
-        } else {
-            $values = array();
-            $multichk_input = '<li><input type="text" id="multiName0" value=""
-                    name="multichk_values[0]" /></li>' . "\n";
-        }
-        return array('multichk_input'=>$multichk_input);
-    }
-}
-
-
-/**
-*   Class for a user account selection
-*   This can be used to link the account to another
-*   @package    profile
-*/
-class prfAccount extends prfItem
-{
-    /**
-    *   Create the data entry field
-    *
-    *   @uses   AccountSelection();
-    *   @return string  HTML for selection dropdown.  Includes <select> tags.
-    */
-    public function FormField()
-    {
-        global $LANG_PROFILE;
-
-        $this->_FormFieldInit();
-
-        $fld = "<select $this->_frmClass name=\"{$this->name}\"
-                    id=\"{$this->name}\" $this->_frmReadonly>\n";
-        $fld .= $this->AccountSelection($this->value);
-        //$fld .= "<option value=\"0\">--{$LANG_PROFILE['select']}--</option>\n";
-        /*foreach ($this->options['values'] as $id=>$value) {
-            $sel = $this->value == $value ? 'selected="selected"' : '';
-            $fld .= "<option value=\"$value\" $sel>$value</option>\n";
-        }*/
-        $fld .= "</select>\n";
-        return $fld;
-    }
-
-
-    /**
-    *   Create an account selection list.
-    *
-    *   @param  integer $selected   Currently-selected value
-    *   @return string              HTML for selection options
-    */
-    public function AccountSelection($selected = 0)
+    public function saveDef($A)
     {
         global $_TABLES;
 
-        $sel = 0 == $selected ? PRF_SELECTED : '';
-        $retval = '<option value="0" ' . $sel . '>--None--</option>' . LB;
+        // Sanitize the entry ID.  Zero = new entry
+        $id = $this->id;
 
-        $sql = "SELECT uid, username, fullname
-                FROM {$_TABLES['users']}
-                ORDER BY username ASC";
-        $res = DB_query($sql);
-        while ($A = DB_fetchArray($res, false)) {
-            $sel = $A['uid'] == $selected ? PRF_SELECTED : '';
-            $retval .= '<option value="' . $A['uid'] . '" ' . $sel . '>' .
-                    $A['username'] . ' - ' . $A['fullname'] . '</option>' . LB;
+        // Sanitize the name, especially make sure there are no spaces and that
+        // the name starts with "prf_", unless it's a system variable
+        // These should be done by template JS, but just in case...
+        if (strpos($A['name'], 'prf_') !== 0 && $A['is_sys'] != 1) {
+            $A['name'] = 'prf_' . $A['name'];
         }
-        return $retval;
-    }
-
-
-    public function FormatValue($value = 0)
-    {
-        global $_CONF, $_TABLES, $LANG_PROFILE;
-
-        if ($value == 0) $value = $this->value;
-        /*if ($value == 0) {
-            return '';
-        }*/
-
-        $linebreak = '';
-        if ($value > 0) {
-            $parent = COM_createLink(COM_getDisplayName($value) . " ($value)",
-                $_CONF['site_url'] . '/users.php?mode=profile&amp;uid=' . $value);
-        } else {
-            $parent = '';
+        $A['name'] = COM_sanitizeID($A['name'], false);
+        if (empty($A['name']) || empty($A['type'])) {
+            return '104';
         }
-        $children = array();
-        $accounts = $parent;
 
-        $sql = "SELECT puid FROM {$_TABLES['profile_data']}
-                WHERE sys_parent = '{$this->uid}'";
+        $this->setVars($A, false);
 
-        $res = DB_query($sql, 1);
-        while ($A = DB_fetchArray($res, false)) {
-            $children[] = COM_createLink(COM_getDisplayName($A['puid']) .
-                    ' (' . $A['puid'] . ')',
-                $_CONF['site_url'].'/users.php?mode=profile&amp;uid='.$A['puid']);
+        // For a new record, make sure the field name is unique
+        if ($this->id == 0) {
+            // for existing records, make sure it's not a duplicate name
+            $cnt = DB_count($_TABLES['profile_def'], 'name', $A['name']);
+            if ($cnt > 0) return '103';
         }
-        if (!empty($children)) {
-            $children = implode(', ', $children);
-            if (!empty($parent)) {
-                $accounts .= $linebreak;
+
+        // Put this field at the end of the line by default
+        //if (empty($A['orderby'])) $A['orderby'] = 65535;
+        if ($this->orderby == 0) $this->orderby = 65535;
+
+        // Set the options and default values according to the data type
+        // Only a couple of field types will override this.
+        $this->options['default'] = isset($A['defvalue']) ? trim($A['defvalue']) : '';
+
+        // Mask and Visible Mask may exist for any field type, but are set
+        // only if they are actually defined.
+        if (isset($A['mask']) && $A['mask'] != '') {
+            $this->options['mask'] = trim($A['mask']);
+        }
+        if (isset($A['vismask']) && $A['vismask'] != '') {
+            $this->options['vismask'] = trim($A['vismask']);
+        }
+        if (isset($A['spancols']) && $A['spancols'] == '1') {
+            $this->options['spancols'] = 1;
+        }
+        if (isset($A['help_text']) && $A['help_text'] != '') {
+            $this->options['help_text'] = trim($A['help_text']);
+        }
+
+        // Now alter the data table.  We do this first in case there's any SQL
+        // error so we don't end up with a mismatch between the definitions and
+        // the values.
+        $sql = $this->getDataSql($A);
+        if (!empty($sql)) {
+            $sql .= "ALTER TABLE {$_TABLES['profile_data']} $sql";
+            //echo $sql;die;
+            DB_query($sql, 1);
+            if (DB_error()) {
+                return '103';
             }
-            $accounts .= $LANG_PROFILE['child_accounts'] . ': ' . $children;
         }
 
-        return $accounts;
+        // After all default options are set, allow the field types to
+        // provide their own.
+        $this->setOptions($A);
+        // This serializes any options set
+        //$A['options'] = PRF_setOpts($options);
+        $options = DB_escapeString(@serialize($this->options));
+
+        // Make all entries SQL-safe
+        //$A = array_map('PRF_escape_string', $A);
+
+        if ($id > 0) {
+            // Existing record, perform update
+            $sql1 = "UPDATE {$_TABLES['profile_def']} SET ";
+            $sql3 = " WHERE id = {$this->id}";
+        } else {
+            // New record
+            $sql1 = "INSERT INTO {$_TABLES['profile_def']} SET ";
+            $sql3 = '';
+        }
+        $sql2 = "orderby = '{$this->orderby}',
+                name = '{$this->name}',
+                type = '{$this->type}',
+                enabled = '{$this->enabled}',
+                required = '{$this->required}',
+                user_reg = '{$this->user_reg}',
+                show_in_profile= '{$this->show_in_profile}',
+                prompt = '{$this->prompt}',
+                options = '{$options}',
+                group_id = '{$this->group_id}',
+                perm_owner = {$this->perm_owner},
+                perm_group = {$this->perm_group},
+                perm_members = {$this->perm_members},
+                perm_anon = {$this->perm_anon}";
+        $sql = $sql1 . $sql2 . $sql3;
+        //echo $sql;die;
+        DB_query($sql);
+        if (DB_error()) {
+            return '103';
+        }
+        // Values array may be affected by changes to definition, so clear both
+        Cache::clear();
+        self::reOrder();
+        return '';
     }
 
-}
+
+    /**
+    *   Get the field-modification part of the SQL statement, if any.
+    *
+    *   @param  array   $A      Array of form fields.
+    *   @return string          SQL statement fragment.
+    */
+    private function getDataSql($A)
+    {
+        $sql = '';
+        if ($A['oldtype'] != $A['type'] || $A['name'] != $A['oldname']) {
+            // Only need to update the data table if name or type changed
+            $sql_type = $this->getSqlType($A);
+            if ($this->id == 0) {
+                $sql .= "ADD {$A['name']} $sql_type";
+            } else {
+                $sql .= "CHANGE {$A['oldname']} {$A['name']} $sql_type";
+            }
+        }
+        return $sql;
+    }
+
+
+    /**
+    *   Reorder all items in a table.
+    */
+    private static function reOrder()
+    {
+        global $_TABLES;
+
+        $sql = "SELECT id, orderby
+                FROM {$_TABLES['profile_def']}
+                ORDER BY orderby ASC;";
+        $result = DB_query($sql, 1);
+        if (!$result) return;
+
+        $order = 10;
+        $stepNumber = 10;
+
+        while ($A = DB_fetchArray($result, false)) {
+            if ($A['orderby'] != $order) {  // only update incorrect ones
+                $sql = "UPDATE {$_TABLES['profile_def']}
+                        SET orderby = '$order'
+                        WHERE id = '" . (int)$A['id'] . "'";
+                DB_query($sql, 1);
+            }
+            $order += $stepNumber;
+        }
+    }
+
+
+    /**
+    *   Prepare to save a value to the DB
+    *
+    *   @param  array   $vals   Array of all submitted values
+    *   @return mixed           String to be saved for this item
+    */
+    public function prepareToSave($vals)
+    {
+        if (isset($vals[$this->name])) {
+            // new value provided in array
+            $newval = $vals[$this->name];
+        } elseif (!empty($this->value)) {
+            // value already set in this object
+            $newval = $this->value;
+        } else {
+            // no value provided, get the default or blank
+            $newval = $this->getOption('default');
+        }
+        return $newval;
+    }
+
+
+    /**
+    *   Get field-specific options for the user search form
+    *
+    *   @return string      HTML input options
+    */
+    public function searchFormOpts()
+    {
+        return '<input type="text" size="50" name="'.$this->name.'" value="" />';
+    }
+
+
+    /**
+    *   Create the search sql for this field
+    *
+    *   @param  array   $post   Values from $_POST
+    *   @param  string  $tbl    Table indicator
+    *   @return string          SQL query fragment
+    */
+    public function createSearchSQL($post, $tbl='data')
+    {
+        if (!isset($post[$this->name])) return '';
+
+        $fld = '';
+        if (isset($post['empty'][$this->name])) {
+            $fld = "(`{$tbl}`.`{$this->name}` = '' OR
+                     `{$tbl}`.`{$this->name}` IS NULL)";
+        } elseif (isset($post[$this->name]) && $post[$this->name] !== '') {
+            $value = DB_escapeString($post[$this->name]);
+            $fld = "`{$tbl}`.`{$this->name}` like '%{$value}%'";
+        }
+        return $fld;
+    }
+
+
+    /**
+    *   Actually gets the options array specific to this field.
+    *   Default- do nothing, return options array
+    *
+    *   @param  array   $A      Form values
+    *   @return array           Array of options to save
+    */
+    public function setOptions($A)
+    {
+        return $this->options;
+    }
+
+}   // class prfItem
 
 ?>

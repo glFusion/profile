@@ -53,6 +53,17 @@ if (file_exists(PRF_PI_PATH . 'config.php')) {
     include_once PRF_PI_PATH . 'config.php';
 }
 
+spl_autoload_register(function($class)
+{
+    if (strpos($class, 'Profile\\') === 0) {
+        $class = str_replace('Profile\\', '', $class);
+        $path = __DIR__ . '/classes/' . $class . '.class.php';
+        if (file_exists($path)) {
+            include_once $path;
+        }
+    }
+});
+
 // Set the custom values into the $_USER array.  Check that this plugin
 // is enabled as an extra safety check.
 if (isset($_PLUGINS) && is_array($_PLUGINS) && in_array('profile', $_PLUGINS)) {
@@ -73,17 +84,18 @@ function USES_profile_functions()
 //function USES_profile_class_profileitem()
 //{   require_once PRF_PI_PATH . 'classes/profileitem.class.php'; }
 
-function USES_profile_class_item()
+/*function USES_profile_class_item()
 {   require_once PRF_PI_PATH . 'classes/prfItem.class.php';     }
-
-function USES_profile_class_list()
+*/
+/*function USES_profile_class_list()
 {   require_once PRF_PI_PATH . 'classes/prfList.class.php';     }
-
-function USES_profile_class_pdfList()
+*/
+/*function USES_profile_class_pdfList()
 {   require_once PRF_PI_PATH . 'classes/pdfList.class.php';     }
 
 function USES_profile_class_htmlList()
 {   require_once PRF_PI_PATH . 'classes/htmlList.class.php';     }
+*/
 
 // Include api functions for other plugins
 require_once PRF_PI_PATH . 'services.inc.php';
@@ -308,32 +320,20 @@ function plugin_profileedit_profile($uid, $panel, $fieldset)
 {
     $retval = '';
 
-/*
     if ($panel == 'privacy' && $fieldset == 'privacy') {
-        $T = new Template(PRF_PI_PATH . 'templates/');
-        $T->set_file('profile', 'profile_privacy.thtml');
-        USES_profile_functions();
-        $A = PRF_getDefs(0, 'sys_directory');
-        if (!isset($A['sys_directory']))
-            return;
-        $T->set_var(array(
-            'prf_prompt'    => $A['sys_directory']->prompt,
-            'prf_field'     => $A['sys_directory']->FormField(),
-        ) );
-        $T->parse('output', 'profile');
-        $retval .= $T->finish($T->get_var('output'));
-    }
-*/
-
-    if ($panel == 'useredit') {
-        USES_profile_functions();
-        $retval = PRF_editForm('edit', $uid);
-    } elseif ($panel == '' && $fieldset == '') {
-        USES_profile_functions();
-        $retval = PRF_editForm('edit', $uid);
-        //USES_profile_class_profile();
-        //$P = new Profile($uid);
-        //$retval = $P->EditForm('edit');
+        $T = PRF_getTemplate('profile_privacy', 'profile');
+        $P = Profile\Profile::getInstance($uid);
+        if (isset($P->fields['sys_directory'])) {
+            $T->set_var(array(
+                'prf_prompt'    => $P->fields['sys_directory']->prompt,
+                'prf_field'     => $P->fields['sys_directory']->FormField(),
+            ) );
+            $T->parse('output', 'profile');
+            $retval .= $T->finish($T->get_var('output'));
+        }
+    } elseif ( ($panel == 'useredit') || ($panel == '' && $fieldset == '') ) {
+        $P = Profile\Profile::getInstance($uid);
+        $retval .= $P->Edit('edit', $uid);
     }
     return $retval;
 }
@@ -364,7 +364,8 @@ function plugin_profilevariablesdisplay_profile($uid, &$template)
         'block' => 'profileblock.thtml',
     ));
     $T->set_var('is_uikit', $_PRF_CONF['_is_uikit']);
-    $A = PRF_getDefs($uid);
+    //$A = PRF_getDefs($uid);
+    $A = Profile\Profile::getInstance($uid)->fields;
     if (empty($A)) {
         return '';
     }
@@ -372,6 +373,7 @@ function plugin_profilevariablesdisplay_profile($uid, &$template)
     $showvisicons = $uid == $_USER['uid'] ? true : false;
     $items = 0;     // counter to check if any items are actually displayed
     foreach ($A as $data) {
+// TODO: show variables to the user if owner perm set
         if ($data->show_in_profile == 0) continue;
         $value = $data->FormatValue();
         if ($_PRF_CONF['showemptyvals'] || !empty($value)) {
@@ -414,11 +416,13 @@ function plugin_profilesave_profile($uid=0)
         $uid = (int)$_USER['uid'];
     }
 
-    USES_profile_functions();
-    PRF_saveData($_POST, $uid);
+    //USES_profile_functions();
+    //PRF_saveData($_POST, $uid);
     //USES_profile_class_profile();
     //$P = new Profile();
     //$P->Save($_POST);
+    $P = Profile\Profile::getInstance($uid);
+    $P->Save($_POST);
 }
 
 
@@ -436,11 +440,12 @@ function plugin_user_create_profile($uid = 0)
     if ($uid == 0)
         return;
 
-    USES_profile_functions();
-    PRF_saveData($_POST, $uid, 'registration');
+    //USES_profile_functions();
+    //PRF_saveData($_POST, $uid, 'registration');
     //USES_profile_class_profile();
     //$P = new Profile($uid);
-    //$P->Save($_POST);
+    $P = Profile\Profile::getInstance($uid);
+    $P->Save($_POST, 'registration');
 }
 
 
@@ -459,16 +464,15 @@ function PRF_setUserValues($uid=0)
 
     //USES_profile_class_profile();
 
+    if ($uid == 0) $uid = $_USER['uid'];
     $uid = (int)$uid;
     $A = array();
     //$P = new Profile($uid);
 
-    $tmp = PRF_getDefs($uid);
-    foreach ($tmp as $name => $data) {
-        //$A['c_'.$data['name']] = $data['value_text'];
+    //$tmp = PRF_getDefs($uid);
+    $P = Profile\Profile::getInstance($uid);
+    foreach ($P->fields as $name => $data) {
         $A[$name] = $data->FormatValue();
-    //foreach ($P->items as $data) {
-    //    $A['c_'.$data->name] = $data->value_text;
     }
     if ($uid == 0) {
         if (is_array($_USER)) {
@@ -497,7 +501,9 @@ function PRF_getDefs($uid = 0, $key = '', $access = 2)
 {
     global $_TABLES, $_USER, $LANG_PROFILE, $_PRF_CONF;
 
-    USES_profile_class_item();
+    return Profile\Profile::getInstance($uid);
+
+    //USES_profile_class_item();
 
     // Default to current user if nothing else provided.  Zero is valid
     // if this is a new user registration, though return will be empty.
@@ -525,16 +531,18 @@ function PRF_getDefs($uid = 0, $key = '', $access = 2)
     $sql = "SELECT * FROM {$_TABLES['profile_data']} WHERE puid='$uid'";
     $res1 = DB_query($sql, 1);
     if (DB_error()) return array();
-    $A = DB_fetchArray($res1, false);
+    $vals = DB_fetchArray($res1, false);
 
     $F = array();
-    while ($tmp = DB_fetchArray($res, false)) {
-        $classname = 'prf' . $tmp['type'];
-        if (isset($A[$tmp['name']]))
-            $tmp['value'] = $A[$tmp['name']];
-        else
-            $tmp['value'] = NULL;
-        $F[$tmp['name']] = prfItem::getClass($tmp, $tmp['value'], $uid);
+    while ($def = DB_fetchArray($res, false)) {
+        //$classname = 'prf' . $tmp['type'];
+        /*if (isset($vals[$def['name']])) {
+            $def['value'] = $vals[$def['name']];
+        } else {
+            $def['value'] = NULL;
+        }*/
+        $value = isset($vals[$def['name']]) ? $vals[$def['name']] : NULL;
+        $F[$def['name']] = Profile\prfItem::getInstance($def, $value, $uid);
     }
     return $F;
 }
@@ -610,13 +618,16 @@ function plugin_itemPreSave_profile($type, $content)
     if ($type != 'registration' && $type != 'useredit')
         return '';
 
-    USES_profile_functions();
+    //USES_profile_functions();
     $errors = array();
 
-    if (!PRF_saveData($_POST, $uid))
+    $P = Profile\Profile::getInstance($uid);
+    //if (!PRF_saveData($_POST, $uid)) {
+    if (!$P->Save($_POST)) {
         return 97;
-    else
+    } else {
         return 0;
+    }
 }
 
 
@@ -713,7 +724,7 @@ function plugin_autotags_profile($op, $content = '', $autotag = '')
         case 'profile_list':
             $item_id = COM_applyFilter($autotag['parm1']);
             USES_profile_class_list();
-            $PL = new prfList($item_id);
+            $PL = new Profile\prfList($item_id);
             if (isset($opts['menu'])) $PL->showMenu();
             if (isset($opts['export'])) $PL->showExport();
             if (isset($opts['extras'])) $PL->hasExtras();
@@ -871,7 +882,6 @@ function PRF_getGroups($grplist='', $NOT='')
     }
 
     return $A;
-
 }
 
 
@@ -888,9 +898,11 @@ function plugin_templatesetvars_profile($templatename, &$template)
     global $_PRF_CONF;
 
     if ($templatename == 'registration') {
-        USES_profile_functions();
+        //USES_profile_functions();
         $existingPluginFields = $template->get_var('plugin_fields');
-        $pluginFields = $existingPluginFields . PRF_editForm('registration');
+        //$pluginFields = $existingPluginFields . PRF_editForm('registration');
+        $P = Profile\Profile::getInstance(1);
+        $pluginFields = $existingPluginFields . $P->Edit('registration');
         $template->set_var('plugin_fields', $pluginFields);
     }
 }
@@ -952,7 +964,9 @@ function plugin_privacy_export_profile($uid,$email='',$username='',$ip='')
     foreach ($tmp as $name => $data) {
         $d = addSlashes(htmlentities($data->FormatValue()));
         if (!empty($d)) {
-            $retval .= '<'.$data->prompt.'>'.$d.'</'.$data->prompt.">\n";
+            $p = str_replace(' ', '_', $data->prompt);
+            $p = preg_replace("/[^A-Za-z0-9_]/", '', $p);
+            $retval .= '<'.$p.'>'.$d.'</'.$p.">\n";
         }
     }
     $retval .= "</profile>\n";
@@ -1001,10 +1015,11 @@ function PRF_getDocURL($file='', $doclang='english')
 *   Reorder all items in a table.
 *   Table name is abstracted to support both list and definition tables.
 *
+*   @deprecated
 *   @param  string  $table  Name of table
 *   @param  string  $id_fld Name of "id" field
 */
-function PRF_reorderDef($table, $id_fld='id')
+function X_PRF_reorderDef($table, $id_fld='id')
 {
     global $_TABLES;
 
@@ -1029,7 +1044,6 @@ function PRF_reorderDef($table, $id_fld='id')
         }
         $order += $stepNumber;
     }
-
 }
 
 
@@ -1056,8 +1070,8 @@ function PRF_isManager()
 {
     global $_PRF_CONF;
 
-    static $isManager = -1;
-    if ($isManager === -1) {
+    static $isManager = NULL;
+    if ($isManager === NULL) {
         if (PRF_isAdmin() ||
                 SEC_hasRights($_PRF_CONF['pi_name'] . '.manage')) {
             $isManager = true;
@@ -1078,8 +1092,8 @@ function PRF_isAdmin()
 {
     global $_PRF_CONF;
 
-    static $isAdmin = -1;
-    if ($isAdmin === -1) {
+    static $isAdmin = NULL;
+    if ($isAdmin === NULL) {
         if (SEC_hasRights($_PRF_CONF['pi_name'] . '.admin')) {
             $isAdmin = true;
         } else {

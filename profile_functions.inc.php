@@ -4,9 +4,9 @@
 *   Load by calling USES_profile_functions()
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2015 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
 *   @package    profile
-*   @version    1.1.4
+*   @version    1.2.0
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
@@ -19,8 +19,9 @@
 *   @param  string  $type   'edit' or 'registration'
 *   @param  integer $uid    User ID whose profile is being edited
 *   @return string          HTML for the form
+*   @deprecated 1.2.0
 */
-function PRF_editForm($type = 'edit', $uid = 0, $form_id='profileform')
+function X_PRF_editForm($type = 'edit', $uid = 0, $form_id='profileform')
 {
     global $_CONF, $_USER, $_TABLES, $LANG_PROFILE, $_PRF_CONF, $_SYSTEM;
 
@@ -45,7 +46,7 @@ function PRF_editForm($type = 'edit', $uid = 0, $form_id='profileform')
         break;
     }
 
-    $A = PRF_getDefs($uid, '', $access_required);
+    $A = Profile\Profile::getInstance($uid)->fields;
     $T = PRF_getTemplate($template_name, 'editform');
     $T->set_var(array(
         'uid'       => $uid,
@@ -57,7 +58,7 @@ function PRF_editForm($type = 'edit', $uid = 0, $form_id='profileform')
     // Flag to make sure calendar javascript is added only once.  It's
     // only added if there's at least one calendar field.
     $T->set_block('editform', 'QueueRow', 'qrow');
-    foreach ($A as $fldname => $data) {
+    foreach ($A as $fldname=>$data) {
         // Could do this in SQL, but why complicate PRF_getDefs()?
         // If the field is not required and is not to appear on the signup
         // form, then skip it.  If it is a registration field, override
@@ -95,20 +96,12 @@ function PRF_editForm($type = 'edit', $uid = 0, $form_id='profileform')
             $data->value = $_POST[$data->name];
         } elseif (is_null($data->value) && isset($data->options['default'])) {
             $data->value = $data->options['default'];
-        } else {
-            $data->value = '';
         }
 
-        if (isset($data->options['spancols'])) {
+/*        if (isset($data->options['spancols'])) {
             $T->set_var('spancols', true);
         } else {
             $T->clear_var('spancols');
-        }
-
-        if (!empty($data->prompt)) {
-            $T->set_var('prompt', PRF_noquotes($data->prompt));
-        } else {
-            $T->clear_var('prompt');
         }
 
         if (!empty($data->options['help_text'])) {
@@ -116,9 +109,12 @@ function PRF_editForm($type = 'edit', $uid = 0, $form_id='profileform')
         } else {
             $T->clear_var('help_text');
         }
-
+*/
         $T->set_var(array(
             'is_visible'    => $data->isPublic() ? 'true' : '',
+            'spancols'      => $data->getOption('spancols'),
+            'help_text'     => htmlspecialchars($data->getOption('help_text')),
+            'prompt'        => PRF_noquotes($data->prompt),
             'field'         => $data->FormField(),
             'fld_class'     => isset($_POST['prf_errors'][$data->name]) ?
                     'profile_error' : '',
@@ -149,14 +145,16 @@ function PRF_saveData($vals, $uid = 0, $type = 'edit')
 
     if ($type == 'registration') {
         // for new user, get empty profile definitions
-        $A = PRF_getDefs($uid, '', 0);
+        //$A = PRF_getDefs($uid, '', 0);
+        $A = Profile\Profile::getInstance(1)->fields;
     } else {
         $isAdmin = SEC_hasRights('profile.admin');
         if ($uid != $_USER['uid'] && !$isAdmin) {
             // non-admin attempting to change another user's record
             return;
         }
-        $A = PRF_getDefs($uid);
+        //$A = PRF_getDefs($uid);
+        $A = Profile\Profile::getInstance($uid)->fields;
     }
 
     $fld_sql = array();
@@ -193,7 +191,7 @@ function PRF_saveData($vals, $uid = 0, $type = 'edit')
 
     foreach ($A as $name => $data) {
         switch ($data->type) {
-        case 'date':
+        case 'Xdate':
             $def_value = empty($data->value) ? $data->options['default'] :
                         $data->value;
             if (strpos($def_value, ' ')) {
@@ -235,15 +233,15 @@ function PRF_saveData($vals, $uid = 0, $type = 'edit')
             $newval = $date . ' ' . $time;
             break;
 
-        case 'checkbox':
+        case 'Xcheckbox':
             $newval = isset($vals[$name]) && $vals[$name] == '1' ? '1' : '0';
             break;
 
-        case 'multicheck':
+        case 'Xmulticheck':
             $newval = @serialize($vals[$name]);
             break;
 
-        case 'select':
+        case 'Xselect':
             if (!isset($vals[$name]) && empty($data->value) &&
                 isset($data->options['values']['default'])) {
                 $vals[$name] = $data->options['values']['default'];
@@ -251,7 +249,7 @@ function PRF_saveData($vals, $uid = 0, $type = 'edit')
             $newval = $vals[$name];
             break;
 
-        case 'radio':
+        case 'Xradio':
             if (!isset($vals[$name]) && empty($data->value) &&
                 isset($data->options['values']['default'])) {
                 $vals[$name] = $data->options['values']['default'];
@@ -259,30 +257,32 @@ function PRF_saveData($vals, $uid = 0, $type = 'edit')
             $newval = isset($vals[$name]) ? $vals[$name] : '';
             break;
 
-        case 'static':
+        case 'Xstatic':
             // Nothing to save for static text fields, continue loop and
             // don't handle any $newval
             $newval = NULL;
             continue 2;
             break;
 
-        case 'textarea':
-        case 'account':
+        case 'Xtextarea':
+        case 'Xaccount':
             $newval = $vals[$name];
             break;
 
         default:
-            if (!isset($vals[$name]) && empty($data->value) &&
+            /*if (!isset($vals[$name]) && empty($data->value) &&
                 isset($data->options['default'])) {
                 $vals[$name] = $data->options['default'];
             }
-            $newval = $vals[$name];
+            $newval = $vals[$name];*/
             break;
         }
 
+        $newval = $data->prepareToSave($vals);
+        if ($newval === NULL) continue;     // special value to avoid saving
+
         // Auto-Generate a value during registration, or if the value is empty
-        if (isset($data->options['autogen']) &&
-                $data->options['autogen'] == 1 &&
+        if ($data->getOption('autogen', 0) == 1 &&
                 ($type == 'registration' || empty($newval))) {
             $newval = PRF_autogen($data, $uid);
         }
@@ -306,6 +306,7 @@ function PRF_saveData($vals, $uid = 0, $type = 'edit')
                     $new_sql
                     WHERE puid = $uid";
         }
+        //echo $sql;die;
         DB_query($sql, 1);
         if (DB_error()) {
             COM_errorLog("PRF_saveData() - error executing sql: $sql");
