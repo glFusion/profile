@@ -17,9 +17,15 @@ var PRFtoggleEnabled = function(cbox, id, type) {
         success: function(result) {
             cbox.checked = result.newval == 1 ? true : false;
             try {
-                $.UIkit.notify("<i class='uk-icon-check'></i>&nbsp;" + result.statusMessage, {timeout: 1000,pos:'top-center'});
+                if (result.newval == oldval) {
+                    icon = "<i class='uk-icon-exclamation-triangle'></i>&nbsp;";
+                } else {
+                    icon = "<i class='uk-icon-check'></i>&nbsp;";
+                }
+                $.UIkit.notify(icon + result.statusMessage, {timeout: 1000,pos:'top-center'});
             }
             catch(err) {
+                $.UIkit.notify("<i class='uk-icon-exclamation-triangle'></i>&nbsp;" + result.statusMessage, {timeout: 1000,pos:'top-center'});
                 alert(result.statusMessage);
             }
         }
