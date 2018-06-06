@@ -105,9 +105,11 @@ class Profile
                     WHERE puid = '{$this->uid}'";
         $res = DB_query($sql);
         $A = DB_fetchArray($res, false);
-        foreach ($A as $name=>$value) {
-            if (isset($this->fields[$name])) {
-                $this->fields[$name]->value = $value;
+        if ($A) {
+            foreach ($A as $name=>$value) {
+                if (isset($this->fields[$name])) {
+                    $this->fields[$name]->value = $value;
+                }
             }
         }
     }
