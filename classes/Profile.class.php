@@ -166,6 +166,10 @@ class Profile
                 if (($data->user_reg == 0 && $data->required == 0))
                     continue;
                 $data->perm_owner = 3;
+            } elseif ($type == 'edit') {
+                // In the account settings, the sys_directory checkbox
+                // appears in the privacy panel so exclude here
+                if ($fldname == 'sys_directory') continue;
             }
 
             // If the field is required, set the fValidator class.
