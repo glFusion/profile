@@ -372,9 +372,11 @@ function plugin_profilevariablesdisplay_profile($uid, &$template)
 
     $showvisicons = $uid == $_USER['uid'] ? true : false;
     $items = 0;     // counter to check if any items are actually displayed
+    $isAdmin = PRF_isManager();
     foreach ($A as $data) {
 // TODO: show variables to the user if owner perm set
-        if ($data->show_in_profile == 0) continue;
+        // Admin can see all fields, they'll be styled to indicate not public.
+        if (!$data->isPublic() && !$isAdmin) continue;
         $value = $data->FormatValue();
         if ($_PRF_CONF['showemptyvals'] || !empty($value)) {
             $T->set_block('block', 'profile_row', 'prow');
@@ -383,6 +385,7 @@ function plugin_profilevariablesdisplay_profile($uid, &$template)
                 'value'     => $value,
                 'showvisicons' => $showvisicons ? 'true' : '',
                 'is_visible' => $showvisicons && $data->isPublic() ? 'true' : '',
+                'pubprv'    => $data->isPublic() ? 'public' : 'private',
             ) );
             $T->parse('prow', 'profile_row', true);
             $items++;

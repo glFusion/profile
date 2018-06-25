@@ -12,7 +12,7 @@
 {!endif}
 <table class="pluginProfileBlock uk-table uk-table-striped uk-table-condensed">
 <!-- BEGIN profile_row -->
-  <tr><td>
+  <tr class="profile_{pubprv}"><td>
     {!if descrip}
       {descrip}:&nbsp;&nbsp;
     {!endif}
