@@ -6,7 +6,7 @@
 *   @copyright  Copyright (c) 2011 Lee Garner <lee@leegarner.com>
 *   @package    profile
 *   @version    1.1.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
@@ -234,7 +234,7 @@ function service_renderForm_profile($args, &$output, &$svc_msg)
     if (COM_isAnonUser()) return PLG_RET_ERROR;
     $uid = isset($args['uid']) ? $args['uid'] : $_USER['uid'];
     $form_id = isset($args['form_id']) ? $args['form_id'] : '';
-    $P = Profile\Profile::getInstance($uid);
+    $P = \Profile\Profile::getInstance($uid);
     $output = $P->Edit('inline', $form_id);
     return PLG_RET_OK;
 }
@@ -260,7 +260,7 @@ function service_saveData_profile($args, &$output, &$svc_msg)
         return PLG_RET_ERROR;
     }
 
-    $P = Profile\Profile::getInstance($args['uid']);
+    $P = \Profile\Profile::getInstance($args['uid']);
     $status = $P->Save($args['data']);;
     if ($status) return PLG_RET_OK;
     else return PLG_RET_ERROR;

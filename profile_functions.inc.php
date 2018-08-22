@@ -46,7 +46,7 @@ function X_PRF_editForm($type = 'edit', $uid = 0, $form_id='profileform')
         break;
     }
 
-    $A = Profile\Profile::getInstance($uid)->fields;
+    $A = \Profile\Profile::getInstance($uid)->fields;
     $T = PRF_getTemplate($template_name, 'editform');
     $T->set_var(array(
         'uid'       => $uid,
@@ -146,7 +146,7 @@ function PRF_saveData($vals, $uid = 0, $type = 'edit')
     if ($type == 'registration') {
         // for new user, get empty profile definitions
         //$A = PRF_getDefs($uid, '', 0);
-        $A = Profile\Profile::getInstance(1)->fields;
+        $A = \Profile\Profile::getInstance(1)->fields;
     } else {
         $isAdmin = SEC_hasRights('profile.admin');
         if ($uid != $_USER['uid'] && !$isAdmin) {
@@ -154,7 +154,7 @@ function PRF_saveData($vals, $uid = 0, $type = 'edit')
             return;
         }
         //$A = PRF_getDefs($uid);
-        $A = Profile\Profile::getInstance($uid)->fields;
+        $A = \Profile\Profile::getInstance($uid)->fields;
     }
 
     $fld_sql = array();

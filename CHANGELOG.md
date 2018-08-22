@@ -2,6 +2,7 @@
 
 ## Version 1.2.0
 Release TBD
+- Fix namespace usage
 - Implement caching for glFusion 1.8.0+
 - Refactor profile field classes by type
 - Add privacy_export function

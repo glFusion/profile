@@ -322,7 +322,7 @@ function plugin_profileedit_profile($uid, $panel, $fieldset)
 
     if ($panel == 'privacy' && $fieldset == 'privacy') {
         $T = PRF_getTemplate('profile_privacy', 'profile');
-        $P = Profile\Profile::getInstance($uid);
+        $P = \Profile\Profile::getInstance($uid);
         if (isset($P->fields['sys_directory'])) {
             $T->set_var(array(
                 'prf_prompt'    => $P->fields['sys_directory']->prompt,
@@ -332,7 +332,7 @@ function plugin_profileedit_profile($uid, $panel, $fieldset)
             $retval .= $T->finish($T->get_var('output'));
         }
     } elseif ( ($panel == 'useredit') || ($panel == '' && $fieldset == '') ) {
-        $P = Profile\Profile::getInstance($uid);
+        $P = \Profile\Profile::getInstance($uid);
         $retval .= $P->Edit('edit', $uid);
     }
     return $retval;
@@ -365,7 +365,7 @@ function plugin_profilevariablesdisplay_profile($uid, &$template)
     ));
     $T->set_var('is_uikit', $_PRF_CONF['_is_uikit']);
     //$A = PRF_getDefs($uid);
-    $A = Profile\Profile::getInstance($uid)->fields;
+    $A = \Profile\Profile::getInstance($uid)->fields;
     if (empty($A)) {
         return '';
     }
@@ -424,7 +424,7 @@ function plugin_profilesave_profile($uid=0)
     //USES_profile_class_profile();
     //$P = new Profile();
     //$P->Save($_POST);
-    $P = Profile\Profile::getInstance($uid);
+    $P = \Profile\Profile::getInstance($uid);
     $P->Save($_POST);
 }
 
@@ -447,7 +447,7 @@ function plugin_user_create_profile($uid = 0)
     //PRF_saveData($_POST, $uid, 'registration');
     //USES_profile_class_profile();
     //$P = new Profile($uid);
-    $P = Profile\Profile::getInstance($uid);
+    $P = \Profile\Profile::getInstance($uid);
     $P->Save($_POST, 'registration');
 }
 
@@ -473,7 +473,7 @@ function PRF_setUserValues($uid=0)
     //$P = new Profile($uid);
 
     //$tmp = PRF_getDefs($uid);
-    $P = Profile\Profile::getInstance($uid);
+    $P = \Profile\Profile::getInstance($uid);
     foreach ($P->fields as $name => $data) {
         $A[$name] = $data->FormatValue();
     }
@@ -504,7 +504,7 @@ function PRF_getDefs($uid = 0, $key = '', $access = 2)
 {
     global $_TABLES, $_USER, $LANG_PROFILE, $_PRF_CONF;
 
-    return Profile\Profile::getInstance($uid);
+    return \Profile\Profile::getInstance($uid);
 
     //USES_profile_class_item();
 
@@ -545,7 +545,7 @@ function PRF_getDefs($uid = 0, $key = '', $access = 2)
             $def['value'] = NULL;
         }*/
         $value = isset($vals[$def['name']]) ? $vals[$def['name']] : NULL;
-        $F[$def['name']] = Profile\prfItem::getInstance($def, $value, $uid);
+        $F[$def['name']] = \Profile\prfItem::getInstance($def, $value, $uid);
     }
     return $F;
 }
@@ -609,23 +609,22 @@ function PRF_escape_string($val)
 */
 function plugin_itemPreSave_profile($type, $content)
 {
-    global $_CONF, $LANG_PROFILE;
-
     // Don't validate administrators, it doesn't work when creating
-    // new users and any fields are required.
+    // new users if any fields are required.
     if (SEC_hasRights('user.admin,profile.admin', 'OR'))
         return '';
 
     // Only check content types that we care about.
     // Profile editing calls this starting with 1.3.0
-    if ($type != 'registration' && $type != 'useredit')
+    if ($type == 'registration') {
+        $uid = 0;
+    } elseif ($type == 'useredit') {
+        $uid = $_POST['uid'];
+    } else {
         return '';
+    }
 
-    //USES_profile_functions();
-    $errors = array();
-
-    $P = Profile\Profile::getInstance($uid);
-    //if (!PRF_saveData($_POST, $uid)) {
+    $P = \Profile\Profile::getInstance($uid);
     if (!$P->Save($_POST)) {
         return 97;
     } else {
@@ -727,7 +726,7 @@ function plugin_autotags_profile($op, $content = '', $autotag = '')
         case 'profile_list':
             $item_id = COM_applyFilter($autotag['parm1']);
             USES_profile_class_list();
-            $PL = new Profile\prfList($item_id);
+            $PL = new \Profile\prfList($item_id);
             if (isset($opts['menu'])) $PL->showMenu();
             if (isset($opts['export'])) $PL->showExport();
             if (isset($opts['extras'])) $PL->hasExtras();
@@ -904,7 +903,7 @@ function plugin_templatesetvars_profile($templatename, &$template)
         //USES_profile_functions();
         $existingPluginFields = $template->get_var('plugin_fields');
         //$pluginFields = $existingPluginFields . PRF_editForm('registration');
-        $P = Profile\Profile::getInstance(1);
+        $P = \Profile\Profile::getInstance(1);
         $pluginFields = $existingPluginFields . $P->Edit('registration');
         $template->set_var('plugin_fields', $pluginFields);
     }

@@ -30,7 +30,7 @@ $action = COM_getArgument('action');
 switch ($action) {
 case 'export':
     // Export member list to csv
-    $PL = new Profile\prfList($listid);
+    $PL = new \Profile\prfList($listid);
     $content = $PL->Export();
     //$content = PRF_memberList_export($listid);
     if (!empty($content)) {
@@ -45,7 +45,7 @@ case 'export':
 
 case 'pdf':
     //USES_profile_class_pdflist();
-    $PL = new Profile\pdfList($listid);
+    $PL = new \Profile\pdfList($listid);
     $content = $PL->Render();
     if (!empty($content)) {
         exit;
@@ -54,7 +54,7 @@ case 'pdf':
 
 case 'html':
     //USES_profile_class_htmlList();
-    $PL = new Profile\htmlList($listid);
+    $PL = new \Profile\htmlList($listid);
     $content = $PL->Render();
     if (!empty($content)) {
         echo $content;
@@ -64,7 +64,7 @@ case 'html':
 
 default:
     // Display a member list
-    $PL = new Profile\prfList($listid);
+    $PL = new \Profile\prfList($listid);
     $PL->showExport();      // show the export link to qualified users
     $PL->showMenu();        // show the tabbed menu of lists
     $PL->hasExtras();       // show the search form & query limit selector

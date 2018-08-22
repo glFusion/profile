@@ -64,7 +64,7 @@ case 'toggleEnabled':
         COM_errorLog("Error: $sql");
     } else {
         // Have to clear the cache if there were any changes
-        Profile\Cache::clear();
+        \Profile\Cache::clear();
     }
 
     $result = array(
