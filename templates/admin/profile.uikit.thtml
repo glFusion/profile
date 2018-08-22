@@ -108,7 +108,7 @@ function multichk_insertRow(list) {
 
 </script>
 
-<form class="uk-form-horizontal" id="frm1"
+<form class="uk-form uk-form-horizontal" id="frm1"
     action="{site_url}/admin/plugins/profile/index.php"
     method="post">
   <input type="hidden" name="valueCount" value="0" />
@@ -118,9 +118,7 @@ function multichk_insertRow(list) {
   <fieldset>
     <div class="uk-form-row">
       <label for="name" class="uk-form-label">{$LANG_PROFILE['fieldname']}
-      <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_fieldname', 'Help', 640, 480, 1);return false;">
-        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+        <span id="hlp_fieldname" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
         {!if is_sys}
@@ -131,15 +129,14 @@ function multichk_insertRow(list) {
         <input type="hidden" name="is_sys" value="0" />
         <input type="text" required size="32" name="name" id="name"
           value="{name}" onblur="javascript:setName(this);" />
+        <i class="uk-icon uk-icon-exclamation-triangle prf-icon-danger tooltip" title="{$LANG_PROFILE['required']}"></i>
         {!endif}
       </div>
     </div>
 
     <div class="uk-form-row">
       <label for="prompt" class="uk-form-label">{$LANG_PROFILE['textprompt']}
-        <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_prompt', 'Help', 640, 480, 1);return false;">
-        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+        <span id="hlp_prompt" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
         <input type="text" size="80" id="prompt" name="prompt" value="{prompt}" />
@@ -148,21 +145,17 @@ function multichk_insertRow(list) {
 
     <div class="uk-form-row">
       <label for="help_text" class="uk-form-label">{$LANG_PROFILE['help_text']}
-        <a href="#" class="toolbar" 
-          onclick="popupWindow('{doc_url}#desc_helptext', 'Help', 640, 480, 1);return false;">
-        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+        <span id="hlp_helptext" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
-        <input type="text" name="help_text" maxlength="255" size="40"
+        <input type="text" name="help_text" maxlength="255" size="80"
           id="help_text" value="{help_text}" />
       </div>
     </div>
 
     <div class="uk-form-row">
-      <label for="type" class="uk-form-label">{$LANG_PROFILE['fieldtype']}
-        <a href="#" class="toolbar" 
-          onclick="popupWindow('{doc_url}#desc_type', 'Help', 640, 480, 1);return false;">
-          <img src="{layout_url}/images/button_help.png" alt="" /></a>
+      <label class="uk-form-label">{$LANG_PROFILE['fieldtype']}
+        <span id="hlp_type" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
         {!if is_sys}
@@ -193,9 +186,7 @@ function multichk_insertRow(list) {
 
     <div id="text_size" class="uk-form-row">
       <label for="size" class="uk-form-label">{$LANG_PROFILE['inputlen']}
-    <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_length', 'Help', 640, 480, 1);return false;">
-        <img src="{layout_url}/images/button_help.png" alt="" /></a>
+        <span id="hlp_length" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
         <input id="size" type="text" size="4" name="size" value="{size}" />
@@ -204,9 +195,7 @@ function multichk_insertRow(list) {
 
     <div id="text_maxlen" class="uk-form-row">
       <label for="maxlen" class="uk-form-label">{$LANG_PROFILE['maxlen']}:
-        <a href="#" class="toolbar" 
-          onclick="popupWindow('{doc_url}#desc_length', 'Help', 640, 480, 1);return false;">
-          <img src="{layout_url}/images/button_help.png" alt="" /></a>
+        <span id="hlp_length" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
         <input id="maxlen" type="text" size="4" name="maxlength" value="{maxlength}" />
@@ -215,9 +204,7 @@ function multichk_insertRow(list) {
 
     <div id="cols" class="uk-form-row">
       <label for="f_cols" class="uk-form-label">{$LANG_PROFILE['columns']}
-        <a href="#" class="toolbar"
-          onclick="popupWindow('{doc_url}#desc_columns', 'Help', 640, 480, 1);return false;">
-          <img src="{layout_url}/images/button_help.png" alt="" /></a>
+        <span id="hlp_rowcol" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
         <input type="text" size="4" id="f_cols" name="cols" value="{cols}">
@@ -226,9 +213,7 @@ function multichk_insertRow(list) {
 
     <div id="rows" class="uk-form-row">
       <label for="f_rows" class="uk-form-label">{$LANG_PROFILE['rows']}
-        <a href="#" class="toolbar"
-          onclick="popupWindow('{doc_url}#desc_rows', 'Help', 640, 480, 1);return false;">
-          <img src="{layout_url}/images/button_help.png" alt="" /></a>
+        <span id="hlp_rowcol" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
         <input id="f_rows" type="text" size="4" name="rows" value="{rows}">
@@ -237,9 +222,7 @@ function multichk_insertRow(list) {
 
     <div id="value" class="uk-form-row">
       <label for="f_value" class="uk-form-label">{$LANG_PROFILE['value']}
-        <a href="#" class="toolbar" 
-          onclick="popupWindow('{doc_url}#desc_valuestr', 'Help', 640, 480, 1);return false;">
-          <img src="{layout_url}/images/button_help.png" alt="" /></a>
+        <span id="hlp_default" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
         <input id="f_value" type="text" size="32" name="valuestr" value="{valuestr}" />
@@ -248,9 +231,7 @@ function multichk_insertRow(list) {
 
     <div id="static_value" class="uk-form-row">
       <label for="f_static" class="uk-form-label">{$LANG_PROFILE['value']}
-        <a href="#" class="toolbar" 
-          onclick="popupWindow('{doc_url}#desc_value', 'Help', 640, 480, 1);return false;">
-          <img src="{layout_url}/images/button_help.png" alt="" /></a>
+        <span id="hlp_value" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
         <textarea rows="4" cols="40" id="f_static" name="static_val">{valuestr}</textarea>
@@ -259,9 +240,7 @@ function multichk_insertRow(list) {
 
     <div id="selvalues" class="uk-form-row">
       <label for="fieldValuesList" class="uk-form-label">{$LANG_PROFILE['value']}
-        <a href="#" class="toolbar" 
-          onclick="popupWindow('{doc_url}#desc_values', 'Help', 640, 480, 1);return false;">
-          <img src="{layout_url}/images/button_help.png" alt="" /></a>
+        <span id="hlp_value" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
         <img src="{layout_url}/images/addchild.png"
@@ -275,9 +254,7 @@ function multichk_insertRow(list) {
 
     <div id="multichk_values" class="uk-form-row">
       <label class="uk-form-label">{$LANG_PROFILE['value']}
-        <a href="#" class="toolbar" 
-          onclick="popupWindow('{doc_url}#desc_values', 'Help', 640, 480, 1);return false;">
-          <img src="{layout_url}/images/button_help.png" alt="" /></a>
+        <span id="hlp_value" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
         <img src="{layout_url}/images/addchild.png"
@@ -291,9 +268,7 @@ function multichk_insertRow(list) {
 
     <div id="chk_defvalue" class="uk-form-row">
       <label for="f_chkdefval" class="uk-form-label">{$LANG_PROFILE['defvalue']}
-        <a href="#" class="toolbar" 
-          onclick="popupWindow('{doc_url}#desc_default', 'Help', 640, 480, 1);return false;">
-          <img src="{layout_url}/images/button_help.png" alt="" /></a>
+        <span id="hlp_default" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
         <input id="f_chkdefval" type="checkbox" name="chkdefvalue" value="1" {chkdefault_chk} />
@@ -303,9 +278,7 @@ function multichk_insertRow(list) {
 
     <div id="defvalue" class="uk-form-row">
       <label for="f_defval" class="uk-form-label">{$LANG_PROFILE['defvalue']}
-        <a href="#" class="toolbar" 
-          onclick="popupWindow('{doc_url}#desc_default', 'Help', 640, 480, 1);return false;">
-          <img src="{layout_url}/images/button_help.png" alt="" /></a>
+        <span id="hlp_default" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
         <input id="f_defval" type="text" size="32" name="defvalue" value="{defvalue}" />
@@ -315,9 +288,7 @@ function multichk_insertRow(list) {
 
     <div id="date_showtime" class="uk-form-row">
       <label for="f_showtime" class="uk-form-label">{$LANG_PROFILE['showtime']}?
-        <a href="#" class="toolbar" 
-          onclick="popupWindow('{doc_url}#desc_showtime', 'Help', 640, 480, 1);return false;">
-          <img src="{layout_url}/images/button_help.png" alt="" /></a>a
+        <span id="hlp_24hr" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
         <input id="f_showtime" type="checkbox" value="1" name="showtime" {shtime_chk} />
@@ -326,9 +297,7 @@ function multichk_insertRow(list) {
 
     <div id="date_24h" class="uk-form-row">
       <label class="uk-form-label">{$LANG_PROFILE['hourformat']}?
-        <a href="#" class="toolbar" 
-          onclick="popupWindow('{doc_url}#desc_24hr', 'Help', 640, 480, 1);return false;">
-          <img src="{layout_url}/images/button_help.png" alt="" /></a>
+        <span id="hlp_24hr" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
         <input type="radio" name="timeformat" value="12" {12h_sel} />&nbsp;{$LANG_PROFILE['hour12']}&nbsp;&nbsp;
@@ -339,9 +308,7 @@ function multichk_insertRow(list) {
 
     <div id="dt_input_format" class="uk-form-row">
       <label for="f_dt_format" class="uk-form-label">{$LANG_PROFILE['input_format']}
-        <a href="#" class="toolbar" 
-          onclick="popupWindow('{doc_url}#desc_dt_input_format', 'Help', 640, 480, 1);return false;">
-          <img src="{layout_url}/images/button_help.png" alt="" /></a>
+        <span id="hlp_input_format" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
         <select id="f_dt_format" name="dt_input_format">{dt_input_format}</select>
@@ -349,10 +316,8 @@ function multichk_insertRow(list) {
     </div>
 
     <div id="autogen" class="uk-form-row">
-      <label for="f_autogen" class="uk-form-label">{$LANG_PROFILE['autogen']}?
-        <a href="#" class="toolbar" 
-          onclick="popupWindow('{doc_url}#desc_autogen', 'Help', 640, 480, 1);return false;">
-          <img src="{layout_url}/images/button_help.png" alt="" /></a>
+      <label class="uk-form-label">{$LANG_PROFILE['autogen']}?
+        <span id="hlp_autogen" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
         <input id="f_autogen" type="checkbox" value="1" name="autogen" {autogen_chk} />
@@ -360,10 +325,8 @@ function multichk_insertRow(list) {
     </div>
 
     <div class="uk-form-row">
-      <label for="f_enabled" class="uk-form-label">{$LANG_PROFILE['enabled']}
-        <a href="#" class="toolbar" 
-          onclick="popupWindow('{doc_url}#desc_enabled', 'Help', 640, 480, 1);return false;">
-          <img src="{layout_url}/images/button_help.png" alt="" /></a>
+      <label class="uk-form-label">{$LANG_PROFILE['enabled']}
+        <span id="hlp_enabled" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
         <input id="f_enabled" type="checkbox" value="1" name="enabled" {ena_chk} />
@@ -371,10 +334,8 @@ function multichk_insertRow(list) {
     </div>
 
     <div id="required" class="uk-form-row">
-      <label for="f_required" class="uk-form-label">{$LANG_PROFILE['required']}
-        <a href="#" class="toolbar" 
-          onclick="popupWindow('{doc_url}#desc_required', 'Help', 640, 480, 1);return false;">
-          <img src="{layout_url}/images/button_help.png" alt="" /></a>
+      <label class="uk-form-label">{$LANG_PROFILE['required']}
+        <span id="hlp_required" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
         <input id="f_required" type="checkbox" value="1" name="required" {req_chk} />
@@ -382,10 +343,8 @@ function multichk_insertRow(list) {
     </div>
 
     <div id="registration" class="uk-form-row">
-      <label for="f_at_reg" class="uk-form-label">{$LANG_PROFILE['ent_registration']}
-        <a href="#" class="toolbar" 
-          onclick="popupWindow('{doc_url}#desc_registration', 'Help', 640, 480, 1);return false;">
-          <img src="{layout_url}/images/button_help.png" alt="" /></a>
+      <label class="uk-form-label">{$LANG_PROFILE['ent_registration']}
+        <span id="hlp_registration" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
         <input id="f_at_reg" type="checkbox" value="1" name="user_reg" {user_reg_chk} />
@@ -393,10 +352,8 @@ function multichk_insertRow(list) {
     </div>
 
     <div id="show_in_profile" class="uk-form-row">
-      <label for="f_in_profile" class="uk-form-label">{$LANG_PROFILE['show_in_profile']}
-        <a href="#" class="toolbar" 
-          onclick="popupWindow('{doc_url}#desc_show_in_profile', 'Help', 640, 480, 1);return false;">
-          <img src="{layout_url}/images/button_help.png" alt="" /></a>
+      <label class="uk-form-label">{$LANG_PROFILE['show_in_profile']}
+        <span id="hlp_inprofile" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
         <input id="f_in_profile" type="checkbox" value="1" name="show_in_profile" {in_prf_chk} />
@@ -404,10 +361,8 @@ function multichk_insertRow(list) {
     </div>
 
     <div id="spancols" class="uk-form-row">
-      <label for="f_spancols" class="uk-form-label">{$LANG_PROFILE['spancols']}?
-        <a href="#" class="toolbar" 
-          onclick="popupWindow('{doc_url}#desc_spancols', 'Help', 640, 480, 1);return false;">
-          <img src="{layout_url}/images/button_help.png" alt="" /></a>
+      <label class="uk-form-label">{$LANG_PROFILE['spancols']}?
+        <span id="hlp_spancols" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
         <input id="f_spancols" type="checkbox" value="1" name="spancols" {spancols_chk} />
@@ -415,10 +370,8 @@ function multichk_insertRow(list) {
     </div>
 
     <div id="pos_after" class="uk-form-row">
-      <label for="f_pos_after" class="uk-form-label">{$LANG_PROFILE['pos_after']}
-        <a href="#" class="toolbar" 
-          onclick="popupWindow('{doc_url}#desc_position', 'Help', 640, 480, 1);return false;">
-          <img src="{layout_url}/images/button_help.png" alt="" /></a>
+      <label class="uk-form-label">{$LANG_PROFILE['pos_after']}
+        <span id="hlp_position" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
         <select name="orderby">
@@ -433,10 +386,9 @@ function multichk_insertRow(list) {
 </fieldset>
 
 <fieldset>
-<legend>{$LANG_PROFILE['permissions']}</legend>
-    <a href="#" class="toolbar" 
-      onclick="popupWindow('{doc_url}#desc_permissions', 'Help', 640, 480, 1);return false;">
-      <img src="{layout_url}/images/button_help.png" alt="" /></a>
+<legend>{$LANG_PROFILE['permissions']}
+        <span id="hlp_permissions" class="tooltip_cfg tooltipstered"></span> 
+</legend>
 
     <div class="uk-form-row">
       <label class="uk-form-label">{$LANG_PROFILE['defgroup']}</label>
@@ -472,5 +424,34 @@ function multichk_insertRow(list) {
 $(document).ready(function() {
     PRF_changeType("{oldtype}");
   });
+
+var ConfigDocUrl = '{doc_url}';
+$(document).ready(function() {
+    $('.tooltip_cfg').tooltipster({
+        contentAsHTML: true,
+        animation: 'fade',
+        trigger: 'click',
+        iconDesktop: true,
+        iconTouch: true,
+        functionBefore: function(origin, continueTooltip) {
+            var attrHref = ConfigDocUrl;
+            var ajobj = $(this);
+            $.get(attrHref, function(data) {
+                var confVar = ajobj.attr('id');
+                if (data.indexOf(confVar) > 0) {
+                    var desc = $(data).find('#desc_' + confVar + ' dd:first').text();
+                    //var a = $(data).find('a[name=desc_' + confVar + ']');
+                    //var tds = a.parent().parent().children("td");
+                    //var desc = tds.eq(1).html();
+                    origin.tooltipster('content', desc);
+                } else {
+                    origin.tooltipster('content', 'No Help Text Found');
+                    console.log('Unable to find help text for desc_%s',confVar);
+                }
+                continueTooltip();
+            });
+        }
+    });
+});
 </script>
 {# end {templatelocation} #}
