@@ -85,7 +85,6 @@ class prfList
             $this->sortby = '';
             $this->sortdir  = '';
         }
-
     }
 
 
@@ -128,7 +127,6 @@ class prfList
                 $this->dir_optional = false;
             }
        }
-
     }
 
 
@@ -300,34 +298,6 @@ class prfList
             $where_and .= ' ' . $query;
         }
 
-        $exp_where = '';
-        /*if ($this->incl_exp_stat > 0 && $this->incl_exp_stat < 7) {
-            $grace = (int)$_PRF_CONF['grace_expired'];
-            $exp_arr = array();
-            if ($this->incl_exp_stat & PRF_EXP_ACTIVE) {
-                $exp_arr[] = "p.sys_expires > '{$_PRF_CONF['now']}'";
-            }
-            if ($this->incl_exp_stat & PRF_EXP_ARREARS) {
-                $exp_arr[] = "(p.sys_expires < '{$_PRF_CONF['now']}'
-                    AND p.sys_expires >= DATE_SUB('{$_PRF_CONF['now']}',
-                    INTERVAL {$grace} DAY))";
-            }
-            if ($this->incl_exp_stat & PRF_EXP_EXPIRED) {
-                $exp_arr[] = "p.sys_expires < DATE_SUB('{$_PRF_CONF['now']}',
-                    INTERVAL {$grace} DAY)";
-            }
-            if (!empty($exp_arr)) {
-                $exp_where = "AND p.sys_expires > '0000-00-00' AND (" .
-                        implode(' OR ', $exp_arr) . ')';
-            }
-        }*/
-
-        /*if (empty($_GET['direction']) && !empty($this->sortby)) {
-            $order_clause = " ORDER BY `{$this->sortby}` {$this->sortdir} ";
-        } else {
-            $order_clause = '';
-        }*/
-
         if ($this->name_format == 1) {
             $full_name = "IF (u.fullname = '' OR u.fullname IS NULL,
                     u.fullname,
@@ -350,7 +320,7 @@ class prfList
                 ON u.uid = p.puid
                 $addjoin
                 WHERE u.uid > $noshow_uid
-                $where_and $exp_where
+                $where_and
                 GROUP BY u.uid";
         //echo $sql;die;
         return $sql;
@@ -564,7 +534,8 @@ class prfList
         $T->set_file('list', 'memberlist.thtml');
 
         $T->set_var(array(
-            'list_contents' => ADMIN_list('membership', __NAMESPACE__ . '\PRF_getListField',
+            'list_contents' => ADMIN_list('membership_list_'.$this->listid,
+                __NAMESPACE__ . '\PRF_getListField',
                 $header_arr, $text_arr, $query_arr, $defsort_arr,
                 $this->pi_filter, $extras, '', $form_arr),
             'export_link'   => $exportlink,
@@ -699,7 +670,7 @@ class prfList
             case 'username':
             case 'email':
             case 'fullname':
-                $classes[$fieldinfo['field']] = new prfItem_text($fieldinfo['field']);
+                $classes[$fieldinfo['field']] = new Fields\text($fieldinfo['field']);
                 break;
             default:
                 $tmp[] = "'" . DB_escapeString($fieldinfo['field']) . "'";
@@ -709,10 +680,10 @@ class prfList
         if (!empty($tmp)) {
             $tmp = implode(',', $tmp);
             $q = "SELECT name, type FROM {$_TABLES['profile_def']}
-                    WHERE name in ($tmp)";
+                    WHERE enabled = 1 AND name in ($tmp)";
             $r = DB_query($q);
             while ($z = DB_fetchArray($r, false)) {
-                $classes[$z['name']] = prfItem::getInstance($z);
+                $classes[$z['name']] = Field::getInstance($z);
                 /*$classname = 'prf' . $z['type'];
                 if (class_exists($classname)) {
                     $classes[$z['name']] = new $classname($z['name']);
@@ -986,7 +957,7 @@ class prfList
         $sql = $sql_action . $sql_fields . $sql_where;
         //echo $sql;die;
         DB_query($sql);
-        PRF_reorderDef('profile_lists', 'listid');
+        //PRF_reorderDef('profile_lists', 'listid');
     }
 
 
@@ -1281,7 +1252,7 @@ function PRF_getListField($fieldname, $fieldvalue, $A, $icon_arr, $extras)
             $status = 'current';
         }
 
-        $F = new prfItem_date($fieldname, $fieldvalue);
+        $F = new Fields\date($fieldname, $fieldvalue);
         $fieldvalue = $F->FormatValue();
         $retval = "<span class=\"profile_$status\">{$fieldvalue}</span>";
         break;
@@ -1314,7 +1285,7 @@ function PRF_getListField($fieldname, $fieldvalue, $A, $icon_arr, $extras)
                 } else {
                     $F = new prfText($custflds[$fieldname], $fieldvalue, $A['uid']);
                 }*/
-                $F = prfItem::getInstance($custflds[$fieldname], $fieldvalue, $A['uid']);
+                $F = Field::getInstance($custflds[$fieldname], $fieldvalue, $A['uid']);
                 $retval = $F->FormatValue();
             } else {
                 // The field is probably from a plugin.

@@ -53,14 +53,32 @@ if (file_exists(PRF_PI_PATH . 'config.php')) {
     include_once PRF_PI_PATH . 'config.php';
 }
 
-spl_autoload_register(function($class)
+spl_autoload_register(function ($class)
 {
-    if (strpos($class, 'Profile\\') === 0) {
-        $class = str_replace('Profile\\', '', $class);
-        $path = __DIR__ . '/classes/' . $class . '.class.php';
-        if (file_exists($path)) {
-            include_once $path;
-        }
+    // project-specific namespace prefix
+    $prefix = 'Profile\\';
+
+    // base directory for the namespace prefix
+    $base_dir = __DIR__ . '/classes/';
+
+    // does the class use the namespace prefix?
+    $len = strlen($prefix);
+    if (strncmp($prefix, $class, $len) !== 0) {
+        // no, move to the next registered autoloader
+        return;
+    }
+
+    // get the relative class name
+    $relative_class = substr($class, $len);
+
+    // replace the namespace prefix with the base directory, replace namespace
+    // separators with directory separators in the relative class name, append
+    // with .php
+    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.class.php';
+
+    // if the file exists, require it
+    if (file_exists($file)) {
+        require $file;
     }
 });
 
@@ -545,7 +563,7 @@ function PRF_getDefs($uid = 0, $key = '', $access = 2)
             $def['value'] = NULL;
         }*/
         $value = isset($vals[$def['name']]) ? $vals[$def['name']] : NULL;
-        $F[$def['name']] = \Profile\prfItem::getInstance($def, $value, $uid);
+        $F[$def['name']] = \Profile\Field::getInstance($def, $value, $uid);
     }
     return $F;
 }
@@ -1131,5 +1149,52 @@ function PRF_getTemplate($name, $id, $path='')
     $T->set_file($id, $filename);
     return $T;
 }
+
+
+/**
+*   Get an array variable, first checking whether it's set
+*
+*   @since  1.0.8
+*   @param  array   $A          Array where the variable should be
+*   @param  string  $key        Name of array element
+*   @param  string  $type       Type of return value
+*   @param  mixed   $default    Default value, if key is not set
+*   @return     Array element cast to $type, or NULL if not set
+*/
+function PRF_getVar($A, $key, $type = 'string', $default = NULL)
+{
+    // If the key is not set, return the default
+    if (!is_array($A) || !isset($A[$key])) {
+        return $default;
+    } else {
+        $val = $A[$key];
+    }
+
+    // Cast the value according to the specified type
+    switch ($type) {
+    case 'int':
+    case 'integer':
+        $val = (int)$val;
+        break;
+    case 'bool':
+        $val = (bool)$val;
+        break;
+    case 'float':
+        $val = (float)$val;
+        break;
+    case 'array':
+        // Cast value as an array only if it isn't already one
+        if (!is_array($val)) {
+            $val = array($val);
+        }
+        break;
+    case 'string':
+    default:
+        $val = (string)$val;
+        break;
+    }
+    return $val;
+}
+
 
 ?>

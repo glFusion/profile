@@ -57,7 +57,7 @@ function PRF_changeType(value)
     document.getElementById('hlp_defvalue').innerHTML = 
         '{$LANG_PROFILE['hlp_fld_enter_default']}';
     break;
-  case 'static':
+  case 'statictext':
     document.getElementById('static_value').style.display = '';
     document.getElementById('plugin').style.display = 'none';
     document.getElementById('defvalue').style.display = 'none';
@@ -122,11 +122,11 @@ function multichk_insertRow(list) {
       </label>
       <div class="uk-form-controls">
         {!if is_sys}
-        <input type="hidden" name="is_sys" value="1" />
+        <input type="hidden" name="sys" value="1" />
         <input type="hidden" name="name" value="{name}" />{name}
           <i class="uk-icon uk-icon-question-circle" data-uk-tooltip title="{$LANG_PROFILE['hlp_no_change_system']}"></i>
         {!else}
-        <input type="hidden" name="is_sys" value="0" />
+        <input type="hidden" name="sys" value="0" />
         <input type="text" required size="32" name="name" id="name"
           value="{name}" onblur="javascript:setName(this);" />
         <i class="uk-icon uk-icon-exclamation-triangle prf-icon-danger tooltip" title="{$LANG_PROFILE['required']}"></i>
@@ -234,7 +234,7 @@ function multichk_insertRow(list) {
         <span id="hlp_value" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
-        <textarea rows="4" cols="40" id="f_static" name="static_val">{valuestr}</textarea>
+        <textarea rows="4" cols="80" id="f_static" name="static_val">{valuestr}</textarea>
       </div>
     </div>
 
@@ -385,7 +385,7 @@ function multichk_insertRow(list) {
     </div>
 </fieldset>
 
-<fieldset>
+<fieldset style="margin-top:15px">
 <legend>{$LANG_PROFILE['permissions']}
         <span id="hlp_permissions" class="tooltip_cfg tooltipstered"></span> 
 </legend>

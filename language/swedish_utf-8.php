@@ -62,7 +62,7 @@ $LANG_PROFILE = array(
     'select' => 'Dropdown',
     'radio' => 'Radio Buttons',
     'date' => 'Date',
-    'static' => 'Static',
+    'statictext' => 'Static',
     'account' => 'User Account',
 ),
 

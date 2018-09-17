@@ -87,7 +87,7 @@ case 'deletelist':
 
 case 'savedef':
     // Save or update a profile definition
-    $F = \Profile\prfItem::getInstance($_POST);
+    $F = \Profile\Field::getInstance($_POST);
     $F->saveDef($_POST);
     $view = 'listfields';
     break;
@@ -158,7 +158,7 @@ case 'dousersearch':
 switch ($view) {
 case 'editform':
     // Edit a single definition
-    $F = \Profile\prfItem::getInstance($id);
+    $F = \Profile\Field::getInstance($id);
     $content .= $F->Edit();
     break;
 
@@ -225,7 +225,7 @@ function X_PRF_adminForm($id)
     $retval = '';
 
     $id = (int)$id;
-    $F = \Profile\prfItem::getInstance($id);
+    $F = \Profile\Field::getInstance($id);
     $T = PRF_getTemplate('profile', 'editform', 'admin');
     /*if ($id > 0) {
         // Existing item, retrieve it
@@ -261,7 +261,7 @@ function X_PRF_adminForm($id)
         $T->set_var('editing', '');
     }
 
-    $F = \Profile\prfItem::getInstance($A);
+    $F = \Profile\Field::getInstance($A);
     */
 
     // Instantiate a class to handle default values
@@ -321,7 +321,7 @@ function X_PRF_adminForm($id)
         'spancols_chk' => (isset($opts['spancols']) && $opts['spancols'] == 1) ? PRF_CHECKED : '',
         'orderby'   => $A['orderby'],
         'format'    => isset($opts['format']) ? $opts['format'] : '',
-        'input_format' => \Profile\prfItem_date::DateFormatSelect($opts['input_format']),
+        'input_format' => \Profile\Field\date::DateFormatSelect($opts['input_format']),
         'doc_url'   => PRF_getDocURL('profile_def.html'),
         'mask'      => isset($opts['mask']) ? $opts['mask'] : '',
         'vismask'   => isset($opts['vismask']) ? $opts['vismask'] : '',
@@ -337,7 +337,7 @@ function X_PRF_adminForm($id)
                         'pi_name,pi_name', $A['plugin'], 0, 'pi_enabled=1'),
         'help_text' => isset($opts['help_text']) ?
                 htmlspecialchars($opts['help_text']) : '',
-        'dt_input_format' => \Profile\prfItem_date::DateFormatSelect($opts['input_format']),
+        'dt_input_format' => \Profile\Field\date::DateFormatSelect($opts['input_format']),
         'orderby_selection' => $orderby_options,
         'type_options' => $type_options,
     ) );
@@ -1042,7 +1042,7 @@ function PRF_searchUsersForm()
             ' ORDER BY orderby ASC';
     $res = DB_query($sql);
     while ($A = DB_fetchArray($res, false)) {
-        $F = \Profile\prfItem::getInstance($A);
+        $F = \Profile\Field::getInstance($A);
         $T->set_block('searchform', 'FldRow', 'frow');
         $T->set_var(array(
             'fld_prompt'    => $F->prompt,
@@ -1084,7 +1084,7 @@ function PRF_searchUsers($vals)
     $flds = array();
     foreach ($fields as $f_name=>$fld) {
         if (!isset($_POST[$f_name]) || $_POST[$f_name] == '-1') continue;   // signifies "any"
-        $F = \Profile\prfItem::getInstance($fld);
+        $F = \Profile\Field::getInstance($fld);
         $f_name = DB_escapeString($f_name);
         switch($F->type) {
         case 'Xdate':
