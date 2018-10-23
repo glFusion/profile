@@ -64,7 +64,7 @@ class date extends \Profile\Field
             break;
         }
 
-        if ($this->options['timeformat'] != '') {
+        if (isset($this->options['timeformat']) && $this->options['timeformat'] != '') {
             $format = $this->getOption('timeformat') == '12' ? '%I:%M %p' : '%H:%M';
             $formatted .= ' ' .
                     strftime($format, mktime($hour, $minute, $second));
