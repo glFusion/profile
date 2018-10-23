@@ -23,7 +23,7 @@ define('PRF_EXP_EXPIRED',   4);
 *   Class for profile lists
 *   @package profile
 */
-class prfList
+class UserList
 {
     protected $listid;    // List identifier string
     protected $title;     // Title string
@@ -151,13 +151,17 @@ class prfList
             $this->incl_user_stat = @unserialize($A['incl_user_stat']);
             if (!$this->incl_user_stat) $this->incl_user_stat = array();
         }
-        if (is_array($A['incl_exp_stat'])) {
-            $this->incl_exp_stat = 0;
-            foreach ($A['incl_exp_stat'] as $value) {
-                $this->incl_exp_stat += (int)$value;
+        if (isset($A['incl_exp_stat'])) {
+            if (is_array($A['incl_exp_stat'])) {
+                $this->incl_exp_stat = 0;
+                foreach ($A['incl_exp_stat'] as $value) {
+                    $this->incl_exp_stat += (int)$value;
+                }
+            } else {
+                $this->incl_exp_stat = (int)$A['incl_exp_stat'];
             }
         } else {
-            $this->incl_exp_stat = (int)$A['incl_exp_stat'];
+            $this->incl_exp_stat = 0;
         }
 
         if ($fromDB) {
@@ -891,7 +895,7 @@ class prfList
         foreach ($avail_fields as $field => $data) {
             if ($field == 'fullname') {
                 $fld_opt = '<select name="fld_opt[' .
-                            $field['field'] . '][disp]">' . LB;
+                            $data['field'] . '][disp]">' . LB;
                 $nf = 0;
                 for ($i = 0; $i < 2; $i++) {
                     $fld_opt .= '<option value="' . $i . '" ' .
@@ -1157,7 +1161,7 @@ class prfList
         return $fields;
     }
 
-}   // class prfList
+}   // class UserList
 
 
 /**

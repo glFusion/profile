@@ -137,7 +137,7 @@ case 'savelist':
         $listid = $_POST['listid'];
     }
     if (!empty($listid)) {
-        $L = new \Profile\prfList($listid);
+        $L = new \Profile\UserList($listid);
         $L->Save($_POST);
     }
     $view = 'lists';
@@ -168,7 +168,7 @@ case 'lists':
 
 case 'editlist':
     //$content .= PRF_adminMenu('list_edit_help');
-    $L = new \Profile\prfList($actionval);
+    $L = new \Profile\UserList($actionval);
     $content .= $L->Edit();
     break;
 

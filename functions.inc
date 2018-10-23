@@ -96,25 +96,6 @@ $_PRF_CONF['_iconset'] = $_PRF_CONF['_is_uikit'] ? 'uk-icon' : 'fa fa';
 function USES_profile_functions()
 {   require_once PRF_PI_PATH . 'profile_functions.inc.php';     }
 
-//function USES_profile_class_profile()
-//{   require_once PRF_PI_PATH . 'classes/profile.class.php';     }
-
-//function USES_profile_class_profileitem()
-//{   require_once PRF_PI_PATH . 'classes/profileitem.class.php'; }
-
-/*function USES_profile_class_item()
-{   require_once PRF_PI_PATH . 'classes/prfItem.class.php';     }
-*/
-/*function USES_profile_class_list()
-{   require_once PRF_PI_PATH . 'classes/prfList.class.php';     }
-*/
-/*function USES_profile_class_pdfList()
-{   require_once PRF_PI_PATH . 'classes/pdfList.class.php';     }
-
-function USES_profile_class_htmlList()
-{   require_once PRF_PI_PATH . 'classes/htmlList.class.php';     }
-*/
-
 // Include api functions for other plugins
 require_once PRF_PI_PATH . 'services.inc.php';
 
@@ -743,8 +724,7 @@ function plugin_autotags_profile($op, $content = '', $autotag = '')
 
         case 'profile_list':
             $item_id = COM_applyFilter($autotag['parm1']);
-            USES_profile_class_list();
-            $PL = new \Profile\prfList($item_id);
+            $PL = new \Profile\UserList($item_id);
             if (isset($opts['menu'])) $PL->showMenu();
             if (isset($opts['export'])) $PL->showExport();
             if (isset($opts['extras'])) $PL->hasExtras();

@@ -17,7 +17,7 @@ namespace Profile;
 *   @package    profile
 *   @since      1.1.4
 */
-class htmlList extends prfList
+class htmlList extends UserList
 {
     /**
     *   Constructor. Simply calls the parent constructor
