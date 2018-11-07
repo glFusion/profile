@@ -158,14 +158,14 @@ class Profile
         // Flag to make sure calendar javascript is added only once.  It's
         // only added if there's at least one calendar field.
         $T->set_block('editform', 'QueueRow', 'qrow');
-        foreach ($this->fields as $fldname=>$data) {
+        foreach ($this->fields as $fldname=>$Fld) {
             // If the field is not required and is not to appear on the signup
             // form, then skip it.  If it is a registration field, override
             // the owner permission to make sure the user can edit it.
             if ($type == 'registration') {
-                if (($data->user_reg == 0 && $data->required == 0))
+                if (($Fld->user_reg == 0 && $Fld->required == 0))
                     continue;
-                $data->perm_owner = 3;
+                $Fld->perm_owner = 3;
             } elseif ($type == 'edit') {
                 // In the account settings, the sys_directory checkbox
                 // appears in the privacy panel so exclude here
@@ -175,8 +175,8 @@ class Profile
             // If the field is required, set the fValidator class.
             // This doesn't work right for dates (yet).
             $fValidator_opts = array();     // Start with a clean array
-            if ($data->required == 1) {
-                if ($data->type != 'checkbox' && $data->type != 'multicheck') {
+            if ($Fld->required == 1) {
+                if ($Fld->type != 'checkbox' && $Fld->type != 'multicheck') {
                     // current fValidator doesn't work with checkboxes
                     $fValidator_opts[] = 'required';
                 }
@@ -187,7 +187,7 @@ class Profile
 
             // Set a flag to indicate that this is a static field.  No status
             // indicators need to be shown.
-            if ($data->type == 'static' || $data->type == 'system') {
+            if ($Fld->type == 'static' || $Fld->type == 'system') {
                 $T->set_var('is_static', 'true');
             } else {
                 $T->clear_var('is_static');
@@ -195,21 +195,21 @@ class Profile
 
             // If POSTed form data, set the user variable to that.  Otherwise,
             // set it to the default or leave it alone.
-            if (isset($_POST[$data->name])) {
-                $data->value = $_POST[$data->name];
-            } elseif (is_null($data->value) && isset($data->options['default'])) {
-                $data->value = $data->options['default'];
+            if (isset($_POST[$Fld->name])) {
+                $Fld->value = $_POST[$Fld->name];
+            } elseif (is_null($Fld->value) && isset($Fld->options['default'])) {
+                $Fld->value = $Fld->options['default'];
             }
 
             $T->set_var(array(
-                'is_visible'    => $data->isPublic() ? 'true' : '',
-                'spancols'      => $data->getOption('spancols'),
-                'help_text'     => htmlspecialchars($data->getOption('help_text')),
-                'prompt'        => PRF_noquotes($data->prompt),
-                'field'         => $data->FormField(),
-                'fld_class'     => isset($_POST['prf_errors'][$data->name]) ?
+                'is_visible'    => $Fld->isPublic() ? 'true' : '',
+                'spancols'      => $Fld->getOption('spancols'),
+                'help_text'     => htmlspecialchars($Fld->getOption('help_text')),
+                'prompt'        => PRF_noquotes($Fld->prompt),
+                'field'         => $Fld->FormField(),
+                'fld_class'     => isset($_POST['prf_errors'][$Fld->name]) ?
                     'profile_error' : '',
-                'fld_name'      => $data->name,
+                'fld_name'      => $Fld->name,
             ) );
             $T->parse('qrow', 'QueueRow', true);
         }
@@ -244,13 +244,13 @@ class Profile
         $fld_sql = array();
         $validation_errs = 0;
         $_POST['prf_errors'] = array();
-        foreach ($this->fields as $name=>$data) {
+        foreach ($this->fields as $name=>$Fld) {
             // Now make changes based on the type of data and applicable options.
             // Managers can override normal validations.
-            if (!$data->validData($vals)) {
+            if (!$Fld->validData($vals)) {
                 // We could just return false here, but instead continue checking so
                 // we can show the user all the errors, not just the first.
-                $msg = sprintf($LANG_PROFILE['msg_fld_missing'], $data->prompt);
+                $msg = sprintf($LANG_PROFILE['msg_fld_missing'], $Fld->prompt);
                 LGLIB_storeMessage($msg, '', true);
                 // Add a value to $_POST so the field will be highlighted when it
                 // is redisplayed.
@@ -259,19 +259,19 @@ class Profile
                 continue;   // skip remainder of loop for invalid records
             }
 
-            $newval = $data->prepareToSave($vals);
+            $newval = $Fld->prepareToSave($vals);
             if ($newval === NULL) continue;     // special value to avoid saving
 
             // Auto-Generate a value during registration, or if the value is empty
-            if ($data->getOption('autogen', 0) == 1 &&
+            if ($Fld->getOption('autogen', 0) == 1 &&
                     ($type == 'registration' || empty($newval))) {
-                $newval = PRF_autogen($data, $this->uid);
+                $newval = PRF_autogen($Fld, $this->uid);
             }
 
-            if ($data->perm_owner == 3 || $isAdmin) {
+            if ($Fld->perm_owner == 3 || $isAdmin) {
                 // Perform field-specific sanitization and add to array of sql
-                $newval = $data->Sanitize($newval);
-                $fld_sql[] = $data->name . "='" . DB_escapeString($newval) . "'";
+                $newval = $Fld->Sanitize($newval);
+                $fld_sql[] = $Fld->name . "='" . DB_escapeString($newval) . "'";
             }
         }
 
