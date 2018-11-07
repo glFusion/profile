@@ -65,13 +65,8 @@ class Profile
 
         if ($uid == 0) $uid = $_USER['uid'];
         $uid = (int)$uid;
-        $cache_key = 'user_' . $uid;
         if (!array_key_exists($uid, $_profiles)) {
-            $_profiles[$uid] = Cache::get($cache_key);
-            if ($_profiles[$uid] === NULL) {
-                $_profiles[$uid] = new self($uid);
-                Cache::set($cache_key, $_profiles[$uid], array('defs','vals'));
-            }
+            $_profiles[$uid] = new self($uid);
         }
         return $_profiles[$uid];
     }
@@ -94,23 +89,28 @@ class Profile
                     WHERE enabled = 1";
             $res = DB_query($sql);
             while ($A = DB_fetchArray($res, false)) {
-                $defs[$A['name']] = prfItem::getInstance($A);
+                $defs[$A['name']] = Field::getInstance($A);
             }
             Cache::set($key, $defs, 'defs');
         }
         $this->fields = $defs;
 
         // Now read the values for the current user
-        $sql = "SELECT * FROM {$_TABLES['profile_data']}
+        $key = 'user_' . $this->uid;
+        $A = Cache::get($key);
+        if ($A === NULL) {
+            $sql = "SELECT * FROM {$_TABLES['profile_data']}
                     WHERE puid = '{$this->uid}'";
-        $res = DB_query($sql);
-        $A = DB_fetchArray($res, false);
-        if ($A) {
+            $res = DB_query($sql);
+            $A = DB_fetchArray($res, false);
+        }
+        if (!empty($A)) {
             foreach ($A as $name=>$value) {
                 if (isset($this->fields[$name])) {
                     $this->fields[$name]->value = $value;
                 }
             }
+            Cache::set($key, $A, array('defs', 'userdata'));
         }
     }
 
