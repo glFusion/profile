@@ -49,7 +49,7 @@ class radio extends \Profile\Field
     {
         $this->_FormFieldInit();
 
-        if (empty($this->options['values'])) {
+        if (empty($this->getOption('values'))) {
             // Have to have some values for radio buttons
             return '';
         }
@@ -64,7 +64,7 @@ class radio extends \Profile\Field
             $sel = $this->value == $value ? PRF_CHECKED : '';
             $fld .= "<input $this->_frmClass type=\"radio\"
                 name=\"{$this->name}\"
-                id=\"{$this->name}\"
+                id=\"{$this->name}_{$value}\"
                 value=\"" . htmlentities($value, ENT_QUOTES) .
                 "\" $sel {$this->_frmReadonly}/>$value&nbsp;\n";
         }

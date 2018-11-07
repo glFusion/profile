@@ -30,8 +30,8 @@ class textarea extends \Profile\Field
         // by setting the width
         $fld = '<textarea style="width:90%;" ' .
                 "{$this->_frmClass} name=\"{$this->name}\" " .
-                "rows=\"{$this->options['rows']}\" " .
-                "cols=\"{$this->options['cols']}\" " .
+                'rows="' . $this->getOption('rows', '5') . '" ' .
+                'cols="' . $this->getOption('cols', '40') . '" ' .
                 "id=\"{$this->name}\" {$this->_frmReadonly}>" .
                 $this->value . "</textarea>\n";
         return $fld;

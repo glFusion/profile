@@ -64,11 +64,8 @@ class date extends \Profile\Field
             break;
         }
 
-        if (isset($this->options['timeformat']) && $this->options['timeformat'] != '') {
-            $format = $this->getOption('timeformat') == '12' ? '%I:%M %p' : '%H:%M';
-            $formatted .= ' ' .
-                    strftime($format, mktime($hour, $minute, $second));
-        }
+        $format = $this->getOption('timeformat', '24') == '12' ? '%I:%M %p' : '%H:%M';
+        $formatted .= ' ' . strftime($format, mktime($hour, $minute, $second));
         /*if ($this->options['showtime'] == 1) {
             if ($_CONF['hour_mode'] == 12) {
                 //$format = ' %I:%M:%S %p';
@@ -96,7 +93,8 @@ class date extends \Profile\Field
 
         $this->_FormFieldInit();
 
-        if ($this->options['timeformat'] && $incl_time) {
+        $timeformat = $this->getOption('timeformat');
+        if ($timeformat && $incl_time) {
             $iFormat = '%Y-%m-%d %H:%M';
             if (strpos($this->value, ' ')) {
                 list($date, $time) = explode(' ', $this->value);
@@ -222,7 +220,7 @@ function {$this->name}_onUpdate(cal)
             break;
         }
 
-        if ($this->options['timeformat'] && $incl_time) {
+        if ($timeformat && $incl_time) {
             $fld .= '&nbsp;&nbsp;' . $hr_fld . ':' . $min_fld . $ampm_fld;
         }
 
