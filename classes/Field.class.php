@@ -48,7 +48,7 @@ class Field
     *   @param  mixed   $value  Optional value to assign
     *   @param  integer $uid    Optional user ID, current user by default
     */
-    public function __construct($item, $value='', $uid = '')
+    public function __construct($item=NULL, $value='', $uid = '')
     {
         global $_USER, $_TABLES, $_PRF_CONF;
 
@@ -62,7 +62,7 @@ class Field
         // Otherwise, read the item from the DB.
         if (is_array($item)) {
             $A = $item;
-        } else {
+        } elseif ($item !== NULL) {
             $sql = "SELECT *
                     FROM {$_TABLES['profile_def']}
                     WHERE name='" . DB_escapeString($item) . "'";
@@ -116,7 +116,7 @@ class Field
             $this->perm_group = PRF_getVar($A, 'perm_group', 'integer', $_PRF_CONF['default_permissions'][1]);
             $this->perm_members = PRF_getVar($A, 'perm_members', 'integer', $_PRF_CONF['default_permissions'][2]);
             $this->perm_anon = PRF_getVar($A, 'perm_anon', 'integer', $_PRF_CONF['default_permissions'][3]);
-            $this->options = @unserialize(PRF_getVar($A, 'options', 'array'));
+            $this->options = @unserialize(PRF_getVar($A, 'options'));
         } else {
             if (isset($A['perm_owner'])) {
                 $perms = SEC_getPermissionValues($A['perm_owner'],

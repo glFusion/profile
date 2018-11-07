@@ -86,7 +86,7 @@ class htmlList extends UserList
             case 'username':
             case 'email':
             case 'fullname':
-                $classes[$fieldinfo['field']] = new prfItem_text($fieldinfo['field']);
+                $classes[$fieldinfo['field']] = new Fields\text();
                 break;
             default:
                 $tmp[] = "'" . DB_escapeString($fieldinfo['field']) . "'";
@@ -99,13 +99,7 @@ class htmlList extends UserList
                     WHERE name in ($tmp)";
             $r = DB_query($q);
             while ($z = DB_fetchArray($r, false)) {
-                $classes[$z['name']] = prfItem::getInstance($z);
-                $classname = 'prf' . $z['type'];
-                if (class_exists($classname)) {
-                    $classes[$z['name']] = new $classname($z['name']);
-                } else {
-                    $classes[$z['name']] = new prfItem_text($z['name']);
-                }
+                $classes[$z['name']] = Field::getInstance($z);
             }
         }
 

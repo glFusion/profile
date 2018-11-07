@@ -688,12 +688,6 @@ class UserList
             $r = DB_query($q);
             while ($z = DB_fetchArray($r, false)) {
                 $classes[$z['name']] = Field::getInstance($z);
-                /*$classname = 'prf' . $z['type'];
-                if (class_exists($classname)) {
-                    $classes[$z['name']] = new $classname($z['name']);
-                } else {
-                    $classes[$z['name']] = new prfItem_text($z['name']);
-                }*/
             }
         }
 
