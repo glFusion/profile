@@ -97,26 +97,26 @@ class Field
     {
         global $_PRF_CONF;
 
-        $this->id = PRF_getVar($A, 'id', 'integer', 0);
-        $this->name = PRF_getVar($A, 'name');
-        $this->value = PRF_getVar($A, 'value');
-        $this->orderby = PRF_getVar($A, 'orderby', 'integer', 999);
-        $this->type = PRF_getVar($A, 'type', 'string', 'text');
-        $this->prompt = PRF_getVar($A, 'prompt');
-        $this->group_id = PRF_getVar($A, 'group_id', 'integer', $_PRF_CONF['defgroup']);
-        $this->sys = PRF_getVar($A, 'sys', 'integer', 0);
-        $this->user_reg = PRF_getVar($A, 'user_reg', 'integer', 0);
-        $this->enabled = PRF_getVar($A, 'enabled', 'integer', 0);
-        $this->required = PRF_getVar($A, 'required', 'integer', 0);
-        $this->show_in_profile = PRF_getVar($A, 'show_in_profile', 'integer', 0);
+        $this->id = LGLIB_getVar($A, 'id', 'integer', 0);
+        $this->name = LGLIB_getVar($A, 'name');
+        $this->value = LGLIB_getVar($A, 'value');
+        $this->orderby = LGLIB_getVar($A, 'orderby', 'integer', 999);
+        $this->type = LGLIB_getVar($A, 'type', 'string', 'text');
+        $this->prompt = LGLIB_getVar($A, 'prompt');
+        $this->group_id = LGLIB_getVar($A, 'group_id', 'integer', $_PRF_CONF['defgroup']);
+        $this->sys = LGLIB_getVar($A, 'sys', 'integer', 0);
+        $this->user_reg = LGLIB_getVar($A, 'user_reg', 'integer', 0);
+        $this->enabled = LGLIB_getVar($A, 'enabled', 'integer', 0);
+        $this->required = LGLIB_getVar($A, 'required', 'integer', 0);
+        $this->show_in_profile = LGLIB_getVar($A, 'show_in_profile', 'integer', 0);
 
         // Load permissions differently if read from DB vs. from a form
         if ($from_db) {
-            $this->perm_owner = PRF_getVar($A, 'perm_owner', 'integer', $_PRF_CONF['default_permissions'][0]);
-            $this->perm_group = PRF_getVar($A, 'perm_group', 'integer', $_PRF_CONF['default_permissions'][1]);
-            $this->perm_members = PRF_getVar($A, 'perm_members', 'integer', $_PRF_CONF['default_permissions'][2]);
-            $this->perm_anon = PRF_getVar($A, 'perm_anon', 'integer', $_PRF_CONF['default_permissions'][3]);
-            $this->options = @unserialize(PRF_getVar($A, 'options'));
+            $this->perm_owner = LGLIB_getVar($A, 'perm_owner', 'integer', $_PRF_CONF['default_permissions'][0]);
+            $this->perm_group = LGLIB_getVar($A, 'perm_group', 'integer', $_PRF_CONF['default_permissions'][1]);
+            $this->perm_members = LGLIB_getVar($A, 'perm_members', 'integer', $_PRF_CONF['default_permissions'][2]);
+            $this->perm_anon = LGLIB_getVar($A, 'perm_anon', 'integer', $_PRF_CONF['default_permissions'][3]);
+            $this->options = @unserialize(LGLIB_getVar($A, 'options'));
         } else {
             if (isset($A['perm_owner'])) {
                 $perms = SEC_getPermissionValues($A['perm_owner'],
@@ -260,7 +260,6 @@ class Field
                     id=\"{$this->name}\" $maxlength
                     size=\"$size\"
                     type=\"text\" value=\"{$this->value}\" $this->_frmReadonly>\n";
-
         return $fld;
     }
 
@@ -301,7 +300,7 @@ class Field
     public function isPublic()
     {
         return $this->show_in_profile ? true : false;
-        return ($this->perm_members > 1 || $this->perm_anon > 1) ? TRUE : FALSE;
+        //return ($this->perm_members > 1 || $this->perm_anon > 1) ? TRUE : FALSE;
     }
 
 
