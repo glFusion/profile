@@ -109,13 +109,14 @@ class radio extends \Profile\Field
     */
     public function prepareToSave($vals)
     {
-        $name = $this->name;
-        if (!isset($vals[$name]) && empty($this->value) &&
-                isset($this->options['values']['default'])) {
-                $vals[$name] = $data->options['values']['default'];
+        if (!isset($vals[$this->name])) {
+            if (empty($this->value)) {
+                $vals[$this->name] = $this->getOption('default');
+            } else {
+                $vals[$this->name] = $this->value;
+            }
         }
-        $newval = isset($vals[$name]) ? $vals[$name] : '';
-        return $newval;
+        return $vals[$this->name];
     }
 
 
