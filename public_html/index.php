@@ -6,11 +6,12 @@
 *   @copyright  Copyright (c) 2009-2010 Lee Garner <lee@leegarner.com>
 *   @package    profile
 *   @version    1.0.2
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
 
+/** Include common functions */
 require_once '../lib-common.php';
 if (!in_array('profile', $_PLUGINS) || !is_array($_PRF_CONF)) {
     COM_404();
@@ -50,7 +51,7 @@ $T->set_var('srchval', $srchval == '' ? 'Search' : $srchval);
 $group = (int)$group;
 if ($group < 1) $group = 13;    // Avoid nasty surprises
 
-// If we're excluding rather than including groups, then make 
+// If we're excluding rather than including groups, then make
 // the query negative.
 $grplist = DB_escapeString($conf_grplist);
 if (empty($grplist)) {
@@ -58,7 +59,7 @@ if (empty($grplist)) {
     exit;
 }
 
-$exclude = isset($_PRF_CONF['exclude_groups']) && 
+$exclude = isset($_PRF_CONF['exclude_groups']) &&
                 $_PRF_CONF['exclude_groups'] == true ? 'NOT' : '';
 $sel_list = COM_optionList($_TABLES['groups'], 'grp_id, grp_name', $group, 1,
     "grp_id $NOT IN ($grplist)");
@@ -68,11 +69,11 @@ $min_uid = isset($_PRF_CONF['include_admin']) &&
             $_PRF_CONF['include_admin'] == true ? 1 : 2;
 $sql = "SELECT u.uid, u.fullname, u.email, u.homepage, u.photo
         FROM {$_TABLES['users']} u
-        RIGHT JOIN {$_TABLES['userinfo']} i 
+        RIGHT JOIN {$_TABLES['userinfo']} i
             ON i.uid = u.uid
         LEFT JOIN {$_TABLES['group_assignments']} ga
             ON u.uid = ga.ug_uid
-        WHERE u.uid > $min_uid 
+        WHERE u.uid > $min_uid
         AND ga.ug_main_grp_id = $group ";
 
 // Add the search parameters if any were supplied
@@ -148,7 +149,7 @@ $result = DB_query($sql);
 
 // Determine whether a link to the users' profiles should be shown
 $show_profile_link = false;
-if (isset($_PRF_CONF['groups_link_profile']) && 
+if (isset($_PRF_CONF['groups_link_profile']) &&
         is_array($_PRF_CONF['groups_link_profile'])) {
     foreach ($_PRF_CONF['groups_link_profile'] as $grp_id) {
         if (in_array($grp_id, $_GROUPS)) {
@@ -158,11 +159,11 @@ if (isset($_PRF_CONF['groups_link_profile']) &&
     }
 }
 // Set the image width to a sensible default if it's not configured
-$img_width = isset($_PRF_CONF['img_width']) && (int)$_PRF_CONF['img_width'] > 0 ? 
+$img_width = isset($_PRF_CONF['img_width']) && (int)$_PRF_CONF['img_width'] > 0 ?
             (int)$_PRF_CONF['img_width'] : 100;
 
 while ($row = DB_fetchArray($result)) {
-        $photo = USER_getPhoto ($row['uid'], $row['photo'], $row['email'], 
+        $photo = USER_getPhoto ($row['uid'], $row['photo'], $row['email'],
                                 $img_width, 0);
         $caption = "{$row['fullname']}<br />{$row['homepage']}";
         if (isset($_PRF_CONF['show_email']) && $_PRF_CONF['show_email'] == true) {
@@ -173,11 +174,11 @@ while ($row = DB_fetchArray($result)) {
         $T->set_var('caption', htmlspecialchars($caption));
         $T->set_var('img_width', $img_width);
 
-        if ($show_profile_link == true || 
-            (isset($_PRF_CONF['link_own_profile']) && 
-                $_PRF_CONF['link_own_profile'] && 
+        if ($show_profile_link == true ||
+            (isset($_PRF_CONF['link_own_profile']) &&
+                $_PRF_CONF['link_own_profile'] &&
             $row['uid'] == $_USER['uid'])) {
-            $T->set_var('profile_url', 
+            $T->set_var('profile_url',
                 "{$_CONF['site_url']}/users.php?mode=profile&uid={$row['uid']}");
         } else {
             $T->set_var('profile_url', '');
@@ -185,7 +186,6 @@ while ($row = DB_fetchArray($result)) {
 
         //$T->set_var('photo_url', PHOTOURL . $photo);
         $T->set_var('photo_url', $photo);
-        
         $T->parse('output', 'oneuser', false);
         echo $T->finish($T->get_var('output'));
 }
@@ -198,8 +198,8 @@ echo COM_siteFooter();
 
 /**
  *  Retrieve the groups to show in the selection dropdown.
- *  Takes the list from the configuration, converts it to an array 
- *  and gets the corresponding names from the database.  If a name 
+ *  Takes the list from the configuration, converts it to an array
+ *  and gets the corresponding names from the database.  If a name
  *  is given in the configuraton for a group, that name is used instead.
  *
  *  @param  string  &$group Pointer to the group to use as selected
@@ -216,7 +216,7 @@ function X_PRF_GetGroups(&$group)
         $A['None'] = 0;
     }*/
 
-    // If we're excluding rather than including groups, then make 
+    // If we're excluding rather than including groups, then make
     // the query negative.
     $grplist = DB_escapeString($_PRF_CONF['groups']);
     $exclude = $_PRF_CONF['exclude_groups'] == true ? 'NOT' : '';
@@ -241,7 +241,7 @@ function X_PRF_GetGroups(&$group)
                 $firstgroup = $row['grp_id'];
 
             if (isset($_PRF_CONF['group_names'][$row['grp_id']])) {
-                $row['grp_name'] = 
+                $row['grp_name'] =
                     $_PRF_CONF['group_names'][$row['grp_id']];
             }
 
@@ -254,9 +254,15 @@ function X_PRF_GetGroups(&$group)
     }
 
     return $A;
-
 }
 
+/**
+ * Get a parameter from $_POST or $_GET.
+ *
+ * @param   string  $name       Name of parameter
+ * @param   mixed   $defvalue   Default value if not defined
+ * @return  mixed               Content of parameter
+ */
 function PRF_getParam($name, $defvalue = '')
 {
     if (isset($_POST[$name]))

@@ -1,26 +1,26 @@
 <?php
 /**
-*   Plugin-specific functions for the profile plugin
-*   Load by calling USES_profile_functions()
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
-*   @package    profile
-*   @version    1.2.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Plugin-specific functions for the profile plugin.
+ * Load by calling USES_profile_functions()
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
+ * @package     profile
+ * @version     1.2.0
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 
 
 /**
-*   Displays a form for editing profile data.
-*
-*   @param  string  $type   'edit' or 'registration'
-*   @param  integer $uid    User ID whose profile is being edited
-*   @return string          HTML for the form
-*   @deprecated 1.2.0
-*/
+ * Displays a form for editing profile data.
+ *
+ * @param   string  $type   'edit' or 'registration'
+ * @param   integer $uid    User ID whose profile is being edited
+ * @return  string          HTML for the form
+ * @deprecated 1.2.0
+ */
 function X_PRF_editForm($type = 'edit', $uid = 0, $form_id='profileform')
 {
     global $_CONF, $_USER, $_TABLES, $LANG_PROFILE, $_PRF_CONF, $_SYSTEM;
@@ -129,13 +129,13 @@ function X_PRF_editForm($type = 'edit', $uid = 0, $form_id='profileform')
 
 
 /**
-*   Saves the user data to the database.
-*
-*   @param  array   $vals   Array of name=>value pairs, like $_POST.
-*   @param  integer $uid    Optional user ID to save, current user default.
-*   @param  string  $type   Type of operation.
-*   @return boolean     True on success, False on failure.
-*/
+ * Saves the user data to the database.
+ *
+ * @param   array   $vals   Array of name=>value pairs, like $_POST.
+ * @param   integer $uid    Optional user ID to save, current user default.
+ * @param   string  $type   Type of operation.
+ * @return  boolean     True on success, False on failure.
+ */
 function PRF_saveData($vals, $uid = 0, $type = 'edit')
 {
     global $_TABLES, $_USER, $LANG_PROFILE;
@@ -318,14 +318,14 @@ function PRF_saveData($vals, $uid = 0, $type = 'edit')
 
 
 /**
-*   Create the fValidator class string for input fields.  If no options
-*   are supplied, then the fValidator is empty.
-*
-*   @since  version 0.0.2
-*   @param  array   $opts   Options to include ('required', 'email', etc).
-*   @param  array   $data   All field data, to get the mask
-*   @return string          String for 'class="fValidate[] iMask...'
-*/
+ * Create the fValidator class string for input fields.
+ * If no options are supplied, then the fValidator is empty.
+ *
+ * @since   version 0.0.2
+ * @param   array   $opts   Options to include ('required', 'email', etc).
+ * @param   array   $data   All field data, to get the mask
+ * @return  string          String for 'class="fValidate[] iMask...'
+ */
 function PRF_make_fValidator($opts, $data)
 {
     $retval = 'class="fValidate[';
@@ -354,12 +354,12 @@ function PRF_make_fValidator($opts, $data)
 
 
 /**
-*   Convert a field mask (9999-AA-XX) to a visible mask (____-__-__)
-*
-*   @since  version 0.0.2
-*   @param  string  $mask   Field mask
-*   @return string          Field mask converted to visible mask
-*/
+ * Convert a field mask (9999-AA-XX) to a visible mask (____-__-__).
+ *
+ * @since   version 0.0.2
+ * @param   string  $mask   Field mask
+ * @return  string          Field mask converted to visible mask
+ */
 function PRF_mask2vismask($mask)
 {
     $old = array('9', 'X', 'A', 'a', 'x');
@@ -369,18 +369,18 @@ function PRF_mask2vismask($mask)
 
 
 /**
-*   Automatically generate a field value.
-*
-*   The site admin can effectively override this function by creating a
-*   CUSTOM_profile_autogen() function which takes the field name & type
-*   as arguments, or a CUSTOM_profile_autogen_{fieldname} function.
-*   The second form takes precedence over the first.
-*
-*   @since  version 0.0.3
-*   @param  array   $A      Field definition and values
-*   @param  integer $uid    Optional user ID.  Zero is acceptable here.
-*   @return string          Value to give the field
-*/
+ * Automatically generate a field value.
+ *
+ * The site admin can effectively override this function by creating a
+ * CUSTOM_profile_autogen() function which takes the field name & type
+ * as arguments, or a CUSTOM_profile_autogen_{fieldname} function.
+ * The second form takes precedence over the first.
+ *
+ * @since   version 0.0.3
+ * @param   array   $A      Field definition and values
+ * @param   integer $uid    Optional user ID.  Zero is acceptable here.
+ * @return  string          Value to give the field
+ */
 function PRF_autogen($A, $uid=0)
 {
     if (!is_object($A) || empty($A)) {
@@ -397,14 +397,14 @@ function PRF_autogen($A, $uid=0)
 
 
 /**
-*   Show the site header, with or without left blocks according to config.
-*
-*   @since  1.0.2
-*   @see    COM_siteHeader()
-*   @param  string  $subject    Text for page title (ad title, etc)
-*   @param  string  $meta       Other meta info
-*   @return string              HTML for site header
-*/
+ * Show the site header, with or without left blocks according to config.
+ *
+ * @since   1.0.2
+ * @see     COM_siteHeader()
+ * @param   string  $subject    Text for page title (ad title, etc)
+ * @param   string  $meta       Other meta info
+ * @return  string              HTML for site header
+ */
 function PRF_siteHeader($subject='', $meta='')
 {
     global $_PRF_CONF, $LANG_PROFILE;
@@ -432,12 +432,12 @@ function PRF_siteHeader($subject='', $meta='')
 
 
 /**
-*   Show the site footer, with or without right blocks according to config.
-*
-*   @since  version 1.0.2
-*   @see    COM_siteFooter()
-*   @return string              HTML for site header
-*/
+ * Show the site footer, with or without right blocks according to config.
+ *
+ * @since   version 1.0.2
+ * @see     COM_siteFooter()
+ * @return  string              HTML for site header
+ */
 function PRF_siteFooter()
 {
     global $_PRF_CONF;
@@ -463,16 +463,16 @@ function PRF_siteFooter()
 
 
 /**
-*   Create a group selection dropdown, without the variable name.
-*   The default SEC_getGroupDropdown function includes the "select" tags
-*   with a hard-coded variable name ("group_id"), making it impossible to use
-*   more than once on a form.
-*
-*   @since  version 1.1.1
-*   @param  integer $group_id   Group ID selected by default
-*   @param  integer $access     Access needed (2=read, 3=write)
-*   @return string              HTML for the option selections
-*/
+ * Create a group selection dropdown, without the variable name.
+ * The default SEC_getGroupDropdown function includes the "select" tags
+ * with a hard-coded variable name ("group_id"), making it impossible to use
+ * more than once on a form.
+ *
+ * @since   version 1.1.1
+ * @param   integer $group_id   Group ID selected by default
+ * @param   integer $access     Access needed (2=read, 3=write)
+ * @return  string              HTML for the option selections
+ */
 function PRF_GroupDropdown($group_id, $access)
 {
     global $_TABLES;
@@ -503,18 +503,18 @@ function PRF_GroupDropdown($group_id, $access)
 
 
 /**
-*   Shows security control for an object
-*
-*   This will return the HTML needed to create the security control see on
-*   screen for profile items.
-*   Taken from SEC_getPermissionsHTML() to allow for no owner access
-*
-*   @param  int     $perm_owner     Permissions the owner has 3 = read/write, 2 = read only, 0 = none
-*   @param  int     $perm_group     Permission the group has
-*   @param  int     $perm_members   Permissions logged in members have
-*   @param  int     $perm_anon      Permissions anonymous users have
-*   @return string  needed HTML (table) in HTML $perm_owner = array of permissions [edit,read], etc edit = 1 if permission, read = 2 if permission
-*/
+ * Shows security control for an object.
+ *
+ * This will return the HTML needed to create the security control see on
+ * screen for profile items.
+ * Taken from SEC_getPermissionsHTML() to allow for no owner access
+ *
+ * @param   int     $perm_owner     Permissions the owner has 3 = read/write, 2 = read only, 0 = none
+ * @param   int     $perm_group     Permission the group has
+ * @param   int     $perm_members   Permissions logged in members have
+ * @param   int     $perm_anon      Permissions anonymous users have
+ * @return  string  needed HTML (table) in HTML $perm_owner = array of permissions [edit,read], etc edit = 1 if permission, read = 2 if permission
+ */
 function PRF_getPermissionsHTML($perm_owner,$perm_group,$perm_members,$perm_anon)
 {
     $retval = '';

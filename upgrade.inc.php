@@ -1,29 +1,29 @@
 <?php
 /**
-*   Upgrade routines for the Custom Profile plugin
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2016 Lee Garner <lee@leegarner.com>
-*   @package    profile
-*   @version    1.1.4
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Upgrade routines for the Custom Profile plugin
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2016 Lee Garner <lee@leegarner.com>
+ * @package     profile
+ * @version     1.1.4
+ * @license     http://opensource.org/licenses/gpl-2.0.php 
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 
 // Required to get the config values
 global $_CONF, $_PRF_CONF;
 
 
 /**
-*   Perform the upgrade starting at the current version.
-*   If a version has no upgrade activity, e.g. only a code change,
-*   then no upgrade section is required.  The version is bumped in
-*   functions.inc.
-*
-*   @param  string  $current_ver Current installed version to be upgraded
-*   @return integer Error code, 0 for success
-*/
+ * Perform the upgrade starting at the current version.
+ * If a version has no upgrade activity, e.g. only a code change,
+ * then no upgrade section is required.  The version is bumped in
+ * functions.inc.
+ *
+ * @param   string  $current_ver Current installed version to be upgraded
+ * @return  integer Error code, 0 for success
+ */
 function profile_do_upgrade($current_ver)
 {
     global $_PRF_CONF, $_PLUGIN_INFO;
@@ -92,10 +92,11 @@ function profile_do_upgrade($current_ver)
 
 
 /**
-*   Actually perform any sql updates
-*   @param string $version  Version being upgraded TO
-*   @param array  $sql      Array of SQL statement(s) to execute
-*/
+ * Actually perform any sql updates.
+ *
+ * @param   string $version  Version being upgraded TO
+ * @param   array  $sql      Array of SQL statement(s) to execute
+ */
 function profile_do_upgrade_sql($version, $sql='')
 {
     global $_TABLES, $_PRF_CONF;
@@ -120,13 +121,13 @@ function profile_do_upgrade_sql($version, $sql='')
 
 
 /**
-*   Update the plugin version number in the database.
-*   Called at each version upgrade to keep up to date with
-*   successful upgrades.
-*
-*   @param  string  $ver    New version to set
-*   @return boolean         True on success, False on failure
-*/
+ * Update the plugin version number in the database.
+ * Called at each version upgrade to keep up to date with
+ * successful upgrades.
+ *
+ * @param   string  $ver    New version to set
+ * @return  boolean         True on success, False on failure
+ */
 function profile_do_set_version($ver)
 {
     global $_TABLES, $_PRF_CONF;
@@ -655,13 +656,13 @@ function profile_upgrade_1_1_4()
 
 
 /**
-*   Create the database name for a field.
-*   Used when upgrading to 1.1.0 to change "fieldname" to "prf_fieldname".
-*
-*   @see    function profile_upgrade_1_1_0
-*   @param  string  $oldname    Original field name
-*   @return string              New fieldname
-*/
+ * Create the database name for a field.
+ * Used when upgrading to 1.1.0 to change "fieldname" to "prf_fieldname".
+ *
+ * @see     function profile_upgrade_1_1_0
+ * @param   string  $oldname    Original field name
+ * @return  string              New fieldname
+ */
 function PRF_dbname($oldname)
 {
     // Empty name? Do nothing.

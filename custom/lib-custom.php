@@ -1,44 +1,44 @@
 <?php
 /**
-*   Custom functions for including profile information into registration
-*   and account settings pages.
-*
-*   These functions should be includedi in private/system/lib-custom.php
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2016 Lee Garner <lee@leegarner.com>
-*   @package    profile
-*   @version    1.1.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Custom functions for including profile information into registration
+ * and account settings pages.
+ *
+ * These functions should be includedi in private/system/lib-custom.php
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2016 Lee Garner <lee@leegarner.com>
+ * @package     profile
+ * @version     1.1.0
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 
 /**
-*   Generate content for a specific field.
-*   This function generates a string for a field named "state". 
-*
-*   The function should be named "CUSTOM_profile_autogen_{fieldname}.
-*   Note that the internal field name is "prf_state", which should be used
-*   in the function name. The internal fields names are typically
-*   "prf_{name}" and can be seen in the profile item list.
-*
-*   @param  object  $A      Field Object
-*   @return string          Field Content
-*/
+ * Generate content for a specific field.
+ * This function generates a string for a field named "state".
+ *
+ * The function should be named "CUSTOM_profile_autogen_{fieldname}.
+ * Note that the internal field name is "prf_state", which should be used
+ * in the function name. The internal fields names are typically
+ * "prf_{name}" and can be seen in the profile item list.
+ *
+ * @param   object  $A      Field Object
+ * @return  string          Field Content
+ */
 /*function CUSTOM_profile_autogen_prf_state($A)
 {
     return 'CA';
 }*/
 
 /**
-*   Generate content for any field.
-*   This function handles all field names and types that are not handled
-*   by a field-specific function (see above).
-*
-*   @param  object  $A      Field Object
-*   @return string          Field Content
-*/
+ * Generate content for any field.
+ * This function handles all field names and types that are not handled
+ * by a field-specific function (see above).
+ *
+ * @param   object  $A      Field Object
+ * @return  string          Field Content
+ */
 /*function CUSTOM_profile_autogen($A)
 {
     switch ($A->name) {
@@ -62,6 +62,5 @@
     // Should always return something even if empty
     return '';
 }*/
-
 
 ?>

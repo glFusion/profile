@@ -410,13 +410,14 @@ function PRF_listLists()
 
 
 /**
-*   Determine what to display in the admin list for each field
-*   @param  string  $fieldname  Name of the field, from database
-*   @param  mixed   $fieldvalue Value of the current field
-*   @param  array   $A          Array of all name/field pairs
-*   @param  array   $icon_arr   Array of system icons
-*   @return string              HTML for the field cell
-*/
+ * Determine what to display in the admin list for each field.
+ *
+ * @param   string  $fieldname  Name of the field, from database
+ * @param   mixed   $fieldvalue Value of the current field
+ * @param   array   $A          Array of all name/field pairs
+ * @param   array   $icon_arr   Array of system icons
+ * @return  string              HTML for the field cell
+ */
 function PRF_getField_list($fieldname, $fieldvalue, $A, $icon_arr)
 {
     global $_CONF, $LANG_ACCESS, $LANG_PROFILE, $LANG_ADMIN;
@@ -541,13 +542,14 @@ function PRF_listFields()
 
 
 /**
-*   Determine what to display in the admin list for each field
-*   @param  string  $fieldname  Name of the field, from database
-*   @param  mixed   $fieldvalue Value of the current field
-*   @param  array   $A          Array of all name/field pairs
-*   @param  array   $icon_arr   Array of system icons
-*   @return string              HTML for the field cell
-*/
+ * Determine what to display in the admin list for each field.
+ *
+ * @param   string  $fieldname  Name of the field, from database
+ * @param   mixed   $fieldvalue Value of the current field
+ * @param   array   $A          Array of all name/field pairs
+ * @param   array   $icon_arr   Array of system icons
+ * @return  string              HTML for the field cell
+ */
 function PRF_getField_profile($fieldname, $fieldvalue, $A, $icon_arr)
 {
     global $_CONF, $LANG_ACCESS, $_PRF_CONF, $LANG_ADMIN, $LANG_PROFILE;
@@ -642,9 +644,10 @@ function PRF_getField_profile($fieldname, $fieldvalue, $A, $icon_arr)
 
 
 /**
-*   Saves the current form entries as a new or existing record
-*   @param  array   $A          Array of all values from the submitted form
-*/
+ * Saves the current form entries as a new or existing record.
+ *
+ * @param   array   $A          Array of all values from the submitted form
+ */
 function PRF_saveDefs($A)
 {
     global $_TABLES;
@@ -897,13 +900,13 @@ function PRF_saveDefs($A)
 
 
 /**
-*   Move a profile definition up or down the admin list.
-*
-*   @param  string  $table  Name of table in $_TABLES array
-*   @param  string  $id_fld Name of "ID" field
-*   @param  mixed   $id_val Record ID to move
-*   @param  string  $where  Direction to move ('up' or 'down')
-*/
+ * Move a profile definition up or down the admin list.
+ *
+ * @param   string  $table      Name of table in $_TABLES array.
+ * @param   string  $id_fld     Name of "ID" field.
+ * @param   mixed   $id_val     Record ID to move.
+ * @param   string  $where      Direction to move ('up' or 'down').
+ */
 function PRF_moveRow($table, $id_fld, $id_val, $where)
 {
     global $_CONF, $_TABLES, $LANG21;
@@ -939,10 +942,11 @@ function PRF_moveRow($table, $id_fld, $id_val, $where)
 
 
 /**
-*   Create the admin menu at the top of the list and form pages.
-*
-*   @return string      HTML for admin menu section
-*/
+ * Create the admin menu at the top of the list and form pages.
+ *
+ * @param   string  $page   Current page key
+ * @return  string      HTML for admin menu section
+ */
 function PRF_adminMenu($page='list')
 {
     global $_CONF, $LANG_PROFILE, $_PRF_CONF, $LANG01;
@@ -1022,7 +1026,7 @@ function PRF_permReset()
 
 
 /**
-*   Create a form to collect search parameters for users
+*   Create a form to collect search parameters for users.
 *
 *   @since  version 1.1.0
 *   @return string      HTML for form

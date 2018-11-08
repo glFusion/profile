@@ -14,8 +14,8 @@
 namespace Profile;
 
 /**
-*   Class for Classifieds Cache
-*   @package classifieds
+*   Class for Profile Cache
+*   @package profile
 */
 class Cache
 {

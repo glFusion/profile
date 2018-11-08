@@ -21,6 +21,10 @@ class checkbox extends \Profile\Field
     /**
     *   Constructor.
     *   Set up the options array
+    *
+    *   @param  mixed   $item   Name of item, or array of info
+    *   @param  mixed   $value  Optional value to assign
+    *   @param  integer $uid    Optional user ID, current user by default
     */
     public function __construct($item, $value='', $uid='')
     {

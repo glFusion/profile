@@ -1,38 +1,38 @@
 <?php
 /**
-*   Class to handle individual profile items.
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
-*   @package    profile
-*   @version    1.2.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to handle individual profile items.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
+ * @package     profile
+ * @version     1.2.0
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Profile;
 
 /**
-*   Class for profile items
-*   @package    profile
-*   @since      1.1.0
-*/
+ * Base class for profile fields.
+ * @package     profile
+ * @since       @version 1.1.0
+ */
 class Field
 {
-    /** Options for this item
+    /** Options for this item.
         Public, but should be accessed via getOption()
         @var array */
     public $options = array();
 
-    /** CSS class to use on the entry form
+    /** CSS class to use on the entry form.
         @var string */
     protected $_frmClass = '';
 
-    /** Set to "DISABLED" if this item is read-only, to disable frm entry
+    /** Set to "DISABLED" if this item is read-only, to disable frm entry.
         @var string */
     protected $_frmReadonly = '';
 
-    /** Properties array
+    /** Properties array.
         @var array */
     private $properties = array();
 
@@ -42,12 +42,12 @@ class Field
 
 
     /**
-    *   Constructor.  Sets the local properties using the array $item.
-    *
-    *   @param  mixed   $item   Name of item, or array of info
-    *   @param  mixed   $value  Optional value to assign
-    *   @param  integer $uid    Optional user ID, current user by default
-    */
+     * Constructor.  Sets the local properties using the array $item.
+     *
+     * @param   mixed   $item   Name of item, or array of info
+     * @param   mixed   $value  Optional value to assign
+     * @param   integer $uid    Optional user ID, current user by default
+     */
     public function __construct($item=NULL, $value='', $uid = '')
     {
         global $_USER, $_TABLES, $_PRF_CONF;
@@ -133,11 +133,11 @@ class Field
 
 
     /**
-    *   Set a property's value
-    *
-    *   @param  string  $key    Name of property
-    *   @param  mixed   $value  Value of property
-    */
+     * Set a property's value
+     *
+     * @param   string  $key    Name of property
+     * @param   mixed   $value  Value of property
+     */
     public function __set($key, $value)
     {
         switch ($key) {
@@ -170,11 +170,11 @@ class Field
 
 
     /**
-    *   Get the value of a property, NULL if undefined
-    *
-    *   @param  string  $key    Name of property
-    *   @return mixed           Value of property
-    */
+     * Get the value of a property, NULL if undefined
+     *
+     * @param   string  $key    Name of property
+     * @return  mixed           Value of property
+     */
     public function __get($key)
     {
         if (array_key_exists($key, $this->properties)) {
@@ -186,11 +186,12 @@ class Field
 
 
     /**
-    *   Return a formatted value.
-    *   This default function simply returns the current value unchanged.
-    *
-    *   @return string  Value formatted for display
-    */
+     * Return a formatted value.
+     * This default function simply returns the current value unchanged.
+     *
+     * @param   mixed   $value  Raw value
+     * @return  string  Value formatted for display
+     */
     public function FormatValue($value = '')
     {
         if ($value == '') $value = $this->value;
@@ -199,9 +200,9 @@ class Field
 
 
     /**
-    *   Initialize common form field requirements.
-    *   This can be called by child classes in their FormField() function
-    */
+     * Initialize common form field requirements.
+     * This can be called by child classes in their FormField() function
+     */
     protected function _FormFieldInit()
     {
         global $_SYSTEM;
@@ -244,11 +245,11 @@ class Field
 
 
     /**
-    *   Provide a form field for editing this data item.
-    *   This provides a text input field, to be overridden by child classes
-    *
-    *   @return string  HTML for data entry field
-    */
+     * Provide a form field for editing this data item.
+     * This provides a text input field, to be overridden by child classes
+     *
+     * @return  string  HTML for data entry field
+     */
     public function FormField()
     {
         $this->_FormFieldInit();
@@ -266,10 +267,10 @@ class Field
 
 
     /**
-    *   Get the available options for this field.
-    *
-    *   @return array   Field options
-    */
+     * Get the available options for this field.
+     *
+     * @return  array   Field options
+     */
     public function Options()
     {
         return $this->options;
@@ -277,14 +278,14 @@ class Field
 
 
     /**
-    *   Sanitize the value.
-    *   Does not make it database-safe, just strips invalid or objectionable
-    *   material.
-    *   This will depend largely upon the type of field.
-    *
-    *   @param  mixed   $val    Current field value
-    *   @return mixed           Sanitized value.
-    */
+     * Sanitize the value.
+     * Does not make it database-safe, just strips invalid or objectionable
+     * material.
+     * This will depend largely upon the type of field.
+     *
+     * @param   mixed   $val    Current field value
+     * @return  mixed           Sanitized value.
+     */
     public function Sanitize($val)
     {
         //$val = COM_checkWords(COM_checkHTML($val));
@@ -293,11 +294,11 @@ class Field
 
 
     /**
-    *   Check if this item should be publicly displayed in the user's
-    *   profile.
-    *
-    *   @return boolean     True if publicly visible, False if not
-    */
+     * Check if this item should be publicly displayed in the user's
+     * profile.
+     *
+     * @return  boolean     True if publicly visible, False if not
+     */
     public function isPublic()
     {
         return $this->show_in_profile ? true : false;
@@ -306,10 +307,10 @@ class Field
 
 
     /**
-    *   Prepare this item's values to be saved in the database
-    *
-    *   @return string      DB-safe version of the value(s)
-    */
+     * Prepare this item's values to be saved in the database
+     *
+     * @return  string      DB-safe version of the value(s)
+     */
     public function prepareForDB()
     {
         return DB_escapeString($this->value);
@@ -317,11 +318,11 @@ class Field
 
 
     /**
-    *   Create the form elements for editing the value selections
-    *   Returns the default value for single-value fields (text, textarea, etc)
-    *
-    *   @return array   Array of name=>value pairs for Template::set_var()
-    */
+     * Create the form elements for editing the value selections
+     * Returns the default value for single-value fields (text, textarea, etc)
+     *
+     * @return  array   Array of name=>value pairs for Template::set_var()
+     */
     public function editValues()
     {
         return array(
@@ -333,14 +334,14 @@ class Field
 
 
     /**
-    *   Get a value from the options array, returning a default if not set.
-    *   This is just a helper function to avoid "invalid index" errors for
-    *   options that aren't set.
-    *
-    *   @param  string  $name       Name of option
-    *   @param  mixed   $default    Default return value
-    *   @return mixed       Option value, or default if not set
-    */
+     * Get a value from the options array, returning a default if not set.
+     * This is just a helper function to avoid "invalid index" errors for
+     * options that aren't set.
+     *
+     * @param   string  $name       Name of option
+     * @param   mixed   $default    Default return value
+     * @return  mixed       Option value, or default if not set
+     */
     public function getOption($name, $default='')
     {
         return isset($this->options[$name]) ? $this->options[$name] : $default;
@@ -348,11 +349,12 @@ class Field
 
 
     /**
-    *   Check if a field has valid data.  Used in conjuction with the "required" flag.
-    *
-    *   @param  array   $vals   Array of name->value pairs
-    *   @return booldan         True if data is valid, False if not
-    */
+     * Check if a field has valid data.
+     * Used in conjuction with the "required" flag.
+     *
+     * @param   array   $vals   Array of name->value pairs
+     * @return  boolean         True if data is valid, False if not
+     */
     public function validData($vals)
     {
         if (isset($vals[$this->name])) {
@@ -410,16 +412,16 @@ class Field
 
 
     /**
-    *   Get an instance of the class based on the type of field definition.
-    *   If the requested class doesn't exist, return a text field object.
-    *   If an array is passed in, get the type from it. Otherwise read the
-    *   definition record to get the correct type.
-    *
-    *   @param  array   $A      Row from profile_def table
-    *   @param  mixed   $value  Data value to pass to class
-    *   @param  integer $uid    User ID to pass to class
-    *   @return object          Class instsnce
-    */
+     * Get an instance of the class based on the type of field definition.
+     * If the requested class doesn't exist, return a text field object.
+     * If an array is passed in, get the type from it. Otherwise read the
+     * definition record to get the correct type.
+     *
+     * @param   array   $A      Row from profile_def table
+     * @param   mixed   $value  Data value to pass to class
+     * @param   integer $uid    User ID to pass to class
+     * @return  object          Class instsnce
+     */
     public static function getInstance($A, $value='', $uid=0)
     {
         global $_TABLES;
@@ -464,11 +466,11 @@ class Field
 
 
     /**
-    *   Displays a form for editing a profile definition.
-    *
-    *   @param  integer $id     Database ID of item to edit, 0 for new item
-    *   @return string          HTML for the form
-    */
+     * Displays a form for editing a profile definition.
+     *
+     * @param   integer $id     Database ID of item to edit, 0 for new item
+     * @return  string          HTML for the form
+     */
     public function Edit()
     {
         global $_TABLES, $_CONF, $LANG_PROFILE, $LANG_ADMIN, $_PRF_CONF;
@@ -555,9 +557,10 @@ class Field
 
 
     /**
-    *   Saves the current form entries as a new or existing record
-    *   @param  array   $A          Array of all values from the submitted form
-    */
+     * Saves the current form entries as a new or existing record.
+     *
+     * @param   array   $A          Array of all values from the submitted form
+     */
     public function saveDef($A)
     {
         global $_TABLES;
@@ -668,11 +671,11 @@ class Field
 
 
     /**
-    *   Get the field-modification part of the SQL statement, if any.
-    *
-    *   @param  array   $A      Array of form fields.
-    *   @return string          SQL statement fragment.
-    */
+     * Get the field-modification part of the SQL statement, if any.
+     *
+     * @param   array   $A      Array of form fields.
+     * @return  string          SQL statement fragment.
+     */
     private function getDataSql($A)
     {
         $sql = '';
@@ -690,8 +693,8 @@ class Field
 
 
     /**
-    *   Reorder all items in a table.
-    */
+     * Reorder all items in a table.
+     */
     private static function reOrder()
     {
         global $_TABLES;
@@ -718,11 +721,11 @@ class Field
 
 
     /**
-    *   Prepare to save a value to the DB
-    *
-    *   @param  array   $vals   Array of all submitted values
-    *   @return mixed           String to be saved for this item
-    */
+     * Prepare to save a value to the DB.
+     *
+     * @param   array   $vals   Array of all submitted values
+     * @return  mixed           String to be saved for this item
+     */
     public function prepareToSave($vals)
     {
         if (isset($vals[$this->name])) {
@@ -740,10 +743,10 @@ class Field
 
 
     /**
-    *   Get field-specific options for the user search form
-    *
-    *   @return string      HTML input options
-    */
+     * Get field-specific options for the user search form.
+     *
+     * @return  string      HTML input options
+     */
     public function searchFormOpts()
     {
         return '<input type="text" size="50" name="'.$this->name.'" value="" />';
@@ -751,12 +754,12 @@ class Field
 
 
     /**
-    *   Create the search sql for this field
-    *
-    *   @param  array   $post   Values from $_POST
-    *   @param  string  $tbl    Table indicator
-    *   @return string          SQL query fragment
-    */
+     * Create the search sql for this field.
+     *
+     * @param   array   $post   Values from $_POST
+     * @param   string  $tbl    Table indicator
+     * @return  string          SQL query fragment
+     */
     public function createSearchSQL($post, $tbl='data')
     {
         if (!isset($post[$this->name])) return '';
@@ -774,12 +777,12 @@ class Field
 
 
     /**
-    *   Actually gets the options array specific to this field.
-    *   Default- do nothing, return options array
-    *
-    *   @param  array   $A      Form values
-    *   @return array           Array of options to save
-    */
+     * Actually gets the options array specific to this field.
+     * Default- do nothing, return options array
+     *
+     * @param   array   $A      Form values
+     * @return  array           Array of options to save
+     */
     public function setOptions($A)
     {
         return $this->options;

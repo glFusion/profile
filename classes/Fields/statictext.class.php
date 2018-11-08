@@ -19,6 +19,13 @@ namespace Profile\Fields;
 */
 class statictext extends \Profile\Field
 {
+    /**
+     * Call the parent constructor and initialize values for this object.
+     *
+     * @param   mixed   $item   Name of item, or array of info
+     * @param   mixed   $value  Optional value to assign
+     * @param   integer $uid    Optional user ID
+     */
     public function __construct($item, $value='', $uid='')
     {
         parent::__construct($item, $value, $uid);

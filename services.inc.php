@@ -1,35 +1,35 @@
 <?php
 /**
-*   Web service functions for the Profile plugin
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2011 Lee Garner <lee@leegarner.com>
-*   @package    profile
-*   @version    1.1.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Web service functions for the Profile plugin.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011 Lee Garner <lee@leegarner.com>
+ * @package     profile
+ * @version     1.1.0
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 
 if (!defined ('GVERSION')) {
     die ('This file can not be used on its own!');
 }
 
 /**
-*   Set system values in a user's profile.
-*   If profile data doesn't exist for the user, then a record is
-*   created.
-*
-*   The $args array must contain:
-*       'uid' => user_id
-*       'field' => field_name
-*       'value' => new_value
-*
-*   @param  array   $args       Array of UID, Field and Value.
-*   @param  mixed   &$output    Unused.
-*   @param  string  &$svc_msg   Unused.
-*   @return integer             Status of update
-*/
+ * Set system values in a user's profile.
+ * If profile data doesn't exist for the user, then a record is
+ * created.
+ *
+ * The $args array must contain:
+ *      'uid' => user_id
+ *      'field' => field_name
+ *      'value' => new_value
+ *
+ * @param   array   $args       Array of UID, Field and Value.
+ * @param   mixed   &$output    Unused.
+ * @param   string  &$svc_msg   Unused.
+ * @return  integer             Status of update
+ */
 function service_setvalue_profile($args, &$output, &$svc_msg)
 {
     global $_TABLES;
@@ -78,17 +78,17 @@ function service_setvalue_profile($args, &$output, &$svc_msg)
 
 
 /**
-*   Set the system values for a user profile.
-*   This allows another plugin to update this information.
-*   Similar to service_setvalue_profile(), except that this only sets the
-*   known system values and doesn't need to check that the columns exist, and
-*   the update is done in a single query.
-*
-*   @param  array   $args       Array of sys_expires and sys_membership
-*   @param  array   &$output    Pointer to output array (unused)
-*   @param  array   &$svc_msg   Unused
-*   @return integer             Status code
-*/
+ * Set the system values for a user profile.
+ * This allows another plugin to update this information.
+ * Similar to service_setvalue_profile(), except that this only sets the
+ * known system values and doesn't need to check that the columns exist, and
+ * the update is done in a single query.
+ *
+ * @param   array   $args       Array of sys_expires and sys_membership
+ * @param   array   &$output    Pointer to output array (unused)
+ * @param   array   &$svc_msg   Unused
+ * @return  integer             Status code
+ */
 function service_setSysValues_profile($args, &$output, &$svc_msg)
 {
     global $_TABLES, $_USER;
@@ -124,13 +124,13 @@ function service_setSysValues_profile($args, &$output, &$svc_msg)
 
 
 /**
-*   Get the child accounts of the supplied user ID
-*
-*   @param  array   $args       Optional 'uid' element
-*   @param  array   &$output    Set to array of child IDs, or empty
-*   @param  mixed   &$svc_msg   Not used
-*   @return integer             Return code
-*/
+ * Get the child accounts of the supplied user ID.
+ *
+ * @param   array   $args       Optional 'uid' element
+ * @param   array   &$output    Set to array of child IDs, or empty
+ * @param   mixed   &$svc_msg   Not used
+ * @return  integer             Return code
+ */
 function service_getChildAccounts_profile($args, &$output, &$svc_msg)
 {
     global $_TABLES, $_USER;
@@ -152,13 +152,13 @@ function service_getChildAccounts_profile($args, &$output, &$svc_msg)
 
 
 /**
-*   Get the parent account of the supplied user ID
-*
-*   @param  array   $args       Optional 'uid' element
-*   @param  mixed   &$output    Output, contains parent uid or zero
-*   @param  mixed   &$svc_msg   Not used
-*   @return integer             Return code
-*/
+ * Get the parent account of the supplied user ID.
+ *
+ * @param   array   $args       Optional 'uid' element
+ * @param   mixed   &$output    Output, contains parent uid or zero
+ * @param   mixed   &$svc_msg   Not used
+ * @return  integer             Return code
+ */
 function service_getParentAccount_profile($args, &$output, &$svc_msg)
 {
     global $_TABLES, $_USER;
@@ -175,14 +175,14 @@ function service_getParentAccount_profile($args, &$output, &$svc_msg)
 
 
 /**
-*   Return one or more value from the data table corresponding to
-*   a specific user ID and item name(s).
-*
-*   @param  array       $args       mixed 'item' and optional 'uid'
-*   @param  reference   $output     Output array
-*   @param  reference   $svc_msg    Service messages
-*   @return integer     Result code
-*/
+ * Return one or more value from the data table corresponding to
+ * a specific user ID and item name(s).
+ *
+ * @param   array       $args       mixed 'item' and optional 'uid'
+ * @param   reference   $output     Output array
+ * @param   reference   $svc_msg    Service messages
+ * @return  integer     Result code
+ */
 function service_getValues_profile($args, &$output, &$svc_msg)
 {
     global $_TABLES, $_USER;
@@ -217,14 +217,14 @@ function service_getValues_profile($args, &$output, &$svc_msg)
 
 
 /**
-*   Create an edit form similar to the Account Settings section.
-*   Does not include the <form> tags, leaving the action up to the caller.
-*
-*   @param  array       $args       mixed 'item' and optional 'uid'
-*   @param  reference   $output     Output array
-*   @param  reference   $svc_msg    Service messages
-*   @return integer     Result code
-*/
+ * Create an edit form similar to the Account Settings section.
+ * Does not include the <form> tags, leaving the action up to the caller.
+ *
+ * @param   array       $args       mixed 'item' and optional 'uid'
+ * @param   reference   $output     Output array
+ * @param   reference   $svc_msg    Service messages
+ * @return  integer     Result code
+ */
 function service_renderForm_profile($args, &$output, &$svc_msg)
 {
     global $_USER;
@@ -241,15 +241,15 @@ function service_renderForm_profile($args, &$output, &$svc_msg)
 
 
 /**
-*   Allow other plugins to pass profile data to be saved.
-*   The form should be created with service_renderForm_profile() to ensure
-*   that all the variables are present and named correctly.
-*
-*   @param  array       $args       mixed 'item' and optional 'uid'
-*   @param  reference   $output     Output array
-*   @param  reference   $svc_msg    Service messages
-*   @return integer     Result code
-*/
+ * Allow other plugins to pass profile data to be saved.
+ * The form should be created with service_renderForm_profile() to ensure
+ * that all the variables are present and named correctly.
+ *
+ * @param   array       $args       mixed 'item' and optional 'uid'
+ * @param   reference   $output     Output array
+ * @param   reference   $svc_msg    Service messages
+ * @return  integer     Result code
+ */
 function service_saveData_profile($args, &$output, &$svc_msg)
 {
     global $_USER;
@@ -265,6 +265,5 @@ function service_saveData_profile($args, &$output, &$svc_msg)
     if ($status) return PLG_RET_OK;
     else return PLG_RET_ERROR;
 }
-
 
 ?>

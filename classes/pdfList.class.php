@@ -19,6 +19,11 @@ namespace Profile;
 */
 class pdfList extends htmlList
 {
+    /**
+     * Call the parent constructor.
+     *
+     * @param   integer $listid     ID of list to generate
+     */
     public function __construct($listid='')
     {
         parent::__construct($listid);
@@ -28,7 +33,7 @@ class pdfList extends htmlList
     /**
     *   Create the report
     *
-    *   @param  $filename   Filename to save to disk, empty to show in browser
+    *   @param  string  $filename   Filename to save to disk, empty to show in browser
     */
     public function Render($filename = '')
     {
