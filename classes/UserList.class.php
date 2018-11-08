@@ -1,15 +1,15 @@
 <?php
 /**
-*   Class to handle profile lists
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
-*   @package    profile
-*   @version    1.2.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to handle profile lists
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
+ * @package     profile
+ * @version     1.2.0
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Profile;
 
 /** Import user library for USER_getPhoto() */
@@ -20,38 +20,97 @@ define('PRF_EXP_ARREARS',   2);
 define('PRF_EXP_EXPIRED',   4);
 
 /**
-*   Class for profile lists
-*   @package profile
-*/
+ * Class for profile lists.
+ * @package profile
+ */
 class UserList
 {
-    protected $listid;    // List identifier string
-    protected $title;     // Title string
-    protected $orderby;   // List order of apperarance
-    protected $fields;    // Array of Fields included in this list
-    protected $group_id;  // Group with View access to this list
-    private $incl_grp;  // User group included in this list
-    private $incl_user_stat;    // User statuses included in list
-    private $isNew = true;  // Indicate whether this is a new list or an update
-    protected $isAdmin = false;   // Indicate whether this user is an admin
-    private $showMenu = false;  // Indicate whether the menu should be shown
-    private $show_export = false;  // Indicate whether to show the Export link
-    private $hasExtras = false; // Indicate whether to show the search form
-    private $dir_optional = false;  // Respect the show_directory preference?
-    private $access_sql;    // Restrict access to lists by group membership
-    private $sortby;        // Field to order by
-    private $sortdir;       // Directory to order list (ASC or DESC)
-    private $incl_exp_stat = 0;  // Account expiration statuses to include
-    private $name_format = 0;   // Fname Lname, 1 = "Lname, Fname"
-    private $pi_query = '';     // Query string obtained from plugins
-    private $pi_filter = '';    // Plugin-supplied search form items
+    /** List identifier string.
+     * @var string */
+    protected $listid;
+
+    /** Title string.
+     * @var string */
+    protected $title;
+
+    /** List order of apperarance.
+     * @var integer */
+    protected $orderby;
+
+    /** Array of Fields included in this list.
+     * @var array */
+    protected $fields;
+
+    /** Group with View access to this list.
+     * @var integer */
+    protected $group_id;
+
+    /** User group included in this list.
+     * @var integer */
+    private $incl_grp;
+
+    /** User statuses included in list.
+     * @var boolean */
+    private $incl_user_stat;
+
+    /** Indicate whether this is a new list or an update.
+     * @var boolean */
+    private $isNew = true;
+
+    /** Indicate whether this user is an admin.
+     * @var boolean */
+    protected $isAdmin = false;
+
+    /** Indicate whether the menu should be shown.
+     * @var boolean; */
+    private $showMenu = false;
+
+    /** Indicate whether to show the Export link.
+     * @var boolean */
+    private $show_export = false;
+
+    /** Indicate whether to show the search form.
+     * @var boolean */
+    private $hasExtras = false;
+
+    /** Respect the show_directory preference?
+     * @var boolean */
+    private $dir_optional = false;
+
+    /** SQL clause to restrict access by group membership
+     * @var string*/
+    private $access_sql;
+
+    /** Field to order by.
+     * @var string */
+    private $sortby;
+
+    /** Directory to order list (ASC or DESC).
+     * @var string */
+    private $sortdir;
+
+    /** Account expiration statuses to include.
+     * @var integer */
+    private $incl_exp_stat = 0;
+
+    /** Fname Lname, 1 = "Lname, Fname".
+     * @var integer */
+    private $name_format = 0;
+
+    /** Query string obtained from plugins.
+     * @var string */
+    private $pi_query = '';
+
+    /** Plugin-supplied search form items.
+     * @var string */
+    private $pi_filter = '';
 
 
     /**
-    *   Constructor.
-    *
-    *   @param  string  $listid List ID to edit or display, empty for new list
-    */
+     * Constructor.
+     *
+     * @param   string  $listid List ID to edit or display, empty for new list
+     */
     public function __construct($listid = '')
     {
         global $_GROUPS, $_USER;
@@ -89,10 +148,10 @@ class UserList
 
 
     /**
-    *   Read a list record from the database.
-    *
-    *   @param  string  $listid     Optional list ID, current ID if empty
-    */
+     * Read a list record from the database.
+     *
+     * @param   string  $listid     Optional list ID, current ID if empty
+     */
     public function Read($listid = '')
     {
         global $_TABLES, $LANG_PROFILE;
@@ -131,12 +190,12 @@ class UserList
 
 
     /**
-    *   Set this objects variables from an array.
-    *   If $fromDB is true, the fields are unserialized from the stored string.
-    *
-    *   @param  array   $A  Array of name=>value pairs
-    *   @param  boolean $fromDB True if $A is from the database
-    */
+     * Set this objects variables from an array.
+     * If $fromDB is true, the fields are unserialized from the stored string.
+     *
+     * @param   array   $A  Array of name=>value pairs
+     * @param   boolean $fromDB True if $A is from the database
+     */
     public function SetVars($A=array(), $fromDB=false)
     {
         if (empty($A)) return;
@@ -210,16 +269,16 @@ class UserList
 
 
     /**
-    *   Get the query SQL for this list.
-    *   This function goes through all the plugins and incorporates their
-    *   profile SQL to create one query.
-    *
-    *   @since  version 1.1.1
-    *   @uses   _usersInGroup()
-    *   @param  string  $query  Optional query, needed by Export()
-    *   @param  array   $extras Extras field info to be used by the list func.
-    *   @return string      SQL query to find users in the list
-    */
+     * Get the query SQL for this list.
+     * This function goes through all the plugins and incorporates their
+     * profile SQL to create one query.
+     *
+     * @since   version 1.1.1
+     * @uses    _usersInGroup()
+     * @param   string  $query  Optional query, needed by Export()
+     * @param   array   $extras Extras field info to be used by the list func.
+     * @return  string      SQL query to find users in the list
+     */
     protected function _getListSQL($query='', &$extras=array('f_info'=>array()))
     {
         global $_TABLES, $_PLUGINS, $_PRF_CONF;
@@ -332,12 +391,12 @@ class UserList
 
 
     /**
-    *   Set the fullname format if fullname is one of the fields.
-    *   Iterate through the fields and if the full name is present, set the
-    *   name format. $name_format is set to zero by default.
-    *
-    *   @since  version 1.1.3
-    */
+     * Set the fullname format if fullname is one of the fields.
+     * Iterate through the fields and if the full name is present, set the
+     * name format. $name_format is set to zero by default.
+     *
+     * @since   version 1.1.3
+     */
     private function _setFullnameFormat()
     {
         foreach ($this->fields as $key=>$fld) {
@@ -349,13 +408,13 @@ class UserList
 
 
     /**
-    *   Set the query fields into an array.
-    *   This is sent by Render() to ADMIN_list(), but is also needed by
-    *   Export() which has to construct the query itself.
-    *
-    *   @since  version 1.1.3
-    *   @return array   Array of searchable fields
-    */
+     * Set the query fields into an array.
+     * This is sent by Render() to ADMIN_list(), but is also needed by
+     * Export() which has to construct the query itself.
+     *
+     * @since   version 1.1.3
+     * @return  array   Array of searchable fields
+     */
     private function _setQueryFields()
     {
         $query_fields = array();
@@ -383,35 +442,28 @@ class UserList
 
 
     /**
-    *   Render the list using the ADMIN_ list functions in lib-admin.php
-    *   Need to have a function available outside the object to handle
-    *   the field display.
-    *   If $autotag is true, then nothing is returned if the user doesn't
-    *   have access to the list.  If false, an error block is returned.
-    *
-    *   @uses   _getListSQL()
-    *   @uses   _getListMenu()
-    *   @uses   _setNameFormat()
-    *   @uses   _getQueryFields()
-    *   @param  boolean $autotag    True if being displayed by an autotag
-    *   @return string      HTML for the user list
-    */
+     * Render the list using the ADMIN_ list functions in lib-admin.php.
+     * Need to have a function available outside the object to handle
+     * the field display.
+     * If $autotag is true, then nothing is returned if the user doesn't
+     * have access to the list.  If false, an error block is returned.
+     *
+     * @uses    _getListSQL()
+     * @uses    _getListMenu()
+     * @uses    _setNameFormat()
+     * @uses    _getQueryFields()
+     * @param   boolean $autotag    True if being displayed by an autotag
+     * @return  string      HTML for the user list
+     */
     public function Render($autotag=false)
     {
         global $_CONF, $_TABLES, $LANG_ADMIN, $LANG_PROFILE, $_PRF_CONF,
                 $LANG_ADMIN, $_SYSTEM;
 
         if ($this->listid == '') {
-            // Get the first available list
-            $sql = "SELECT * FROM {$_TABLES['profile_lists']}
-                    {$this->access_sql}
-                    ORDER BY orderby ASC LIMIT 1";
-            //echo $sql;die;
-            $r = DB_query($sql, 1);
-            if ($r && DB_numRows($r) == 1) {
-                $A = DB_fetchArray($r, false);
-                $this->Read($A['listid']);
-            }
+            // Get the first list if none specified, return empty string
+            // if no list found.
+            if (!$this->getFirst()) return '';
         }
 
         $retval = '';
@@ -555,11 +607,11 @@ class UserList
 
 
     /**
-    *   Get the query string from $_POST or $_GET, preferring $_GET.
-    *
-    *   @since  version 1.1.3
-    *   @return string  User-supplied query
-    */
+     * Get the query string from $_POST or $_GET, preferring $_GET.
+     *
+     * @since   version 1.1.3
+     * @return  string  User-supplied query
+     */
     private function _getQuery()
     {
         if (isset($_GET['q'])) {
@@ -575,15 +627,15 @@ class UserList
 
 
     /**
-    *   Export a member list as a CSV file.
-    *
-    *   @since  version 1.1.1
-    *   @uses   _getListSQL()
-    *   @uses   showExport()
-    *   @uses   _setNameFormat()
-    *   @uses   _getQueryFields()
-    *   @return string      CSV output, or false for error/no access
-    */
+     * Export a member list as a CSV file.
+     *
+     * @since   version 1.1.1
+     * @uses    _getListSQL()
+     * @uses    showExport()
+     * @uses    _setNameFormat()
+     * @uses    _getQueryFields()
+     * @return  string      CSV output, or false for error/no access
+     */
     public function Export()
     {
         global $_TABLES;
@@ -610,19 +662,9 @@ class UserList
         }
 
         // If no list ID was specified, get the first available list that
-        // the user can access
+        // the user can access. Return empty string if none found.
         if ($this->listid == '') {
-            $sql = "SELECT * FROM {$_TABLES['profile_lists']}
-                    {$this->access_sql}
-                    ORDER BY listid ASC LIMIT 1";
-            //echo $sql;die;
-            $r = DB_query($sql, 1);
-            if ($r && DB_numRows($r) == 1) {
-                $A = DB_fetchArray($r, false);
-                $this->Read($A['listid']);
-            } else {
-                return false;
-            }
+            if (!$this->getFirst()) return '';
         }
 
         // Get the requested sort field & direction, or use the default
@@ -710,10 +752,10 @@ class UserList
 
 
     /**
-    *   Gets a menu of available lists and returns the tabbed menu.
-    *
-    *   @return string      HTML for menu list
-    */
+     * Gets a menu of available lists and returns the tabbed menu.
+     *
+     * @return  string      HTML for menu list
+     */
     private function _getListMenu()
     {
         global $_TABLES;
@@ -746,10 +788,10 @@ class UserList
 
 
     /**
-    *   Edit a list definition
-    *
-    *   @return string      HTML for the edit form
-    */
+     * Edit a list definition
+     *
+     * @return  string      HTML for the edit form
+     */
     public function Edit()
     {
         global $_CONF, $_TABLES, $LANG_PROFILE, $LANG_ACCESS, $_PLUGINS,
@@ -926,10 +968,10 @@ class UserList
 
 
     /**
-    *   Save a list definition
-    *
-    *   @param  array   $A  Variables, typically from $_POST
-    */
+     * Save a list definition
+     *
+     * @param   array   $A  Variables, typically from $_POST
+     */
     public function Save($A = array())
     {
         global $_TABLES;
@@ -960,11 +1002,11 @@ class UserList
 
 
     /**
-    *   Set the showExport property.  This is "false" by default.
-    *   This property determines whether the export link is shown by Render().
-    *
-    *   @param  boolean $value  New value to set, default = true
-    */
+     * Set the showExport property.  This is "false" by default.
+     * This property determines whether the export link is shown by Render().
+     *
+     * @param   boolean $value  New value to set, default = true
+     */
     public function showExport($value = TRUE)
     {
         if ($value !== FALSE &&
@@ -978,11 +1020,11 @@ class UserList
 
 
     /**
-    *   Set the showMenu property.  This is "false" by default.
-    *   This property determines whether the menu of lists is shown by Render().
-    *
-    *   @param  boolean $value  New value to set, default = true
-    */
+     * Set the showMenu property.  This is "false" by default.
+     * This property determines whether the menu of lists is shown by Render().
+     *
+     * @param   boolean $value  New value to set, default = true
+     */
     public function showMenu($value = true)
     {
         if ($value !== FALSE) $value = TRUE;
@@ -991,11 +1033,11 @@ class UserList
 
 
     /**
-    *   Set the hasExtras property.  This is "false" by default.
-    *   This property determines whether the search form is shown with the list.
-    *
-    *   @param  boolean $value  New value to set, default = true
-    */
+     * Set the hasExtras property.  This is "false" by default.
+     * This property determines whether the search form is shown with the list.
+     *
+     * @param   boolean $value  New value to set, default = true
+     */
     public function hasExtras($value = true)
     {
         if ($value !== FALSE) $value = TRUE;
@@ -1004,13 +1046,13 @@ class UserList
 
 
     /**
-    *   Get all the users in a specified group or sub-group
-    *   Borrowed nearly verbatim from GROUP_UsersInGroup()
-    *
-    *   @param  integer $group_id   Requested group ID
-    *   @return string      Comma-separated list of user IDs
-    */
-    private function _usersInGroup($group_id, $allusers = false)
+     * Get all the users in a specified group or sub-group.
+     * Borrowed nearly verbatim from GROUP_UsersInGroup().
+     *
+     * @param   integer $group_id   Requested group ID
+     * @return  string      Comma-separated list of user IDs
+     */
+    private function _usersInGroup($group_id)
     {
         global $_TABLES;
 
@@ -1058,6 +1100,9 @@ class UserList
     }
 
 
+    /**
+     * Get the plugin filters for each plugin for searches.
+     */
     protected function _getPluginFilters()
     {
         global $_PLUGINS;
@@ -1090,11 +1135,11 @@ class UserList
 
 
     /**
-    *   Get all fieldnames into a serialized array.
-    *   Used in list export to export all data fields
-    *
-    *   @return string  Serialized array of field names
-    */
+     * Get all fieldnames into a serialized array.
+     * Used in list export to export all data fields
+     *
+     * @return  string  Serialized array of field names
+     */
     protected function _getAllFields()
     {
         global $_TABLES;
@@ -1155,21 +1200,48 @@ class UserList
         return $fields;
     }
 
+
+    /**
+     * Get the first list in the database. Used if there is no list specified.
+     * No return, calls $this->Read() to load the list into object properties.
+     *
+     * @return  boolean     True if a list was loaded, False if not
+     */
+    protected function getFirst()
+    {
+        global $_TABLES;
+
+        // Get the first available list
+        $sql = "SELECT * FROM {$_TABLES['profile_lists']}
+                {$this->access_sql}
+                ORDER BY orderby ASC LIMIT 1";
+        //echo $sql;die;
+        $r = DB_query($sql, 1);
+        if ($r && DB_numRows($r) == 1) {
+            $A = DB_fetchArray($r, false);
+            $this->Read($A['listid']);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }   // class UserList
 
 
 /**
-*   Get the display value for a give list field.
-*   Custom fields require a lookup to the profile_def table to find out
-*   how to display the values.  Known fields, from the users table, can
-*   be handled more simply.
-*
-*   @param  string  $fieldname      Name of field, from the header array
-*   @param  mixed   $fieldvalue     Value of current field
-*   @param  array   $A              Array of all fieldnames & values
-*   @param  array   $icon_arr       Array of system icons (not used)
-*   @return string          Value to display for the current field
-*/
+ * Get the display value for a give list field.
+ * Custom fields require a lookup to the profile_def table to find out
+ * how to display the values.  Known fields, from the users table, can
+ * be handled more simply.
+ *
+ * @param   string  $fieldname      Name of field, from the header array
+ * @param   mixed   $fieldvalue     Value of current field
+ * @param   array   $A              Array of all fieldnames & values
+ * @param   array   $icon_arr       Array of system icons (not used)
+ * @param   array   $extras         Extra data passed in verbatim
+ * @return  string          Value to display for the current field
+ */
 function PRF_getListField($fieldname, $fieldvalue, $A, $icon_arr, $extras)
 {
     global $_CONF, $LANG_ACCESS, $LANG_PROFILE, $_PRF_CONF, $_TABLES;
@@ -1188,19 +1260,19 @@ function PRF_getListField($fieldname, $fieldvalue, $A, $icon_arr, $extras)
     switch($fieldname) {
     case 'edit':
         $retval = COM_createLink(
-            $icon_arr['edit'],
+            '<i class="' . $_PRF_CONF['_iconset'] . '-edit"></i>',
             "{$_CONF['site_admin_url']}/user.php?edit=x&amp;uid={$A['uid']}"
-            );
+        );
         break;
 
     case 'delete':
-            $retval = COM_createLink(
-                "<img src=\"{$_CONF['layout_url']}/images/admin/delete.png\"
-                    height=\"16\" width=\"16\" border=\"0\"
-                    onclick=\"return confirm('Do you really want to delete this item?');\"
-                    >",
-                "{$pi_admin_url}/list.php?action=delete&id={$A['id']}"
-            );
+        $retval = COM_createLink(
+            '<i class="' . $_PRF_CONF['_iconset'] . '-trash-o prf-icon-danger"></i>',
+            "{$pi_admin_url}/list.php?action=delete&id={$A['id']}",
+            array(
+                'onclick' => "return confirm('Do you really want to delete this item?');",
+            )
+        );
        break;
 
     case 'fullname':
