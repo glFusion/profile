@@ -40,16 +40,7 @@ class htmlList extends UserList
         global $_CONF, $_TABLES;
 
         if ($this->listid == '') {
-            // Get the first available list
-            $sql = "SELECT * FROM {$_TABLES['profile_lists']}
-                    {$this->access_sql}
-                    ORDER BY orderby ASC LIMIT 1";
-            //echo $sql;die;
-            $r = DB_query($sql, 1);
-            if ($r && DB_numRows($r) == 1) {
-                $A = DB_fetchArray($r, false);
-                $this->Read($A['listid']);
-            }
+            if (!$this->getFirst()) return '';
         }
 
         // Verify that the current user is allowed to see this list, and
