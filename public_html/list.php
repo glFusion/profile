@@ -20,7 +20,6 @@ if (!in_array('profile', $_PLUGINS)) {
 }
 
 USES_profile_functions();
-//USES_profile_class_list();
 
 // Retrieve input variables.
 COM_setArgNames(array('listid', 'action'));
@@ -44,7 +43,6 @@ case 'export':
     break;
 
 case 'pdf':
-    //USES_profile_class_pdflist();
     $PL = new \Profile\pdfList($listid);
     $content = $PL->Render();
     if (!empty($content)) {
@@ -53,7 +51,6 @@ case 'pdf':
     break;
 
 case 'html':
-    //USES_profile_class_htmlList();
     $PL = new \Profile\htmlList($listid);
     $content = $PL->Render();
     if (!empty($content)) {
