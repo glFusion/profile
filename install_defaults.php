@@ -1,48 +1,161 @@
 <?php
 /**
-*   Configuration defaults for the Custom Profile plugin
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009 Lee Garner <lee@leegarner.com>
-*   @package    profile
-*   @version    1.1.2
-*   @since      0.0.2
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
-*   GNU Public License v2 or later
-*   @filesource
-*/
+ * Configuration defaults for the Custom Profile plugin
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009 Lee Garner <lee@leegarner.com>
+ * @package     profile
+ * @version     1.1.2
+ * @since       0.0.2
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 
 if (!defined('GVERSION')) {
     die('This file can not be used on its own!');
 }
 
-/**
- *  Profile default settings
- *
- *  Initial Installation Defaults used when loading the online configuration
- *  records. These settings are only used during the initial installation
- *  and not referenced any more once the plugin is installed
- *
- *  @global array $_PRF_DEFAULT
- *
- */
-global $_PRF_DEFAULT, $_PRF_CONF;
-$_PRF_DEFAULT = array();
+/** @var global config data */
+global $profileConfigData;
+$profileConfigData = array(
+    array(
+        'name' => 'sg_main',
+        'default_value' => NULL,
+        'type' => 'subgroup',
+        'subgroup' => 0,
+        'fieldset' => 0,
+        'selection_array' => NULL,
+        'sort' => 0,
+        'set' => true,
+        'group' => 'profile',
+    ),
+    array(
+        'name' => 'fs_main',
+        'default_value' => NULL,
+        'type' => 'fieldset',
+        'subgroup' => 0,
+        'fieldset' => 0,
+        'selection_array' => NULL,
+        'sort' => 0,
+        'set' => true,
+        'group' => 'profile',
+    ),
+    array(
+        'name' => 'showemptyvals',
+        'default_value' => 1,
+        'type' => 'select',
+        'subgroup' => 0,
+        'fieldset' => 0,
+        'selection_array' => 3,
+        'sort' => 10,
+        'set' => true,
+        'group' => 'profile',
+    ),
+    array(
+        'name' => 'grace_expired',
+        'default_value' => '30',
+        'type' => 'text',
+        'subgroup' => 0,
+        'fieldset' => 0,
+        'selection_array' => 0,
+        'sort' => 20,
+        'set' => true,
+        'group' => 'profile',
+    ),
+    array(
+        'name' => 'date_format',
+        'default_value' => 1,
+        'type' => 'select',
+        'subgroup' => 0,
+        'fieldset' => 0,
+        'selection_array' => 13,
+        'sort' => 30,
+        'set' => true,
+        'group' => 'profile',
+    ),
 
-// Set the default permissions
-$_PRF_DEFAULT['group_id'] = 1;      // last resort
-$_PRF_DEFAULT['default_permissions'] =  array (3, 3, 0, 0);
+    array(
+        'name' => 'fs_lists',
+        'default_value' => NULL,
+        'type' => 'fieldset',
+        'subgroup' => 0,
+        'fieldset' => 10,
+        'selection_array' => NULL,
+        'sort' => 0,
+        'set' => true,
+        'group' => 'profile',
+    ),
+    array(
+        'name' => 'date_format',
+        'default_value' => 1,
+        'type' => 'select',
+        'subgroup' => 0,
+        'fieldset' => 0,
+        'selection_array' => 13,
+        'sort' => 30,
+        'set' => true,
+        'group' => 'profile',
+    ),
+    array(
+        'name' => 'list_incl_admin',
+        'default_value' => 0,
+        'type' => 'select',
+        'subgroup' => 0,
+        'fieldset' => 10,
+        'selection_array' => 3,
+        'sort' => 10,
+        'set' => true,
+        'group' => 'profile',
+    ),
+    array(
+        'name' => 'list_allow_pdf',
+        'default_value' => 1,
+        'type' => 'select',
+        'subgroup' => 0,
+        'fieldset' => 10,
+        'selection_array' => 13,
+        'sort' => 20,
+        'set' => true,
+        'group' => 'profile',
+    ),
 
-// Show empty values (e.g. in user profile)?
-$_PRF_DEFAULT['showemptyvals'] = 1;
 
-// Period after dues are due that members will be in arrears, not expired
-$_PRF_DEFAULT['grace_expired'] = 30;
-$_PRF_DEFAULT['date_format'] = 1;
+    array(
+        'name' => 'fs_permissions',
+        'default_value' => NULL,
+        'type' => 'fieldset',
+        'subgroup' => 0,
+        'fieldset' => 20,
+        'selection_array' => NULL,
+        'sort' => 0,
+        'set' => true,
+        'group' => 'profile',
+    ),
+    array(
+        'name' => 'defgroup',
+        'default_value' => 1,
+        'type' => 'select',
+        'subgroup' => 0,
+        'fieldset' => 20,
+        'selection_array' => 0,
+        'sort' => 10,
+        'set' => true,
+        'group' => 'profile',
+    ),
+    array(
+        'name' => 'default_permissions',
+        'default_value' => array(3, 3, 0, 0),
+        'type' => '@select',
+        'subgroup' => 0,
+        'fieldset' => 10,
+        'selection_array' => 12,
+        'sort' => 30,
+        'set' => true,
+        'group' => 'profile',
+    ),
+);
 
-// List settings
-$_PRF_DEFAULT['list_incl_admin'] = 0;
-$_PRF_DEFAULT['list_allow_pdf'] = 1;
 
 /**
  *  Initialize Profile plugin configuration
@@ -56,46 +169,17 @@ $_PRF_DEFAULT['list_allow_pdf'] = 1;
  */
 function plugin_initconfig_profile($group_id = 0)
 {
-    global $_CONF, $_PRF_CONF, $_PRF_DEFAULT;
-
-    if (is_array($_PRF_CONF) && (count($_PRF_CONF) > 1)) {
-        $_PRF_DEFAULT = array_merge($_PRF_DEFAULT, $_PRF_CONF);
-    }
-
-    // Use configured default if a valid group ID wasn't presented
-    if ($group_id == 0)
-        $group_id = $_PRF_DEFAULT['group_id'];
+    global $profileConfigData;
 
     $c = config::get_instance();
-    if (!$c->group_exists($_PRF_CONF['pi_name'])) {
-
-        $c->add('sg_main', NULL, 'subgroup', 0, 0, NULL, 0, true, 
-                $_PRF_CONF['pi_name']);
-
-        $c->add('fs_main', NULL, 'fieldset', 0, 0, NULL, 0, true, 
-                $_PRF_CONF['pi_name']);
-        $c->add('showemptyvals', $_PRF_DEFAULT['showemptyvals'], 
-                'select', 0, 0, 3, 10, true, $_PRF_CONF['pi_name']);
-        $c->add('grace_expired', $_PRF_DEFAULT['grace_expired'],
-                'text', 0, 0, 0, 30, true, $_PRF_CONF['pi_name']);
-        $c->add('date_format', $_PRF_DEFAULT['date_format'],
-                'select', 0, 0, 13, 30, true, $_PRF_CONF['pi_name']);
-
-        $c->add('fs_lists', NULL, 'fieldset', 0, 2, NULL, 0, true, 
-                $_PRF_CONF['pi_name']);
-        $c->add('list_incl_admin', $_PRF_DEFAULT['list_incl_admin'], 
-                'select', 0, 2, 3, 10, true, $_PRF_CONF['pi_name']);
-        $c->add('list_allow_pdf', $_PRF_DEFAULT['list_allow_pdf'], 
-                'select', 0, 2, 3, 20, true, $_PRF_CONF['pi_name']);
-
-        $c->add('fs_permissions', NULL, 'fieldset', 0, 4, NULL, 0, true, 
-                $_PRF_CONF['pi_name']);
-        $c->add('defgroup', $group_id,
-                'select', 0, 4, 0, 90, true, $_PRF_CONF['pi_name']);
-        $c->add('default_permissions', $_PRF_DEFAULT['default_permissions'],
-                '@select', 0, 4, 12, 100, true, $_PRF_CONF['pi_name']);
+    if (!$c->group_exists('profile')) {
+        USES_lib_install();
+        foreach ($profileConfigData AS $cfgItem) {
+            _addConfigItem($cfgItem);
+        }
+    } else {
+        COM_errorLog('initconfig error: Profile config group already exists');
     }
-
     return true;
 }
 
