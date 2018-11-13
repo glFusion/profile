@@ -1,22 +1,22 @@
 <?php
 /**
-*   Handle the printing of PDF reports using FPDF
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2016-2018 Lee Garner <lee@leegarner.com>
-*   @package    profile
-*   @version    1.2.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Handle the printing of PDF reports using FPDF
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2016-2018 Lee Garner <lee@leegarner.com>
+ * @package     profile
+ * @version     1.2.0
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Profile;
 
 /**
-*   Class for creating a PDF member list
-*   @package    profile
-*   @since      1.1.4
-*/
+ * Class for creating a PDF member list.
+ * @package profile
+ * @since   1.1.4
+ */
 class pdfList extends htmlList
 {
     /**
@@ -31,10 +31,10 @@ class pdfList extends htmlList
 
 
     /**
-    *   Create the report
-    *
-    *   @param  string  $filename   Filename to save to disk, empty to show in browser
-    */
+     * Create the report
+     *
+     * @param   string  $filename   Filename to save to disk, empty to show in browser
+     */
     public function Render($filename = '')
     {
         if (!empty($filename)) {

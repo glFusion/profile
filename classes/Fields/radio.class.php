@@ -1,32 +1,32 @@
 <?php
 /**
-*   Class to handle radio-button profile items.
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2018 Lee Garner <lee@leegarner.com>
-*   @package    profile
-*   @version    1.2.0
-*   @since      1.2.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to handle radio-button profile items.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2018 Lee Garner <lee@leegarner.com>
+ * @package     profile
+ * @version     1.2.0
+ * @since       1.2.0
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Profile\Fields;
 
 /**
-*   Class for radio button items.
-*   @package    profile
-*/
+ * Class for radio button fields.
+ * @package profile
+ */
 class radio extends \Profile\Field
 {
     /**
-    *   Constructor
-    *   Set up the array of value options
-    *
-    *   @param  mixed   $item   Name of item, or array of info
-    *   @param  string  $value  Optional value to assign, serialized array
-    *   @param  integer $uid    Optional user ID, current user by default
-    */
+     * Constructor.
+     * Set up the array of value options
+     *
+     * @param   mixed   $item   Name of item, or array of info
+     * @param   string  $value  Optional value to assign, serialized array
+     * @param   integer $uid    Optional user ID, current user by default
+     */
     public function __construct($item=NULL, $value='', $uid = '')
     {
         parent::__construct($item, $value, $uid);
@@ -40,11 +40,11 @@ class radio extends \Profile\Field
 
 
     /**
-    *   Create the data entry field.
-    *   Creates radio buttons in a line.
-    *
-    *   @return string  HTML for radio buttons & prompts
-    */
+     * Create the data entry field.
+     * Creates radio buttons in a line.
+     *
+     * @return  string  HTML for radio buttons & prompts
+     */
     public function FormField()
     {
         $this->_FormFieldInit();
@@ -73,10 +73,10 @@ class radio extends \Profile\Field
 
 
     /**
-    *   Create the form elements for editing the value selections
-    *
-    *   @return array   Array of name=>value pairs for Template::set_var()
-    */
+     * Create the form elements for editing the value selections
+     *
+     * @return  array   Array of name=>value pairs for Template::set_var()
+     */
     public function editValues()
     {
         $listinput = '';
@@ -102,11 +102,11 @@ class radio extends \Profile\Field
 
 
     /**
-    *   Prepare to save a value to the DB
-    *
-    *   @param  array   $vals   Array of all submitted values
-    *   @return mixed           String to be saved for this item
-    */
+     * Prepare to save a value to the DB
+     *
+     * @param   array   $vals   Array of all submitted values
+     * @return  mixed           String to be saved for this item
+     */
     public function prepareToSave($vals)
     {
         if (!isset($vals[$this->name])) {
@@ -121,10 +121,10 @@ class radio extends \Profile\Field
 
 
     /**
-    *   Get field-specific options for the user search form
-    *
-    *   @return string      HTML input options
-    */
+     * Get field-specific options for the user search form
+     *
+     * @return  string      HTML input options
+     */
     public function searchFormOpts()
     {
         global $LANG_PROFILE;
@@ -141,11 +141,11 @@ class radio extends \Profile\Field
 
 
     /**
-    *   Actually gets the options array specific to this field.
-    *
-    *   @param  array   $A      Form values
-    *   @return array           Array of options to save
-    */
+     * Actually gets the options array specific to this field.
+     *
+     * @param  array   $A      Form values
+     * @return array           Array of options to save
+     */
     public function setOptions($A)
     {
         $newvals = array();
@@ -162,17 +162,6 @@ class radio extends \Profile\Field
         return $this->options;
     }
 
-
-    /**
-    *   Get the SQL field type for the "alter" statement
-    *
-    *   @return string      SQL field definition
-    */
-    public function getSqlType()
-    {
-        return 'TEXT';
-    }
- 
 }
 
 ?>

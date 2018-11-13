@@ -18,6 +18,7 @@
  *
  * @param   string  $type   'edit' or 'registration'
  * @param   integer $uid    User ID whose profile is being edited
+ * @param   string  $form_id    ID value for the form.
  * @return  string          HTML for the form
  * @deprecated 1.2.0
  */

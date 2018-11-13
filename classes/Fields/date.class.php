@@ -1,30 +1,30 @@
 <?php
 /**
-*   Class to handle date fields in profiles
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2018 Lee Garner <lee@leegarner.com>
-*   @package    profile
-*   @version    1.2.0
-*   @since      1.2.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ *   Class to handle date fields in profiles
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2018 Lee Garner <lee@leegarner.com>
+ * @package     profile
+ * @version     1.2.0
+ * @since       1.2.0
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Profile\Fields;
 
 /**
-*   Class for date fields
-*   @package    profile
-*/
+ * Class for date fields
+ * @package profile
+ */
 class date extends \Profile\Field
 {
     /**
-    *   Get the value formatted for display, depending on the field's format.
-    *
-    *   @param  string  $value  Value to display, current value by default
-    *   @return string  HTML for formatted field value
-    */
+     * Get the value formatted for display, depending on the field's format.
+     *
+     * @param   string  $value  Value to display, current value by default
+     * @return  string  HTML for formatted field value
+     */
     public function FormatValue($value = '')
     {
         global $_PRF_CONF, $_CONF;
@@ -83,10 +83,11 @@ class date extends \Profile\Field
 
 
     /**
-    *   Create the form entry field.
-    *
-    *   @return string      HTML for month, day and year fields.
-    */
+     * Create the form entry field.
+     *
+     * @param   boolean $incl_time  True to include time in entry field
+     * @return  string      HTML for month, day and year fields.
+     */
     public function FormField($incl_time = true)
     {
         global $LANG_PROFILE, $_CONF, $_PRF_CONF;
@@ -230,10 +231,10 @@ function {$this->name}_onUpdate(cal)
 
 
     /**
-    *   Get the available date formats
-    *
-    *   @return array   Array of date formats
-    */
+     * Get the available date formats
+     *
+     * @return  array   Array of date formats
+     */
     public static function DateFormats()
     {
         global $LANG_PROFILE;
@@ -246,12 +247,12 @@ function {$this->name}_onUpdate(cal)
 
 
     /**
-    *   Create the date format selector for use in defining the field
-    *   Doesn't include the <select></select> tags, just the options.
-    *
-    *   @param  integer $cur    Currently-selected format
-    *   @return string          HTML for date format seleection options.
-    */
+     * Create the date format selector for use in defining the field.
+     * Doesn't include the <select></select> tags, just the options.
+     *
+     * @param   integer $cur    Currently-selected format
+     * @return  string          HTML for date format seleection options.
+     */
     public static function DateFormatSelect($cur=0)
     {
         $retval = '';
@@ -265,11 +266,11 @@ function {$this->name}_onUpdate(cal)
 
 
     /**
-    *   Convert an hour from 24-hour to 12-hour format for display.
-    *
-    *   @param  integer $hour   Hour to convert
-    *   @return array       array(new_hour, ampm_indicator)
-    */
+     * Convert an hour from 24-hour to 12-hour format for display.
+     *
+     * @param   integer $hour   Hour to convert
+     * @return  array       array(new_hour, ampm_indicator)
+     */
     public function hour24to12($hour)
     {
         if ($hour >= 12) {
@@ -284,12 +285,12 @@ function {$this->name}_onUpdate(cal)
 
 
     /**
-    *   Convert an hour from 12-hour to 24-hour format.
-    *
-    *   @param  integer $hour   Hour to convert
-    *   @param  boolean $pm     True if 'pm' is set
-    *   @return integer     New hour
-    */
+     * Convert an hour from 12-hour to 24-hour format.
+     *
+     * @param   integer $hour   Hour to convert
+     * @param   boolean $pm     True if 'pm' is set
+     * @return  integer     New hour
+     */
     public function hour12to24($hour, $pm)
     {
         if ($pm) {
@@ -302,14 +303,14 @@ function {$this->name}_onUpdate(cal)
 
 
     /**
-    *   Get the AM/PM selection.
-    *   This is exactly like COM_getAmPmFormSelection(), but
-    *   adds the "id" to the selection so javascript can update it.
-    *
-    *   @param  string  $name       Field name
-    *   @param  string  $selected   Which option is selected, am or pm?
-    *   @return string      HTML for selection
-    */
+     * Get the AM/PM selection.
+     * This is exactly like COM_getAmPmFormSelection(), but
+     * adds the "id" to the selection so javascript can update it.
+     *
+     * @param   string  $name       Field name
+     * @param   string  $selected   Which option is selected, am or pm?
+     * @return  string      HTML for selection
+     */
     private function ampmSelection($name, $selected)
     {
         global $_CONF;
@@ -334,10 +335,10 @@ function {$this->name}_onUpdate(cal)
 
 
     /**
-    *   Create the form elements for editing the value selections
-    *
-    *   @return array   Array of name=>value pairs for Template::set_var()
-    */
+     * Create the form elements for editing the value selections
+     *
+     * @return  array   Array of name=>value pairs for Template::set_var()
+     */
     public function editValues()
     {
         $opts = array(
@@ -359,12 +360,12 @@ function {$this->name}_onUpdate(cal)
 
 
     /**
-    *   Check if a field has valid data.  Used in conjuction with the
-    *   "required" flag.
-    *
-    *   @param  array   $vals   Array of values
-    *   @return boolean     True if data is valid, False if not
-    */
+     * Check if a field has valid data.
+     * Used in conjuction with the "required" flag.
+     *
+     * @param   array   $vals   Array of values
+     * @return  boolean     True if data is valid, False if not
+     */
     public function validData($vals)
     {
         // This function uses the field name and the $vals array to construct
@@ -389,12 +390,12 @@ function {$this->name}_onUpdate(cal)
 
 
     /**
-    *   Prepare to save a value to the DB.
-    *   This type uses the submitted values array to assemble the date.
-    *
-    *   @param  array   $vals   Array of all submitted values
-    *   @return null            Null value
-    */
+     * Prepare to save a value to the DB.
+     * This type uses the submitted values array to assemble the date.
+     *
+     * @param   array   $vals   Array of all submitted values
+     * @return  null            Null value
+     */
     public function prepareToSave($vals)
     {
         $name = $this->name;
@@ -439,11 +440,11 @@ function {$this->name}_onUpdate(cal)
     }
 
 
-    /**
-    *   Get field-specific options for the user search form
-    *
-    *   @return string      HTML input options
-    */
+     /**
+     * Get field-specific options for the user search form
+     *
+     * @return  string      HTML input options
+     */
     public function searchFormOpts()
     {
         $fld = '';
@@ -459,12 +460,12 @@ function {$this->name}_onUpdate(cal)
 
 
     /**
-    *   Create the search sql for this field
-    *
-    *   @param  array   $post   Values from $_POST
-    *   @param  string  $tbl    Table indicator
-    *   @return string          SQL query fragment
-    */
+     * Create the search sql for this field
+     *
+     * @param   array   $post   Values from $_POST
+     * @param   string  $tbl    Table indicator
+     * @return  string          SQL query fragment
+     */
     public function createSearchSQL($post, $tbl='data')
     {
         if (isset($post['empty'][$this->name])) {
@@ -488,11 +489,11 @@ function {$this->name}_onUpdate(cal)
 
 
     /**
-    *   Actually gets the options array specific to this field.
-    *
-    *   @param  array   $A      Form values
-    *   @return array           Array of options to save
-    */
+     * Actually gets the options array specific to this field.
+     *
+     * @param   array   $A      Form values
+     * @return  array           Array of options to save
+     */
     public function setOptions($A)
     {
         global $_PRF_CONF;
@@ -516,10 +517,10 @@ function {$this->name}_onUpdate(cal)
 
 
     /**
-    *   Get the SQL field type for the "alter" statement
-    *
-    *   @return string      SQL field definition
-    */
+     * Get the SQL field type for the "alter" statement
+     *
+     * @return  string      SQL field definition
+     */
     public function getSqlType()
     {
         return $this->options['timeformat'] !== '' ? 'DATETIME' : 'DATE';

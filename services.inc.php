@@ -26,8 +26,8 @@ if (!defined ('GVERSION')) {
  *      'value' => new_value
  *
  * @param   array   $args       Array of UID, Field and Value.
- * @param   mixed   &$output    Unused.
- * @param   string  &$svc_msg   Unused.
+ * @param   mixed   $output    Unused.
+ * @param   string  $svc_msg   Unused.
  * @return  integer             Status of update
  */
 function service_setvalue_profile($args, &$output, &$svc_msg)
@@ -85,8 +85,8 @@ function service_setvalue_profile($args, &$output, &$svc_msg)
  * the update is done in a single query.
  *
  * @param   array   $args       Array of sys_expires and sys_membership
- * @param   array   &$output    Pointer to output array (unused)
- * @param   array   &$svc_msg   Unused
+ * @param   array   $output     Pointer to output array (unused)
+ * @param   array   $svc_msg    Unused
  * @return  integer             Status code
  */
 function service_setSysValues_profile($args, &$output, &$svc_msg)
@@ -127,8 +127,8 @@ function service_setSysValues_profile($args, &$output, &$svc_msg)
  * Get the child accounts of the supplied user ID.
  *
  * @param   array   $args       Optional 'uid' element
- * @param   array   &$output    Set to array of child IDs, or empty
- * @param   mixed   &$svc_msg   Not used
+ * @param   array   $output     Set to array of child IDs, or empty
+ * @param   mixed   $svc_msg    Not used
  * @return  integer             Return code
  */
 function service_getChildAccounts_profile($args, &$output, &$svc_msg)
@@ -155,8 +155,8 @@ function service_getChildAccounts_profile($args, &$output, &$svc_msg)
  * Get the parent account of the supplied user ID.
  *
  * @param   array   $args       Optional 'uid' element
- * @param   mixed   &$output    Output, contains parent uid or zero
- * @param   mixed   &$svc_msg   Not used
+ * @param   mixed   $output     Output, set as parent uid or zero
+ * @param   mixed   $svc_msg    Not used
  * @return  integer             Return code
  */
 function service_getParentAccount_profile($args, &$output, &$svc_msg)
@@ -179,8 +179,8 @@ function service_getParentAccount_profile($args, &$output, &$svc_msg)
  * a specific user ID and item name(s).
  *
  * @param   array       $args       mixed 'item' and optional 'uid'
- * @param   reference   $output     Output array
- * @param   reference   $svc_msg    Service messages
+ * @param   mixed       $output     Output array
+ * @param   mixed       $svc_msg    Service messages
  * @return  integer     Result code
  */
 function service_getValues_profile($args, &$output, &$svc_msg)
@@ -221,8 +221,8 @@ function service_getValues_profile($args, &$output, &$svc_msg)
  * Does not include the <form> tags, leaving the action up to the caller.
  *
  * @param   array       $args       mixed 'item' and optional 'uid'
- * @param   reference   $output     Output array
- * @param   reference   $svc_msg    Service messages
+ * @param   mixed       $output     Output array
+ * @param   mixed       $svc_msg    Service messages
  * @return  integer     Result code
  */
 function service_renderForm_profile($args, &$output, &$svc_msg)
@@ -246,8 +246,8 @@ function service_renderForm_profile($args, &$output, &$svc_msg)
  * that all the variables are present and named correctly.
  *
  * @param   array       $args       mixed 'item' and optional 'uid'
- * @param   reference   $output     Output array
- * @param   reference   $svc_msg    Service messages
+ * @param   mixed       $output     Output array
+ * @param   mixed       $svc_msg    Service messages
  * @return  integer     Result code
  */
 function service_saveData_profile($args, &$output, &$svc_msg)

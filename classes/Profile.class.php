@@ -1,23 +1,23 @@
 <?php
 /**
-*   Class to handle a user profile
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2018 Lee Garner <lee@leegarner.com>
-*   @package    profile
-*   @version    1.2.0
-*   @since      1.2.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to handle a user profile
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2018 Lee Garner <lee@leegarner.com>
+ * @package     profile
+ * @version     1.2.0
+ * @since       1.2.0
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Profile;
 
 /**
-*   Class for a user's custom forms.
-*   @package    profile
-*   @since      1.2.0
-*/
+ * Class for a user's custom profile.
+ * @package profile
+ * @since   1.2.0
+ */
 class Profile
 {
     /** Local properties
@@ -33,13 +33,13 @@ class Profile
     var $uid;
 
     /**
-    *   Constructor.  Create a forms object for the specified user ID,
-    *   or the current user if none specified.  If a key is requested,
-    *   then just build the forms for that key (requires a $uid).
-    *
-    *   @param  integer $uid    Optional user ID
-    *   @param  string  $key    Optional key to retrieve
-    */
+     * Constructor.
+     * Create a forms object for the specified user ID, or the current
+     * user if none specified.  If a key is requested, then just build
+     * the forms for that key (requires a $uid).
+     *
+     * @param   integer $uid    Optional user ID
+     */
     function __construct($uid=0)
     {
         global $_USER, $_PRF_CONF, $_TABLES;
@@ -53,11 +53,11 @@ class Profile
 
 
     /**
-    *   Get the profile object for the specified user
-    *
-    *   @param  integer $uid    User ID, default is current user
-    *   @return object          Profile object for the user
-    */
+     * Get the profile object for the specified user.
+     *
+     * @param   integer $uid    User ID, default is current user
+     * @return  object          Profile object for the user
+     */
     public static function getInstance($uid=0)
     {
         global $_USER;
@@ -73,9 +73,9 @@ class Profile
 
 
     /**
-    *   Read the profile field definitions and values.
-    *   Stores definitions in a static array for re-use.
-    */
+     * Read the profile field definitions and values.
+     * Stores definitions in a static array for re-use.
+     */
     private function Read()
     {
         global $_TABLES;
@@ -116,12 +116,12 @@ class Profile
 
 
     /**
-    *   Displays a form for editing profile data.
-    *
-    *   @param  string  $type       'edit' or 'registration'
-    *   @param  integer $form_id    HTML Element ID to set for the form
-    *   @return string          HTML for the form
-    */
+     * Displays a form for editing profile data.
+     *
+     * @param   string  $type       'edit' or 'registration'
+     * @param   integer $form_id    HTML Element ID to set for the form
+     * @return  string          HTML for the form
+     */
     public function Edit($type = 'edit', $form_id='profileform')
     {
         global $_CONF, $_USER, $_TABLES, $LANG_PROFILE, $_PRF_CONF, $_SYSTEM;
@@ -220,12 +220,12 @@ class Profile
 
 
     /**
-    *   Saves the user data to the database.
-    *
-    *   @param  array   $vals   Array of name=>value pairs, like $_POST.
-    *   @param  string  $type   Type of operation.
-    *   @return boolean     True on success, False on failure.
-    */
+     * Saves the user data to the database.
+     *
+     * @param   array   $vals   Array of name=>value pairs, like $_POST.
+     * @param   string  $type   Type of operation.
+     * @return  boolean     True on success, False on failure.
+     */
     public function Save($vals, $type = 'edit')
     {
         global $_TABLES, $_USER, $LANG_PROFILE;

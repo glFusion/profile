@@ -33,7 +33,8 @@ class Field
     protected $_frmReadonly = '';
 
     /** Properties array.
-        @var array */
+     * Accessed via `__set()` and `__get()` functions.
+     * @var array */
     private $properties = array();
 
     /** Easily indicate a hidden field.
@@ -778,7 +779,7 @@ class Field
 
     /**
      * Actually gets the options array specific to this field.
-     * Default- do nothing, return options array
+     * Default- do nothing, return options array.
      *
      * @param   array   $A      Form values
      * @return  array           Array of options to save
@@ -788,6 +789,18 @@ class Field
         return $this->options;
     }
 
+
+    /**
+     * Get the SQL field type for the "alter" statement.
+     * Default type is TEXT.
+     *
+     * @return  string      SQL field definition
+     */
+    public function getSqlType()
+    {
+        return 'TEXT';
+    }
+ 
 }   // class Field
 
 ?>

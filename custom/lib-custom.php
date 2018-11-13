@@ -3,7 +3,7 @@
  * Custom functions for including profile information into registration
  * and account settings pages.
  *
- * These functions should be includedi in private/system/lib-custom.php
+ * These functions should be included in private/system/lib-custom.php
  *
  * @author      Lee Garner <lee@leegarner.com>
  * @copyright   Copyright (c) 2009-2016 Lee Garner <lee@leegarner.com>

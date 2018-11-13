@@ -1,29 +1,29 @@
 <?php
 /**
-*   Handle the printing of PDF reports using FPDF
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2016-2018 Lee Garner <lee@leegarner.com>
-*   @package    profile
-*   @version    1.2.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Create HTML lists for export.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2016-2018 Lee Garner <lee@leegarner.com>
+ * @package     profile
+ * @version     1.2.0
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Profile;
 
 /**
-*   Class for creating a PDF catalog
-*   @package    profile
-*   @since      1.1.4
-*/
+ * Class for creating a HTML uesr list
+ * @package     profile
+ * @since       1.1.4
+ */
 class htmlList extends UserList
 {
     /**
-    *   Constructor. Simply calls the parent constructor
-    *
-    *   @param  string  $listid     Optional list ID to load
-    */
+     * Constructor. Simply calls the parent constructor.
+     *
+     * @param   string  $listid     Optional list ID to load
+     */
     public function __construct($listid='')
     {
         parent::__construct($listid);
@@ -31,10 +31,10 @@ class htmlList extends UserList
 
 
     /**
-    *   Create the report
-    *
-    *   @param  $filename   Filename to save to disk, empty to show in browser
-    */
+     * Create the report.
+     *
+     * @param   $filename   Filename to save to disk, empty to show in browser
+     */
     public function Render($filename = '')
     {
         global $_CONF, $_TABLES;

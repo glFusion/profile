@@ -216,12 +216,12 @@ function profile_upgrade_1_0_2()
 
 
 /**
-*   Upgrade to version 1.1.0
-*   Returns non-zero if an error is encountered at any point.
-*
-*   @uses   PRF_dbname()
-*   @return integer     Zero for success, non-zero on error
-*/
+ * Upgrade to version 1.1.0.
+ * Returns non-zero if an error is encountered at any point.
+ *
+ * @uses    PRF_dbname()
+ * @return  integer     Zero for success, non-zero on error
+ */
 function profile_upgrade_1_1_0()
 {
     global $_TABLES, $LANG_PROFILE, $_PRF_CONF;
@@ -436,9 +436,10 @@ function profile_upgrade_1_1_0()
 
 
 /**
-*   Upgrade to version 1.1.1
-*   @return boolean     True on success, False on error
-*/
+ * Upgrade to version 1.1.1.
+ *
+ * @return  boolean     True on success, False on error
+ */
 function profile_upgrade_1_1_1()
 {
     global $_TABLES, $_PRF_CONF;
@@ -471,10 +472,11 @@ function profile_upgrade_1_1_1()
 
 
 /**
-*   Upgrade to version 1.1.2
-*   Returns non-zero if an error is encountered at any point.
-*   @return boolean     True on success, False on error
-*/
+ * Upgrade to version 1.1.2.
+ * Returns non-zero if an error is encountered at any point.
+ *
+ * @return  boolean     True on success, False on error
+ */
 function profile_upgrade_1_1_2()
 {
     global $_TABLES, $_PRF_CONF, $LANG_PROFILE;
@@ -519,10 +521,11 @@ function profile_upgrade_1_1_2()
 
 
 /**
-*   Upgrade to version 1.1.3
-*   Returns non-zero if an error is encountered at any point.
-*   @return boolean     True on success, False on error
-*/
+ * Upgrade to version 1.1.3.
+ * Returns non-zero if an error is encountered at any point.
+ *
+ * @return  boolean     True on success, False on error
+ */
 function profile_upgrade_1_1_3()
 {
     global $_TABLES;
@@ -567,10 +570,11 @@ function profile_upgrade_1_1_3()
 
 
 /**
-*   Upgrade to version 1.1.4
-*   Adds first and last name fields to the profile data
-*   @return boolean     True on success, False on error
-*/
+ * Upgrade to version 1.1.4.
+ * Adds first and last name fields to the profile data.
+ *
+ * @return  boolean     True on success, False on error
+ */
 function profile_upgrade_1_1_4()
 {
     global $_TABLES, $LANG_PROFILE, $_PRF_CONF;

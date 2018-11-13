@@ -1,32 +1,32 @@
 <?php
 /**
-*   Class to handle dropdown profile items.
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2018 Lee Garner <lee@leegarner.com>
-*   @package    profile
-*   @version    1.2.0
-*   @since      1.2.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to handle dropdown profile items.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2018 Lee Garner <lee@leegarner.com>
+ * @package     profile
+ * @version     1.2.0
+ * @since       1.2.0
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Profile\Fields;
 
 /**
-*   Class for dropdown selections
-*   @package    profile
-*/
+ * Class for dropdown selections.
+ * @package profile
+ */
 class select extends \Profile\Field
 {
     /**
-    *   Constructor.
-    *   Set up the values array
-    *
-    *   @param  mixed   $item   Name of item, or array of info
-    *   @param  mixed   $value  Optional value to assign
-    *   @param  integer $uid    Optional user ID, current user by default
-    */
+     * Constructor.
+     * Set up the values array
+     *
+     * @param   mixed   $item   Name of item, or array of info
+     * @param   mixed   $value  Optional value to assign
+     * @param   integer $uid    Optional user ID, current user by default
+     */
     public function __construct($item, $value='', $uid='')
     {
         parent::__construct($item, $value, $uid);
@@ -40,10 +40,10 @@ class select extends \Profile\Field
 
 
     /**
-    *   Create the data entry field
-    *
-    *   @return string  HTML for selection dropdown.  Included <select> tags.
-    */
+     * Create the data entry field
+     *
+     * @return  string  HTML for selection dropdown.  Included <select> tags.
+     */
     public function FormField()
     {
         global $LANG_PROFILE;
@@ -63,10 +63,10 @@ class select extends \Profile\Field
 
 
     /**
-    *   Create the form elements for editing the value selections
-    *
-    *   @return array   Array of name=>value pairs for Template::set_var()
-    */
+     * Create the form elements for editing the value selections
+     *
+     * @return  array   Array of name=>value pairs for Template::set_var()
+     */
     public function editValues()
     {
         $listinput = '';
@@ -92,11 +92,11 @@ class select extends \Profile\Field
 
 
     /**
-    *   Prepare to save a value to the DB.
-    *
-    *   @param  array   $vals   Array of all submitted values
-    *   @return string          Value to save
-    */
+     * Prepare to save a value to the DB.
+     *
+     * @param   array   $vals   Array of all submitted values
+     * @return  string          Value to save
+     */
     public function prepareToSave($vals)
     {
         $name = $this->name;
@@ -109,10 +109,10 @@ class select extends \Profile\Field
 
 
     /**
-    *   Get field-specific options for the user search form
-    *
-    *   @return string      HTML input options
-    */
+     * Get field-specific options for the user search form
+     *
+     * @return  string      HTML input options
+     */
     public function searchFormOpts()
     {
         global $LANG_PROFILE;
@@ -131,11 +131,11 @@ class select extends \Profile\Field
 
 
     /**
-    *   Actually gets the options array specific to this field.
-    *
-    *   @param  array   $A      Form values
-    *   @return array           Array of options to save
-    */
+     * Actually gets the options array specific to this field.
+     *
+     * @param   array   $A      Form values
+     * @return  array           Array of options to save
+     */
     public function setOptions($A)
     {
         $newvals = array();
@@ -150,17 +150,6 @@ class select extends \Profile\Field
         $this->options['default'] = '';
         $this->options['values'] = $newvals;
         return $this->options;
-    }
-
-
-    /**
-    *   Get the SQL field type for the "alter" statement
-    *
-    *   @return string      SQL field definition
-    */
-    public function getSqlType()
-    {
-        return 'TEXT';
     }
 
 }

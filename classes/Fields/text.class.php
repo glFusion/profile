@@ -1,31 +1,30 @@
 <?php
 /**
-*   Class to handle text fields in profiles
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2018 Lee Garner <lee@leegarner.com>
-*   @package    profile
-*   @version    1.2.0
-*   @since      1.2.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to handle text fields in profiles
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2018 Lee Garner <lee@leegarner.com>
+ * @package     profile
+ * @version     1.2.0
+ * @since       1.2.0
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Profile\Fields;
 
 /**
-*   Class for text input fields
-*   The base class has all the functionality for text fields, this is a stub.
-*   @package    profile
+* Class for text input fields.
+* @package  profile
 */
 class text extends \Profile\Field
 {
     /**
-    *   Provide a form field for editing this data item.
-    *   This provides a text input field, to be overridden by child classes
-    *
-    *   @return string  HTML for data entry field
-    */
+     * Provide a form field for editing this data item.
+     * This provides a text input field, to be overridden by child classes
+     *
+     * @return  string  HTML for data entry field
+     */
     public function FormField()
     {
         $this->_FormFieldInit();
@@ -42,11 +41,11 @@ class text extends \Profile\Field
 
 
     /**
-    *   Actually gets the options array specific to this field.
-    *
-    *   @param  array   $A      Form values
-    *   @return array           Array of options to save
-    */
+     * Actually gets the options array specific to this field.
+     *
+     * @param   array   $A      Form values
+     * @return  array           Array of options to save
+     */
     public function setOptions($A)
     {
         $this->options['maxlength'] = min((int)$A['maxlength'], 255);
@@ -56,10 +55,10 @@ class text extends \Profile\Field
 
 
     /**
-    *   Get the SQL field type for the "alter" statement
-    *
-    *   @return string      SQL field definition
-    */
+     * Get the SQL field type for the "alter" statement
+     *
+     * @return  string      SQL field definition
+     */
     public function getSqlType()
     {
         return 'VARCHAR(255)';

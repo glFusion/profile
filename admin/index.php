@@ -1,15 +1,15 @@
 <?php
 /**
-*   Entry point to administration functions for the Custom Profile plugin
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2012 Lee Garner <lee@leegarner.com>
-*   @package    profile
-*   @version    1.1.3
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Entry point to administration functions for the Custom Profile plugin
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2012 Lee Garner <lee@leegarner.com>
+ * @package     profile
+ * @version     1.2.0
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 
 /** Import core glFusion libraries */
 require_once '../../../lib-common.php';
@@ -213,11 +213,12 @@ exit;
 
 
 /**
-*   Displays a form for editing a profile definition.
-*   @param  integer $id     Database ID of item to edit, 0 for new item
-*   @return string          HTML for the form
-*   @deprecated 1.2.0
-*/
+ * Displays a form for editing a profile definition.
+ *
+ * @deprecated version 1.2.0
+ * @param   integer $id     Database ID of item to edit, 0 for new item
+ * @return  string          HTML for the form
+ */
 function X_PRF_adminForm($id)
 {
     global $_TABLES, $_CONF, $LANG_PROFILE, $LANG_ADMIN, $_PRF_CONF;
@@ -349,9 +350,10 @@ function X_PRF_adminForm($id)
 
 
 /**
-*   Uses lib-admin to list the list definitions
-*   @return string HTML for the list
-*/
+ * Uses lib-admin to list the list definitions.
+ *
+ * @return  string HTML for the list
+ */
 function PRF_listLists()
 {
     global $_CONF, $_TABLES, $LANG_ADMIN, $LANG_PROFILE;
@@ -487,9 +489,10 @@ function PRF_getField_list($fieldname, $fieldvalue, $A, $icon_arr)
 
 
 /**
-*   Uses lib-admin to list the profile definitions and allow updating
-*   @return string HTML for the list
-*/
+ * Uses lib-admin to list the profile definitions and allow updating.
+ *
+ * @return  string HTML for the list
+ */
 function PRF_listFields()
 {
     global $_CONF, $_TABLES, $LANG_ADMIN, $LANG_PROFILE;
@@ -991,10 +994,10 @@ function PRF_adminMenu($page='list')
 
 
 /**
-*   Present a form verifying that all permissions should be reset.
-*
-*   @since  version 1.0.2
-*/
+ * Present a form verifying that all permissions should be reset.
+ *
+ * @since   version 1.0.2
+ */
 function PRF_permResetForm()
 {
     $T = new Template(PRF_PI_PATH . 'templates/admin');
@@ -1007,10 +1010,10 @@ function PRF_permResetForm()
 
 
 /**
-*   Reset all field permissions to the configured defaults.
-*
-*   @since  version 1.0.2
-*/
+ * Reset all field permissions to the configured defaults.
+ *
+ * @since   version 1.0.2
+ */
 function PRF_permReset()
 {
     global $_TABLES, $_PRF_CONF;
@@ -1026,11 +1029,11 @@ function PRF_permReset()
 
 
 /**
-*   Create a form to collect search parameters for users.
-*
-*   @since  version 1.1.0
-*   @return string      HTML for form
-*/
+ * Create a form to collect search parameters for users.
+ *
+ * @since   version 1.1.0
+ * @return  string      HTML for form
+ */
 function PRF_searchUsersForm()
 {
     global $_TABLES, $LANG_PROFILE;
@@ -1063,12 +1066,12 @@ function PRF_searchUsersForm()
 
 
 /**
-*   Search for users based on the parameters entered in PRF_searchUserForm().
-*
-*   @since  version 1.1.0
-*   @param  array   $vals   Search values (e.g. $_POST)
-*   @return string          HTML  for user list
-*/
+ * Search for users based on the parameters entered in PRF_searchUserForm().
+ *
+ * @since   version 1.1.0
+ * @param   array   $vals   Search values (e.g. $_POST)
+ * @return  string          HTML  for user list
+ */
 function PRF_searchUsers($vals)
 {
     global $_TABLES, $LANG_ADMIN, $LANG_PROFILE;

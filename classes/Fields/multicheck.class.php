@@ -1,32 +1,32 @@
 <?php
 /**
-*   Class to handle multi-check profile items.
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2018 Lee Garner <lee@leegarner.com>
-*   @package    profile
-*   @version    1.2.0
-*   @since      1.2.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to handle multi-check profile items.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2018 Lee Garner <lee@leegarner.com>
+ * @package     profile
+ * @version     1.2.0
+ * @since       1.2.0
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Profile\Fields;
 
 /**
-*   Class for multiple checkboxes
-*   @package    profile
-*/
+ * Class for multiple checkboxes
+ * @package profile
+ */
 class multicheck extends \Profile\Field
 {
     /**
-    *   Constructor.
-    *   Set up the values array
-    *
-    *   @param  mixed   $item   Name of item, or array of info
-    *   @param  mixed   $value  Optional value to assign
-    *   @param  integer $uid    Optional user ID, current user by default
-    */
+     * Constructor.
+     * Set up the values array
+     *
+     * @param   mixed   $item   Name of item, or array of info
+     * @param   mixed   $value  Optional value to assign
+     * @param   integer $uid    Optional user ID, current user by default
+     */
     public function __construct($item, $value='', $uid='')
     {
         parent::__construct($item, $value, $uid);
@@ -43,10 +43,10 @@ class multicheck extends \Profile\Field
 
 
     /**
-    *   Create the data entry field
-    *
-    *   @return string  HTML for radio buttons & prompts
-    */
+     * Create the data entry field.
+     *
+     * @return  string  HTML for radio buttons & prompts
+     */
     public function FormField()
     {
         $this->_FormFieldInit();
@@ -78,11 +78,11 @@ class multicheck extends \Profile\Field
 
 
     /**
-    *   Return the formatted string value.
-    *
-    *   @param  integer $value  Not used, just for consistency
-    *   @return string          String corresponding to value.
-    */
+     * Return the formatted string value.
+     *
+     * @param   integer $value  Not used, just for consistency
+     * @return  string          String corresponding to value.
+     */
     public function FormatValue($value = '')
     {
         if (is_string($value)) $value = @unserialize($value);
@@ -93,6 +93,11 @@ class multicheck extends \Profile\Field
     }
 
 
+    /**
+     * Set the value selections ino the $values property.
+     *
+     * @param   array   $vals   Array of values (key=>value)
+     */
     public function setVals($vals)
     {
         $this->values = array();
@@ -105,10 +110,10 @@ class multicheck extends \Profile\Field
 
 
     /**
-    *   Create the form elements for editing the value selections
-    *
-    *   @return array   Array of name=>value pairs for Template::set_var()
-    */
+     * Create the form elements for editing the value selections.
+     *
+     * @return  array   Array of name=>value pairs for Template::set_var()
+     */
     public function editValues()
     {
         if (!empty($this->options['values'])) {
@@ -134,11 +139,11 @@ class multicheck extends \Profile\Field
 
 
     /**
-    *   Prepare to save a value to the DB.
-    *
-    *   @param  array   $vals   Array of all submitted values
-    *   @return string          Value to save
-    */
+     * Prepare to save a value to the DB.
+     *
+     * @param   array   $vals   Array of all submitted values
+     * @return  string          Value to save
+     */
     public function prepareToSave($vals)
     {
         return @serialize($vals[$name]);
@@ -146,10 +151,10 @@ class multicheck extends \Profile\Field
 
 
     /**
-    *   Get field-specific options for the user search form
-    *
-    *   @return string      HTML input options
-    */
+     * Get field-specific options for the user search form
+     *
+     * @return  string      HTML input options
+     */
     public function searchFormOpts()
     {
         global $LANG_PROFILE;
@@ -166,11 +171,11 @@ class multicheck extends \Profile\Field
 
 
     /**
-    *   Actually gets the options array specific to this field.
-    *
-    *   @param  array   $A      Form values
-    *   @return array           Array of options to save
-    */
+     * Actually gets the options array specific to this field.
+     *
+     * @param   array   $A      Form values
+     * @return  array           Array of options to save
+     */
     public function setOptions($A)
     {
         $newvals = array();
@@ -190,17 +195,6 @@ class multicheck extends \Profile\Field
         $this->options['values'] = $newvals;
         $this->options['default'] = $defaults;
         return $this->options;
-    }
-
-
-    /**
-    *   Get the SQL field type for the "alter" statement
-    *
-    *   @return string      SQL field definition
-    */
-    public function getSqlType()
-    {
-        return 'TEXT';
     }
  
 }

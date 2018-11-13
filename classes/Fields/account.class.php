@@ -1,31 +1,31 @@
 <?php
 /**
-*   Class to handle account profile items.
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2018 Lee Garner <lee@leegarner.com>
-*   @package    profile
-*   @version    1.2.0
-*   @since      1.2.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ *   Class to handle account profile items.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2018 Lee Garner <lee@leegarner.com>
+ * @package     profile
+ * @version     1.2.0
+ * @since       1.2.0
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Profile\Fields;
 
 /**
-*   Class for a user account selection
-*   This can be used to link the account to another
-*   @package    profile
-*/
+ * Class for a user account selection.
+ * This can be used to link the account to another.
+ * @package profile
+ */
 class account extends \Profile\Field
 {
     /**
-    *   Create the data entry field
-    *
-    *   @uses   AccountSelection();
-    *   @return string  HTML for selection dropdown.  Includes <select> tags.
-    */
+     * Create the data entry field
+     *
+     * @uses    AccountSelection();
+     * @return  string  HTML for selection dropdown.  Includes <select> tags.
+     */
     public function FormField()
     {
         global $LANG_PROFILE;
@@ -46,11 +46,11 @@ class account extends \Profile\Field
 
 
     /**
-    *   Create an account selection list.
-    *
-    *   @param  integer $selected   Currently-selected value
-    *   @return string              HTML for selection options
-    */
+     * Create an account selection list.
+     *
+     * @param   integer $selected   Currently-selected value
+     * @return  string              HTML for selection options
+     */
     public function AccountSelection($selected = 0)
     {
         global $_TABLES;
@@ -71,6 +71,12 @@ class account extends \Profile\Field
     }
 
 
+    /**
+     * Format the value for dispaly.
+     *
+     * @param   integer $value  Optional value override
+     * @return  string          HTML for value display
+     */
     public function FormatValue($value = 0)
     {
         global $_CONF, $_TABLES, $LANG_PROFILE;
@@ -118,12 +124,12 @@ class account extends \Profile\Field
 
 
     /**
-    *   Prepare to save a value to the DB.
-    *   This type returns the submitted value without modification.
-    *
-    *   @param  array   $vals   Array of all submitted values
-    *   @return string          Value to save
-    */
+     * Prepare to save a value to the DB.
+     * This type returns the submitted value without modification.
+     *
+     * @param   array   $vals   Array of all submitted values
+     * @return  string          Value to save
+     */
     public function prepareToSave($vals)
     {
         return $vals[$this->name];
@@ -131,10 +137,10 @@ class account extends \Profile\Field
 
 
     /**
-    *   Get the SQL field type for the "alter" statement
-    *
-    *   @return string      SQL field definition
-    */
+     * Get the SQL field type for the "alter" statement.
+     *
+     * @return  string      SQL field definition
+     */
     public function getSqlType()
     {
         return 'MEDIUMINT(8) DEFAULT 0';

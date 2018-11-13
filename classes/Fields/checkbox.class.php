@@ -1,31 +1,32 @@
 <?php
 /**
-*   Class to handle checkbox profile items.
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2018 Lee Garner <lee@leegarner.com>
-*   @package    profile
-*   @version    1.2.0
-*   @since      1.2.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to handle checkbox profile items.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2018 Lee Garner <lee@leegarner.com>
+ * @package     profile
+ * @version     1.2.0
+ * @since       1.2.0
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Profile\Fields;
 
 /**
-*   Class for Checkbox items
-*/
+ * Class for Checkbox items.
+ * @package profile
+ */
 class checkbox extends \Profile\Field
 {
     /**
-    *   Constructor.
-    *   Set up the options array
-    *
-    *   @param  mixed   $item   Name of item, or array of info
-    *   @param  mixed   $value  Optional value to assign
-    *   @param  integer $uid    Optional user ID, current user by default
-    */
+     * Constructor.
+     * Set up the options array
+     *
+     * @param   mixed   $item   Name of item, or array of info
+     * @param   mixed   $value  Optional value to assign
+     * @param   integer $uid    Optional user ID, current user by default
+     */
     public function __construct($item, $value='', $uid='')
     {
         parent::__construct($item, $value, $uid);
@@ -33,11 +34,11 @@ class checkbox extends \Profile\Field
 
 
     /**
-    *   Return the formatted string value.
-    *
-    *   @param  integer $value  Optional value.  "1" = on, "0" = off
-    *   @return string          String corresponding to value.
-    */
+     * Return the formatted string value.
+     *
+     * @param   integer $value  Optional value.  "1" = on, "0" = off
+     * @return  string          String corresponding to value.
+     */
     public function FormatValue($value = 0)
     {
         global $LANG_PROFILE;
@@ -52,10 +53,10 @@ class checkbox extends \Profile\Field
 
 
     /**
-    *   Create the data entry field
-    *
-    *   @return string  HTML for checkbox field, with prompt string
-    */
+     * Create the data entry field
+     *
+     * @return  string  HTML for checkbox field, with prompt string
+     */
     public function FormField()
     {
         $this->_FormFieldInit();
@@ -78,11 +79,11 @@ class checkbox extends \Profile\Field
 
 
     /**
-    *   Sanitize this field for storage
-    *
-    *   @param  integer $val    Starting value
-    *   @return integer         Sanitized value, either 1 or 0
-    */
+     * Sanitize this field for storage
+     *
+     * @param   integer $val    Starting value
+     * @return  integer         Sanitized value, either 1 or 0
+     */
     public function Sanitize($val)
     {
         $val = $val == 1 ? 1 : 0;
@@ -91,10 +92,10 @@ class checkbox extends \Profile\Field
 
 
     /**
-    *   Special handling for "required" setting for checkboxes.
-    *   FValidator doesn't work right, so don't use it and allow
-    *   the submission handling to deal with empty checkboxes.
-    */
+     * Special handling for "required" setting for checkboxes.
+     * FValidator doesn't work right, so don't use it and allow
+     * the submission handling to deal with empty checkboxes.
+     */
     protected function _FormFieldInit()
     {
         parent::_FormFieldInit();
@@ -103,10 +104,10 @@ class checkbox extends \Profile\Field
 
 
     /**
-    *   Create the form elements for editing the value selections
-    *
-    *   @return array   Array of name=>value pairs for Template::set_var()
-    */
+     * Create the form elements for editing the value selections
+     *
+     * @return  array   Array of name=>value pairs for Template::set_var()
+     */
     public function editValues()
     {
         return array(
@@ -117,25 +118,28 @@ class checkbox extends \Profile\Field
 
 
     /**
-    *   Check if a field has valid data.  Used in conjuction with the "required" flag.
-    *
-    *   @param  boolean     $required   Return false only if invalid AND required
-    *   @return booldan         True if data is valid, False if not
-    */
+     * Check if a field has valid data.  Used in conjuction with the "required" flag.
+     *
+     * @param   integer $value  Optional value override
+     * @return  booldan         True if data is valid, False if not
+     */
     public function validData($value = NULL)
     {
         $val = $value !== NULL ? $value : $this->value;
-        if ($this->required && $val != 1) return false;
-        else return true;
+        if ($this->required && $val != 1) {
+           return false;
+        } else {
+            return true;
+        }
     }
 
 
     /**
-    *   Prepare to save a value to the DB.
-    *
-    *   @param  array   $vals   Array of all submitted values
-    *   @return string          Value to save
-    */
+     * Prepare to save a value to the DB.
+     *
+     * @param   array   $vals   Array of all submitted values
+     * @return  string          Value to save
+     */
     public function prepareToSave($vals)
     {
         return isset($vals[$this->name]) && $vals[$this->name] == '1' ? '1' : '0';
@@ -143,10 +147,10 @@ class checkbox extends \Profile\Field
 
 
     /**
-    *   Get field-specific options for the user search form
-    *
-    *   @return string      HTML input options
-    */
+     * Get field-specific options for the user search form
+     *
+     * @return  string      HTML input options
+     */
     public function searchFormOpts()
     {
         global $LANG_PROFILE;
@@ -159,11 +163,11 @@ class checkbox extends \Profile\Field
 
 
     /**
-    *   Actually gets the options array specific to this field.
-    *
-    *   @param  array   $A      Form values
-    *   @return array           Array of options to save
-    */
+     * Actually gets the options array specific to this field.
+     *
+     * @param   array   $A      Form values
+     * @return  array           Array of options to save
+     */
     public function setOptions($A)
     {
         $this->options['value'] = 1;
@@ -173,13 +177,13 @@ class checkbox extends \Profile\Field
 
 
     /**
-    *   Get the SQL field type for the "alter" statement
-    *
-    *   @return string      SQL field definition
-    */
-    public function getSqlType($defvalue)
+     * Get the SQL field type for the "alter" statement
+     *
+     * @return  string      SQL field definition
+     */
+    public function getSqlType()
     {
-        return 'TINYINT(1) UNSIGNED NOT NULL DEFAULT ' . (int)$this->getOption('default');
+        return 'TINYINT(1) UNSIGNED NOT NULL DEFAULT ' . (int)$this->getOption('default', 0);
     }
 
 }
