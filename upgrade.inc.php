@@ -681,4 +681,44 @@ function PRF_dbname($oldname)
     return $newname;
 }
 
+
+/**
+ *   Remove deprecated files
+ *   Errors in unlink() and rmdir() are ignored.
+ */
+function PRF_remove_old_files()
+{
+    global $_CONF;
+
+    $paths = array(
+        // private/plugins/profile
+        __DIR__ => array(
+            // 1.2.0 - Replaced with namespaced field classes
+            'classes/prfItem_account.class.php',
+            'classes/prfItem_checkbox.class.php',
+            'classes/prfItem.class.php',
+            'classes/prfItem_date.class.php',
+            'classes/prfItem_link.class.php',
+            'classes/prfItem_multicheck.class.php',
+            'classes/prfItem_radio.class.php',
+            'classes/prfItem_select.class.php',
+            'classes/prfItem_static.class.php',
+            'classes/prfItem_textarea.class.php',
+            'classes/prfItem_text.class.php',
+        ),
+        // public_html/profile
+        $_CONF['path_html'] . 'profile' => array(
+        ),
+        // admin/plugins/profile
+        $_CONF['path_html'] . 'admin/plugins/profile' => array(
+        ),
+    );
+
+    foreach ($paths as $path=>$files) {
+        foreach ($files as $file) {
+            @unlink("$path/$file");
+        }
+    }
+}
+
 ?>
