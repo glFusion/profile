@@ -1,15 +1,15 @@
 <?php
 /**
-*   Functions for the Profile plugin for glFusion.
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2016 Lee Garner <lee@leegarner.com>
-*   @package    profile
-*   @version    1.1.4
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Functions for the Profile plugin for glFusion.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2016 Lee Garner <lee@leegarner.com>
+ * @package     profile
+ * @version     v1.1.4
+ * @license    http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 
 if (!defined ('GVERSION')) {
     die ('This file can not be used on its own.');
@@ -92,21 +92,21 @@ $_PRF_CONF['now'] = date('Y-m-d H:i:s');
 $_PRF_CONF['_is_uikit'] = $_SYSTEM['framework'] == 'uikit' ? true : false;
 $_PRF_CONF['_iconset'] = $_PRF_CONF['_is_uikit'] ? 'uk-icon' : 'fa fa';
 
-// Import plugin-specific functions
+/** Import plugin-specific functions */
 function USES_profile_functions()
 {   require_once PRF_PI_PATH . 'profile_functions.inc.php';     }
 
-// Include api functions for other plugins
+/** Include api functions for other plugins */
 require_once PRF_PI_PATH . 'services.inc.php';
 
 
 /**
-*   Called by the plugin Editor to display the current plugin code version.
-*   This may be different than the version installed and registered currently.
-*   If newer then you may want to run the update.
-*
-*   @return   string  version number
-*/
+ * Called by the plugin Editor to display the current plugin code version.
+ * This may be different than the version installed and registered currently.
+ * If newer then you may want to run the update.
+ *
+ * @return  string  Version number
+ */
 function plugin_chkVersion_profile()
 {
     global $_PRF_CONF;
@@ -115,10 +115,10 @@ function plugin_chkVersion_profile()
 
 
 /**
-*   This will put an option for profile administration in the command
-*   and control area
-*   @return   mixed   array(title, url, icon), or false when not allowed
-*/
+ * This will put an option for profile administration in the command and control area.
+ *
+ * @return  mixed   array(title, url, icon), or false when not allowed
+ */
 function plugin_cclabel_profile()
 {
     global $LANG_PROFILE, $_PRF_CONF;
@@ -134,9 +134,10 @@ function plugin_cclabel_profile()
 
 
 /**
-*   Put an option for profile management on the admin-only menu.
-*   @return   mixed   array(title, url, num. banner), or void when not allowed
-*/
+ * Put an option for profile management on the admin-only menu.
+ *
+ * @return   mixed   array(title, url, num. banner), or void when not allowed
+ */
 function plugin_getadminoption_profile()
 {
     global $_CONF, $LANG_PROFILE;
@@ -152,10 +153,11 @@ function plugin_getadminoption_profile()
 
 
 /**
-*   Delete profile data for users that are deleted.
-*   @param    int     $uid    User id of deleted user
-*   @return   void
-*/
+ * Delete profile data for users that are deleted.
+ *
+ * @param   int     $uid    User id of deleted user
+ * @return  void
+ */
 function plugin_user_delete_profile($uid)
 {
     global $_TABLES;
@@ -165,11 +167,11 @@ function plugin_user_delete_profile($uid)
 
 
 /**
-*   Support merging local accounts into remote accounts
-*
-*   @param  integer $origUID    Original (local) user ID
-*   @param  integer $destUID    New (remote) user ID
-*/
+ * Support merging local accounts into remote accounts
+ *
+ * @param   integer $origUID    Original (local) user ID
+ * @param   integer $destUID    New (remote) user ID
+ */
 function plugin_user_move_profile($origUID, $destUID)
 {
     global $_TABLES;
@@ -183,11 +185,11 @@ function plugin_user_move_profile($origUID, $destUID)
 
 
 /**
-*   Send a message to the user once at login if there's no email address.
-*   This can happen if they've created their account via Facebook oauth.
-*
-*   @param  integer $uid    User ID
-*/
+ * Send a message to the user once at login if there's no email address.
+ * This can happen if they've created their account via Facebook oauth.
+ *
+ * @param   integer $uid    User ID
+ */
 function plugin_user_login_profile($uid)
 {
     global $LANG_PROFILE, $_USER;
@@ -198,10 +200,11 @@ function plugin_user_login_profile($uid)
 
 
 /**
-*   Upgrade the Profile plugin
-*
-*   @return boolean     True on success, False on failure
-*/
+ * Upgrade the Profile plugin.
+ *
+ * @uses    profile_do_upgrade()
+ * @return  boolean     True on success, False on failure
+ */
 function plugin_upgrade_profile()
 {
     require_once dirname(__FILE__) . '/upgrade.inc.php';
@@ -210,10 +213,10 @@ function plugin_upgrade_profile()
 
 
 /**
-*   Returns the URL of the plugin's icon
-*
-*   @return   string      URL of the icon
-*/
+ * Returns the URL of the plugin's icon.
+ *
+ * @return  string      URL of the icon
+ */
 function plugin_geticon_profile()
 {
     return PRF_PI_URL . '/images/profile.png';
@@ -221,16 +224,16 @@ function plugin_geticon_profile()
 
 
 /**
-*   Automatic uninstall function for plugins
-*
-*   This code is automatically uninstalling the plugin.
-*   It passes an array to the core code function that removes
-*   tables, groups, features and php blocks from the tables.
-*   Additionally, this code can perform special actions that cannot be
-*   foreseen by the core code (interactions with other plugins for example)
-*
-*   @return   array     Elements to be removed
-*/
+ * Automatic uninstall function for plugins.
+ *
+ * This code is automatically uninstalling the plugin.
+ * It passes an array to the core code function that removes
+ * tables, groups, features and php blocks from the tables.
+ * Additionally, this code can perform special actions that cannot be
+ * foreseen by the core code (interactions with other plugins for example)
+ *
+ * @return  array     Elements to be removed
+ */
 function plugin_autouninstall_profile ()
 {
     global $_PRF_CONF;
@@ -253,10 +256,10 @@ function plugin_autouninstall_profile ()
 
 
 /**
-*   Get additional Javascript into the site header
-*
-*   @return array List of paths to Javascript files
-*/
+ * Get additional Javascript into the site header.
+ *
+ * @return  array List of paths to Javascript files
+ */
 function plugin_getheaderjs_profile()
 {
     $pi_dir = PRF_PI_PATH . 'js/';
@@ -271,10 +274,10 @@ function plugin_getheaderjs_profile()
 
 
 /**
-*   Get additional CSS into the site header.
-*
-*   @return array   List of paths to Javascript files
-*/
+ * Get additional CSS into the site header.
+ *
+ * @return  array   List of paths to Javascript files
+ */
 function plugin_getheadercss_profile()
 {
     global $_CONF, $_PRF_CONF;
@@ -307,14 +310,14 @@ function plugin_getheadercss_profile()
 
 
 /**
-*   Create an edit form in the Account Settings section.
-*   Used with glFusion 1.1.5 and above only.
-*
-*   @param  integer $uid        User ID
-*   @param  string  $panel      Panel being populated
-*   @param  string  $fieldset   Name of fieldset being populated
-*   @return string              HTML for edit form. Never NULL.
-*/
+ * Create an edit form in the Account Settings section.
+ * Used with glFusion 1.1.5 and above only.
+ *
+ * @param   integer $uid        User ID
+ * @param   string  $panel      Panel being populated
+ * @param   string  $fieldset   Name of fieldset being populated
+ * @return  string              HTML for edit form. Never NULL.
+ */
 function plugin_profileedit_profile($uid, $panel, $fieldset)
 {
     $retval = '';
@@ -339,11 +342,11 @@ function plugin_profileedit_profile($uid, $panel, $fieldset)
 
 
 /**
- *  Displays custom profile variables in the user profile screen.
+ * Displays custom profile variables in the user profile screen.
  *
- *  @param  integer  $uid   User ID whose profile is being displayed
- *  @param  object   &$T    Pointer to template object
- *  @return string          HTML to include in profile page
+ * @param   integer  $uid       User ID whose profile is being displayed
+ * @param   object   $template  Pointer to template object
+ * @return  string          HTML to include in profile page
  */
 function plugin_profilevariablesdisplay_profile($uid, &$template)
 {
@@ -403,9 +406,11 @@ function plugin_profilevariablesdisplay_profile($uid, &$template)
 
 
 /**
-*   Save the profile information when edited via Account Settings.
-*   Used with glFusion 1.1.5 and above
-*/
+ * Save the profile information when edited via Account Settings.
+ * Used with glFusion 1.1.5 and above
+ *
+ * @param   integer $uid    ID of user being saved
+ */
 function plugin_profilesave_profile($uid=0)
 {
     global $_USER;
@@ -429,11 +434,11 @@ function plugin_profilesave_profile($uid=0)
 
 
 /**
-*   Handle a new user registration.
-*   Called by PLG_createUser (glFusion 1.1.5) to handle a new user signup.
-*
-*   @param  integer $uid    UID of new user.  Already set by glFusion
-*/
+ * Handle a new user registration.
+ * Called by PLG_createUser (glFusion 1.1.5) to handle a new user signup.
+ *
+ * @param   integer $uid    UID of new user.  Already set by glFusion
+ */
 function plugin_user_create_profile($uid = 0)
 {
     global $_TABLES;
@@ -452,14 +457,14 @@ function plugin_user_create_profile($uid = 0)
 
 
 /**
-*   Set the custom profile values into the $_USER array
-*   If a user ID is specified, then an array of values is returned for that
-*   user.  If not, then the current user ID is used, the profile values
-*   are merged into the $_USER array, and nothing is returned.
-*
-*   @param  integer $uid    User ID, zero for current user
-*   @return mixed   Array of name=>string pairs, empty string if $_USER is set.
-*/
+ * Set the custom profile values into the $_USER array.
+ * If a user ID is specified, then an array of values is returned for that
+ * user.  If not, then the current user ID is used, the profile values
+ * are merged into the $_USER array, and nothing is returned.
+ *
+ * @param   integer $uid    User ID, zero for current user
+ * @return  mixed   Array of name=>string pairs, empty string if $_USER is set.
+ */
 function PRF_setUserValues($uid=0)
 {
     global $_TABLES, $_USER;
@@ -488,17 +493,16 @@ function PRF_setUserValues($uid=0)
 
 
 /**
-*   Retrieve all the profile definitions and data items for the current or
-*   supplied user ID.
-*   An empty array is returned in case of a database error.  The typical
-*   cause would be when the code is updated and the plugin upgrade function
-*   hasn't yet been run to update the database.
-*
-*   @param  integer $uid    Optional user ID, current user if empty
-*   @param  string  $key    Specific key to retrieve, all if blank
-*   @param  integer $access Access level needed.  Used to allow admin access
-*   @return array           Array of profile objects
-*/
+ * Retrieve all the profile definitions and data items for the current or supplied user ID.
+ * An empty array is returned in case of a database error.  The typical
+ * cause would be when the code is updated and the plugin upgrade function
+ * hasn't yet been run to update the database.
+ *
+ * @param   integer $uid    Optional user ID, current user if empty
+ * @param   string  $key    Specific key to retrieve, all if blank
+ * @param   integer $access Access level needed.  Used to allow admin access
+ * @return  array           Array of profile objects
+ */
 function PRF_getDefs($uid = 0, $key = '', $access = 2)
 {
     global $_TABLES, $_USER, $LANG_PROFILE, $_PRF_CONF;
@@ -551,12 +555,12 @@ function PRF_getDefs($uid = 0, $key = '', $access = 2)
 
 
 /**
-*   Returns a name=>value array of options broken out from the given string.
-*   The string is expected to be a serialized array.
-*
-*   @param  string  $str    Option string
-*   @return array           Associative array of option=>value pairs
-*/
+ * Returns a name=>value array of options broken out from the given string.
+ * The string is expected to be a serialized array.
+ *
+ * @param   string  $str    Option string
+ * @return  array           Associative array of option=>value pairs
+ */
 function PRF_getOpts($str)
 {
     $A = @unserialize($str);
@@ -568,13 +572,13 @@ function PRF_getOpts($str)
 
 
 /**
-*   Creates a name:value;name:value.. option string given the associative
-*   array of name=>value options.
-*   Options must already be validated for the type of record to be saved.
-*
-*   @param  array   $A      Array of name=>value pairs
-*   @return string          Serialized string representing the array
-*/
+ * Creates a name:value;name:value.. option string given the associative
+ * array of name=>value options.
+ * Options must already be validated for the type of record to be saved.
+ *
+ * @param   array   $A      Array of name=>value pairs
+ * @return  string          Serialized string representing the array
+ */
 function PRF_setOpts($A)
 {
     $str = '';
@@ -586,10 +590,11 @@ function PRF_setOpts($A)
 
 
 /**
-*   Sanitize all values in an array.  Used as a calback function to array_map.
-*   @param  string  $val    Value to sanitize
-*   @return string          SQL-safe version of $val
-*/
+ * Sanitize all values in an array.  Used as a calback function to array_map.
+ *
+ * @param   string  $val    Value to sanitize
+ * @return  string          SQL-safe version of $val
+ */
 function PRF_escape_string($val)
 {
     return is_string($val) ? DB_escapeString($val) : $val;
@@ -597,15 +602,15 @@ function PRF_escape_string($val)
 
 
 /**
-*   Verify that all required custom profile variables are set.
-*   This is not truly necessary since fValidator won't allow incomplete
-*   submissions, but serves as a fallback in case Javascript is disabled.
-*   Read-only fields are excluded from the check when $type == 'registration'.
-*
-*   @param  string  $type       Type of submission
-*   @param  string  $content    Submission content
-*   @return string              Error message, or empty string if ok
-*/
+ * Verify that all required custom profile variables are set.
+ * This is not truly necessary since fValidator won't allow incomplete
+ * submissions, but serves as a fallback in case Javascript is disabled.
+ * Read-only fields are excluded from the check when $type == 'registration'.
+ *
+ * @param   string  $type       Type of submission
+ * @param   string  $content    Submission content
+ * @return  string              Error message, or empty string if ok
+ */
 function plugin_itemPreSave_profile($type, $content)
 {
     // Don't validate administrators, it doesn't work when creating
@@ -633,15 +638,15 @@ function plugin_itemPreSave_profile($type, $content)
 
 
 /**
-*   Return a single value from the values table corresponding to
-*   a specific user ID and item name.
-*   Not used by this plugin, but intended to provide a basic API to
-*   other plugins.
-*
-*   @param  string  $key    Name of item to retrieve
-*   @param  integer $uid    User ID, current user if zero
-*   @return array           array(value, value_text) for the requested item.
-*/
+ * Return a single value from the values table corresponding to
+ * a specific user ID and item name.
+ * Not used by this plugin, but intended to provide a basic API to
+ * other plugins.
+ *
+ * @param   string  $key    Name of item to retrieve
+ * @param   integer $uid    User ID, current user if zero
+ * @return  array           array(value, value_text) for the requested item.
+ */
 function PRF_getValue($key, $uid=0)
 {
     global $_TABLES, $_USER;
@@ -660,11 +665,12 @@ function PRF_getValue($key, $uid=0)
 
 
 /**
- *  Implements autotags for custom profile elements..
- *  @param string $op Name of operation
- *  @param string $content Content of the autotag
- *  @param string $autotag Complete autotag
- *  @return string HTML replacement
+ * Implements autotags for custom profile elements.
+ *
+ * @param  string  $op         Name of operation
+ * @param  string  $content    Content of the autotag
+ * @param  string  $autotag    Complete autotag
+ * @return string              HTML replacement
  */
 function plugin_autotags_profile($op, $content = '', $autotag = '')
 {
@@ -741,13 +747,13 @@ function plugin_autotags_profile($op, $content = '', $autotag = '')
 
 
 /**
-* Returns the items for this plugin that should appear on the main menu
-*
-* NOTE: this MUST return the url/value pairs in the following format
-* $<arrayname>[<label>] = <url>
-*
-* @return    array   Associative array of menu items to be added to menu
-*/
+ * Returns the items for this plugin that should appear on the main menu.
+ *
+ * NOTE: this MUST return the url/value pairs in the following format
+ * $<arrayname>[<label>] = <url>
+ *
+ * @return  array   Associative array of menu items to be added to menu
+ */
 function plugin_getmenuitems_profile()
 {
     global $_CONF, $LANG_PROFILE, $_PRF_CONF, $_CONF_MEMBERLIST;
@@ -764,18 +770,18 @@ function plugin_getmenuitems_profile()
 
 
 /**
-*   Return SQL expression to check for permissions.
-*
-*   Taken from COM_getPermSQL with some modifications, since this
-*   plugin doesn't use an owner_id field
-*
-*   @since  version 0.0.2
-*   @param  string      $type     part of the SQL expr. e.g. 'WHERE', 'AND'
-*   @param  int         $u_id     user id or 0 = current user
-*   @param  int         $access   access to check for (2=read, 3=r&write)
-*   @param  string      $table    table name if ambiguous (e.g. in JOINs)
-*   @return string      SQL expression string (may be empty)
-*/
+ * Return SQL expression to check for permissions.
+ *
+ * Taken from COM_getPermSQL with some modifications, since this
+ * plugin doesn't use an owner_id field
+ *
+ * @since   v0.0.2
+ * @param   string  $type   Part of the SQL expr. e.g. 'WHERE', 'AND'
+ * @param   integer $u_id   User id or 0 = current user
+ * @param   integer $access Access to check for (2=read, 3=r&write)
+ * @param   string  $table  Table name if ambiguous (e.g. in JOINs)
+ * @return  string          SQL expression string (may be empty)
+ */
 function PRF_getPermSQL($type = 'WHERE', $u_id = 0, $access = 2,
                         $table = '')
 {
@@ -839,12 +845,12 @@ function PRF_getPermSQL($type = 'WHERE', $u_id = 0, $access = 2,
 
 
 /**
-*   Select default group for field permissions.
-*
-*   @since  version 0.0.2
-*   @uses   PRF_getGroups()
-*   @return array   grp_name=>grp_id array of groups
-*/
+ * Select default group for field permissions.
+ *
+ * @since   v0.0.2
+ * @uses    PRF_getGroups()
+ * @return  array   grp_name=>grp_id array of groups
+ */
 function plugin_configmanager_select_defgroup_profile()
 {
     return PRF_getGroups('\'All Users\'', 'NOT');
@@ -852,14 +858,15 @@ function plugin_configmanager_select_defgroup_profile()
 
 
 /**
-*   Return an an array of group names and IDs, including or excluding
-*   the specified grplist.  No SQL validation is done on the passed parameters.
-*
-*   @since  version 0.0.2
-*   @see plugin_configmanager_select_defgroup_profile()
-*   @param  string  $grplist    Comma-separated list of group names, SQL format
-*   @param  string  $NOT        "NOT" to exclude $grplist, blank to include.
-*/
+ * Return an an array of group names and IDs, including or excluding
+ * the specified grplist.
+ * No SQL validation is done on the passed parameters.
+ *
+ * @since   v0.0.2
+ * @see     plugin_configmanager_select_defgroup_profile()
+ * @param   string  $grplist    Comma-separated list of group names, SQL format
+ * @param   string  $NOT        "NOT" to exclude $grplist, blank to include.
+ */
 function PRF_getGroups($grplist='', $NOT='')
 {
     global $_TABLES;
@@ -886,13 +893,13 @@ function PRF_getGroups($grplist='', $NOT='')
 
 
 /**
-*   Set the plugin's template variable value in the provided template.
-*   The plugin's values are appended to the existing template variable.
-*
-*   @since  version 1.0.0
-*   @param  string  $templatename   Name of template
-*   @param  string  &$template      Actual template, by reference
-*/
+ * Set the plugin's template variable value in the provided template.
+ * The plugin's values are appended to the existing template variable.
+ *
+ * @since   v1.0.0
+ * @param   string  $templatename   Name of template
+ * @param   string  &$template      Actual template, by reference
+ */
 function plugin_templatesetvars_profile($templatename, &$template)
 {
     global $_PRF_CONF;
@@ -923,11 +930,13 @@ function plugin_templatesetvars_profile($templatename, &$template)
 
 
 /**
-*   Get the URL to the localized configuration help file.
-*
-*   @since  version 1.0.0
-*   @return array   Array of (url, window_type)
-*/
+ * Get the URL to the localized configuration help file.
+ *
+ * @since   v1.0.0
+ * @param   string  $option     Help option
+ * @param   string  $doclang    Desired document language
+ * @return  array   Array of (url, window_type)
+ */
 function plugin_getconfigelementhelp_profile($option, $doclang='english')
 {
     if (version_compare(GVERSION, '1.6.0', '<')) {
@@ -948,14 +957,14 @@ function plugin_getconfigelementhelp_profile($option, $doclang='english')
 
 
 /**
-*   Export user data when requested.
-*
-*   @param  integer $uid        User ID
-*   @param  string  $email      User Email Address (not used)
-*   @param  string  $username   User Name (not used)
-*   @param  string  $ip         IP address (not used)
-*   @return string              XML-formatted data
-*/
+ * Export user data when requested.
+ *
+ * @param   integer $uid        User ID
+ * @param   string  $email      User Email Address (not used)
+ * @param   string  $username   User Name (not used)
+ * @param   string  $ip         IP address (not used)
+ * @return  string              XML-formatted data
+ */
 function plugin_privacy_export_profile($uid,$email='',$username='',$ip='')
 {
     $tmp = PRF_getDefs($uid);
@@ -979,14 +988,14 @@ function plugin_privacy_export_profile($uid,$email='',$username='',$ip='')
 
 
 /**
-*   Get the link to a documentation file.
-*   Returns the URL to the file, or to the directory if no file requested.
-*
-*   @see    plugin_getconfigelementhelp_subscription()
-*   @param  string  $file       HTML file
-*   @param  string  $doclang    Documentation language
-*   @return string              URL to document directory or file
-*/
+ * Get the link to a documentation file.
+ * Returns the URL to the file, or to the directory if no file requested.
+ *
+ * @see     plugin_getconfigelementhelp_subscription()
+ * @param   string  $file       HTML file
+ * @param   string  $doclang    Documentation language
+ * @return  string              URL to document directory or file
+ */
 function PRF_getDocURL($file='', $doclang='english')
 {
     global $_CONF, $_PRF_CONF;
@@ -1012,13 +1021,13 @@ function PRF_getDocURL($file='', $doclang='english')
 
 
 /**
-*   Reorder all items in a table.
-*   Table name is abstracted to support both list and definition tables.
-*
-*   @deprecated
-*   @param  string  $table  Name of table
-*   @param  string  $id_fld Name of "id" field
-*/
+ * Reorder all items in a table.
+ * Table name is abstracted to support both list and definition tables.
+ *
+ * @deprecated
+ * @param  string  $table  Name of table
+ * @param  string  $id_fld Name of "id" field
+ */
 function X_PRF_reorderDef($table, $id_fld='id')
 {
     global $_TABLES;
@@ -1048,13 +1057,13 @@ function X_PRF_reorderDef($table, $id_fld='id')
 
 
 /**
-*   Replace quotes and apostrophes with html entities.
-*   This is to avoid fouling up the html display of the text prompts
-*   while still allowing other html to be used.
-*
-*   @param  string  $str    String to convert
-*   @return string          Converted string
-*/
+ * Replace quotes and apostrophes with html entities.
+ * This is to avoid fouling up the html display of the text prompts
+ * while still allowing other html to be used.
+ *
+ * @param   string  $str    String to convert
+ * @return  string          Converted string
+ */
 function PRF_noquotes($str)
 {
     return str_replace(array("'", '"'), array('&apos;', '&quot;'), $str);
@@ -1062,10 +1071,10 @@ function PRF_noquotes($str)
 
 
 /**
-*   Check if the current user is allowed to manage memberships
-*
-*   @return boolean     True is user is a manager, False if not
-*/
+ * Check if the current user is allowed to manage memberships
+ *
+ * @return  boolean     True is user is a manager, False if not
+ */
 function PRF_isManager()
 {
     global $_PRF_CONF;
@@ -1084,10 +1093,10 @@ function PRF_isManager()
 
 
 /**
-*   Check if the current user is allowed to administer the plugin
-*
-*   @return boolean     True is user is an admin, False if not
-*/
+ * Check if the current user is allowed to administer the plugin
+ *
+ * @return  boolean     True is user is an admin, False if not
+ */
 function PRF_isAdmin()
 {
     global $_PRF_CONF;
@@ -1105,13 +1114,13 @@ function PRF_isAdmin()
 
 
 /**
-*   Helper function to get a template object.
-*
-*   @param  string  $name   Base name of template, e.g. "editor"
-*   @param  string  $id     ID of template, e.g. "editform"
-*   @param  string  $path   Optional path if not "templates/"
-*   @return string      Full filename, e.g. "editor.uikit.thtml"
-*/
+ * Helper function to get a template object.
+ *
+ * @param   string  $name   Base name of template, e.g. "editor"
+ * @param   string  $id     ID of template, e.g. "editform"
+ * @param   string  $path   Optional path if not "templates/"
+ * @return  string      Full filename, e.g. "editor.uikit.thtml"
+ */
 function PRF_getTemplate($name, $id, $path='')
 {
     global $_PRF_CONF;
@@ -1132,15 +1141,15 @@ function PRF_getTemplate($name, $id, $path='')
 
 
 /**
-*   Get an array variable, first checking whether it's set
-*
-*   @since  1.0.8
-*   @param  array   $A          Array where the variable should be
-*   @param  string  $key        Name of array element
-*   @param  string  $type       Type of return value
-*   @param  mixed   $default    Default value, if key is not set
-*   @return     Array element cast to $type, or NULL if not set
-*/
+ * Get an array variable, first checking whether it's set.
+ *
+ * @since   v1.0.8
+ * @param   array   $A          Array where the variable should be
+ * @param   string  $key        Name of array element
+ * @param   string  $type       Type of return value
+ * @param   mixed   $default    Default value, if key is not set
+ * @return     Array element cast to $type, or NULL if not set
+ */
 function PRF_getVar($A, $key, $type = 'string', $default = NULL)
 {
     // If the key is not set, return the default
@@ -1175,6 +1184,5 @@ function PRF_getVar($A, $key, $type = 'string', $default = NULL)
     }
     return $val;
 }
-
 
 ?>
