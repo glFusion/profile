@@ -20,21 +20,21 @@ namespace Profile;
  */
 class Profile
 {
-    /** Local properties
-    *   @var array */
+    /** Local properties accessed via `__set()` and `__get()`.
+     * @var array */
     var $properties = array();
 
-    /** Profile fields, an array of objects
-    *   @var array */
+    /** Profile fields, an array of objects.
+     * @var array */
     var $fields = array();
 
-    /** User ID
-    *   @var integer */
+    /** User ID.
+     * @var integer */
     var $uid;
 
     /**
      * Constructor.
-     * Create a forms object for the specified user ID, or the current
+     * Create profile object for the specified user ID, or the current
      * user if none specified.  If a key is requested, then just build
      * the forms for that key (requires a $uid).
      *

@@ -1,25 +1,26 @@
 <?php
 /**
-*   Table definitions and other static config variables
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
-*   @package    profile
-*   @version    1.2.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Table definitions and other static config variables.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
+ * @package     profile
+ * @version     v1.2.0
+ * @license     http://opensource.org/licenses/gpl-2.0.php 
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 
 /**
-*   Global array of table names from glFusion
-*   @global array $_TABLES
-*/
+ * Global array of table names from glFusion.
+ * @global array $_TABLES
+ */
 global $_TABLES;
 
 /**
-*   Global table name prefix
-*   @global string $_DB_table_prefix
-*/
+ * Global table name prefix.
+ * @global string $_DB_table_prefix
+ */
 global $_DB_table_prefix;
 
 $_TABLES['profile_def']     = $_DB_table_prefix . 'profile_def';
@@ -30,9 +31,9 @@ $_TABLES['profile_lists']   = $_DB_table_prefix . 'profile_lists';
 $_TABLES['profile_values']  = $_DB_table_prefix . 'profile_values';
 
 /**
-*   Global configuration array
-*   @global array $_PRF_CONF
-*/
+ * Global configuration array.
+ * @global array $_PRF_CONF
+ */
 global $_PRF_CONF;
 $_PRF_CONF['pi_name']           = 'profile';
 $_PRF_CONF['pi_version']        = '1.2.0';

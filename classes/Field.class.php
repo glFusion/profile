@@ -5,7 +5,7 @@
  * @author      Lee Garner <lee@leegarner.com>
  * @copyright   Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
  * @package     profile
- * @version     1.2.0
+ * @version     v1.2.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -14,8 +14,8 @@ namespace Profile;
 
 /**
  * Base class for profile fields.
- * @package     profile
- * @since       @version 1.1.0
+ * @package profile
+ * @since   v1.1.0
  */
 class Field
 {

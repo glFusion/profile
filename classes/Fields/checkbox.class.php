@@ -5,8 +5,8 @@
  * @author      Lee Garner <lee@leegarner.com>
  * @copyright   Copyright (c) 2018 Lee Garner <lee@leegarner.com>
  * @package     profile
- * @version     1.2.0
- * @since       1.2.0
+ * @version     v1.2.0
+ * @since       v1.2.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -21,7 +21,6 @@ class checkbox extends \Profile\Field
 {
     /**
      * Constructor.
-     * Set up the options array
      *
      * @param   mixed   $item   Name of item, or array of info
      * @param   mixed   $value  Optional value to assign
