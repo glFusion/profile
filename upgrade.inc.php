@@ -83,6 +83,12 @@ function profile_do_upgrade($current_ver)
         if (!profile_upgrade_1_1_4()) return false;
     }
 
+    // Update the plugin configuration
+    USES_lib_install();
+    global $profileConfigData;
+    require_once __DIR__ . '/install_defaults.php';
+    _update_config('profile', $profileConfigData);
+
     // Catch any final version update needed for code-only upgrades
     if (!COM_checkVersion($current_ver, $installed_ver)) {
         if (!profile_do_set_version($installed_ver)) return false;
@@ -643,8 +649,8 @@ function profile_upgrade_1_1_4()
         // use username if fullname is empty
         // fullname may be empty, but username can't be
         if ($A['fullname'] == '') $A['fullname'] = $A['username'];
-        $fname = DB_escapeString(LGLib\NameParser::F($A['fullname']));
-        $lname = DB_escapeString(LGLib\NameParser::L($A['fullname']));
+        $fname = DB_escapeString(\LGLib\NameParser::F($A['fullname']));
+        $lname = DB_escapeString(\LGLib\NameParser::L($A['fullname']));
         $uid = (int)$A['uid'];
         $sql = "UPDATE {$_TABLES['profile_data']} SET
                 sys_fname='$fname', sys_lname='$lname'
