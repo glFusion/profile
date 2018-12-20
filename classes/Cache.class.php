@@ -32,6 +32,7 @@ class Cache
      * @param   mixed   $data   Data, typically an array
      * @param   mixed   $tag    Tag, or array of tags.
      * @param   integer $cache_mins Cache minutes
+     * @return  boolean     True on success, False on error
      */
     public static function set($key, $data, $tag='', $cache_mins=0)
     {
@@ -50,7 +51,7 @@ class Cache
             $tags = array_merge($tags, $tag);
         }
         $key = self::makeKey($key);
-        \glFusion\Cache::getInstance()
+        return \glFusion\Cache\Cache::getInstance()
             ->set($key, $data, $tags, $cache_mins * 60);
     }
 
@@ -59,15 +60,15 @@ class Cache
      * Delete a single item from the cache by key.
      *
      * @param   string  $key    Base key, e.g. item ID
+     * @return  boolean     True on success, False on error
      */
     public static function delete($key)
     {
         if (version_compare(GVERSION, self::MIN_GVERSION, '<')) {
             return;     // caching requires glFusion 1.8.0 or higher
         }
-COM_errorLog("Deleting cache key $key");
         $key = self::makeKey($key);
-        \glFusion\Cache::getInstance()->delete($key);
+        return \glFusion\Cache\Cache::getInstance()->delete($key);
     }
 
 
@@ -76,6 +77,7 @@ COM_errorLog("Deleting cache key $key");
      * Called after upgrade.
      *
      * @param   array   $tag    Optional array of tags, base tag used if undefined
+     * @return  boolean     True on success, False on error
      */
     public static function clear($tag = array())
     {
@@ -87,7 +89,7 @@ COM_errorLog("Deleting cache key $key");
             if (!is_array($tag)) $tag = array($tag);
             $tags = array_merge($tags, $tag);
         }
-        \glFusion\Cache::getInstance()->deleteItemsByTagsAll($tags);
+        return \glFusion\Cache\Cache::getInstance()->deleteItemsByTagsAll($tags);
     }
 
 
@@ -100,7 +102,7 @@ COM_errorLog("Deleting cache key $key");
      */
     public static function makeKey($key)
     {
-        $key = \glFusion\Cache::getInstance()->createKey(self::TAG . '_' . $key);
+        $key = \glFusion\Cache\Cache::getInstance()->createKey(self::TAG . '_' . $key);
         return $key;
     }
 
@@ -117,8 +119,8 @@ COM_errorLog("Deleting cache key $key");
             return NULL;     // caching requires glFusion 1.8.0 or higher
         }
         $key = self::makeKey($key);
-        if (\glFusion\Cache::getInstance()->has($key)) {
-            return \glFusion\Cache::getInstance()->get($key);
+        if (\glFusion\Cache\Cache::getInstance()->has($key)) {
+            return \glFusion\Cache\Cache::getInstance()->get($key);
         } else {
             return NULL;
         }
