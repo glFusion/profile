@@ -192,9 +192,9 @@ function service_getValues_profile($args, &$output, &$svc_msg)
     $uid = isset($args['uid']) ? (int)$args['uid'] : (int)$_USER['uid'];
     if ($uid < 2) return PLG_RET_ERROR;
 
-    // Get all the profile items.  We don't consider a failure here to be
+    // Get all the profile items. We don't consider a failure here to be
     // an error, there will just be nothing returned.
-    $A = PRF_getDefs($uid);
+    $A = \Profile\Profile::getInstance($uid)->fields;
 
     if (isset($args['item'])) {
         $items = $args['item'];
@@ -264,6 +264,30 @@ function service_saveData_profile($args, &$output, &$svc_msg)
     $status = $P->Save($args['data']);;
     if ($status) return PLG_RET_OK;
     else return PLG_RET_ERROR;
+}
+
+
+/**
+ * Verify that a user's profile is valid.
+ * Checks each field using the field's validData function and sets $output
+ * to an array of field names with invalid values.
+ *
+ * @param   array       $args       Must include `uid` element
+ * @param   mixed       $output     Output array - gets error field names
+ * @param   mixed       $svc_msg    Service messages (not used)
+ * @return  integer     Result code
+ */
+function service_validate_profile($args, &$output, &$svc_msg)
+{
+    $uid = $args['uid'];
+    $Prf = \Profile\Profile::getInstance($uid);
+    $output = array();
+    foreach ($Prf->fields as $name=>$Fld) {
+        if (!$Fld->validData($vals)) {
+            $output[] = $name;
+        }
+    }
+    return empty($output) ? PLG_RET_OK : PLG_RET_ERROR;
 }
 
 ?>
