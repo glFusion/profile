@@ -86,7 +86,8 @@ class Profile
         if ($defs === NULL) {
             $defs = array();
             $sql = "SELECT * FROM {$_TABLES['profile_def']}
-                    WHERE enabled = 1";
+                    WHERE enabled = 1
+                    ORDER BY orderby ASC";
             $res = DB_query($sql);
             while ($A = DB_fetchArray($res, false)) {
                 $defs[$A['name']] = Field::getInstance($A);
@@ -237,7 +238,7 @@ class Profile
             $isAdmin = SEC_hasRights('profile.admin');
             if ($this->uid != $_USER['uid'] && !$isAdmin) {
                 // non-admin attempting to change another user's record
-                return;
+                return false;
             }
         }
 
@@ -284,6 +285,7 @@ class Profile
                 $msg .= ' (Manager Override)';
             } else {
                 // Abort for regular users
+                COM_errorLog("$validation_errs errors saving the profile for user {$this->uid}");
                 return false;
             }
         }
