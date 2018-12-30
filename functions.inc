@@ -15,7 +15,7 @@ if (!defined ('GVERSION')) {
     die ('This file can not be used on its own.');
 }
 
-/**  Check and see if we need to load the plugin configuration */
+/** Check and see if we need to load the plugin configuration */
 require_once $_CONF['path_system'] . 'classes/config.class.php';
 
 $prf_config = config::get_instance();
@@ -366,7 +366,6 @@ function plugin_profilevariablesdisplay_profile($uid, &$template)
         'block' => 'profileblock.thtml',
     ));
     $T->set_var('is_uikit', $_PRF_CONF['_is_uikit']);
-    //$A = PRF_getDefs($uid);
     $A = \Profile\Profile::getInstance($uid)->fields;
     if (empty($A)) {
         return '';
@@ -476,9 +475,8 @@ function PRF_setUserValues($uid=0)
     $A = array();
     //$P = new Profile($uid);
 
-    //$tmp = PRF_getDefs($uid);
-    $P = \Profile\Profile::getInstance($uid);
-    foreach ($P->fields as $name => $data) {
+    $fields = \Profile\Profile::getInstance($uid)->fields;
+    foreach ($fields as $name => $data) {
         $A[$name] = $data->FormatValue();
     }
     if ($uid == 0) {
@@ -502,8 +500,9 @@ function PRF_setUserValues($uid=0)
  * @param   string  $key    Specific key to retrieve, all if blank
  * @param   integer $access Access level needed.  Used to allow admin access
  * @return  array           Array of profile objects
+ * @deprecated v1.2.0
  */
-function PRF_getDefs($uid = 0, $key = '', $access = 2)
+function XPRF_getDefs($uid = 0, $key = '', $access = 2)
 {
     global $_TABLES, $_USER, $LANG_PROFILE, $_PRF_CONF;
 
@@ -656,11 +655,12 @@ function PRF_getValue($key, $uid=0)
     $uid = (int)$uid;
     if ($uid == 0) $uid = $_USER['uid'];
 
-    $A = PRF_getDefs($uid, $key);
-    return array($A[$key]->value, $A[$key]->FormatValue());
-    //USES_profile_class_profile();
-    //$P = new Profile($uid, $key);
-    //return array($P->items[$key]->value, $P->items[$key]->value_text);
+    $P = \Profile\Profile::getInstance($uid);
+    if (isset($P->fields[$key])) {
+        return array($P->fields[$key]->value, $P->fields[$key]->FormatValue());
+    } else {
+        return '';
+    }
 }
 
 
@@ -916,17 +916,17 @@ function plugin_templatesetvars_profile($templatename, &$template)
 
 
 /**
-*   Take action when a user's profile is changed.
-*   Gets the data from the global $_POST array.
-*
-*   @since  version 1.0.0
-*   @param  integer $uid    User ID being modified
-*/
-/*function plugin_user_changed_profile($uid)
+ * Take action when a user's profile is changed.
+ * Gets the data from the global $_POST array.
+ *
+ * @since   v1.0.0
+ * @param   integer $uid    User ID being modified
+ */
+function plugin_user_changed_profile($uid)
 {
-   USES_profile_functions();
-   PRF_saveData($_POST, $uid);
-}*/
+    $P = \Profile\Profile::getInstance($uid);
+    $P->Save($_POST);
+}
 
 
 /**
@@ -967,9 +967,8 @@ function plugin_getconfigelementhelp_profile($option, $doclang='english')
  */
 function plugin_privacy_export_profile($uid,$email='',$username='',$ip='')
 {
-    $tmp = PRF_getDefs($uid);
-
     $retval = "<profile>\n";
+    $tmp = \Profile\Profile::getInstance($uid)->fields;
     foreach ($tmp as $name => $data) {
         $d = addSlashes(htmlentities($data->FormatValue()));
         if (!empty($d)) {
@@ -984,6 +983,17 @@ function plugin_privacy_export_profile($uid,$email='',$username='',$ip='')
         $retval = tidy_repair_string($retval, array('input-xml' => 1));
     }
     return $retval;
+}
+
+
+/**
+ * Return true to enable service functions.
+ *
+ * @return  boolean     True to enable web services
+ */
+function plugin_wsEnabled_profile()
+{
+    return true;
 }
 
 
@@ -1024,11 +1034,10 @@ function PRF_getDocURL($file='', $doclang='english')
  * Reorder all items in a table.
  * Table name is abstracted to support both list and definition tables.
  *
- * @deprecated
  * @param  string  $table  Name of table
  * @param  string  $id_fld Name of "id" field
  */
-function X_PRF_reorderDef($table, $id_fld='id')
+function PRF_reorderDef($table, $id_fld='id')
 {
     global $_TABLES;
 
@@ -1042,16 +1051,19 @@ function X_PRF_reorderDef($table, $id_fld='id')
 
     $order = 10;
     $stepNumber = 10;
-
+    $changed = false;
     while ($A = DB_fetchArray($result, false)) {
-
         if ($A['orderby'] != $order) {  // only update incorrect ones
+            $changed = true;
             $sql = "UPDATE {$_TABLES[$table]}
                 SET orderby = '$order'
                 WHERE $id_fld = '" . DB_escapeString($A[$id_fld]) . "'";
             DB_query($sql, 1);
         }
         $order += $stepNumber;
+    }
+    if ($changed) {
+        \Profile\Cache::clear();
     }
 }
 
