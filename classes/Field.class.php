@@ -356,9 +356,11 @@ class Field
      * @param   array   $vals   Array of name->value pairs
      * @return  boolean         True if data is valid, False if not
      */
-    public function validData($vals)
+    public function validData($vals = NULL)
     {
-        if (isset($vals[$this->name])) {
+        if ($vals === NULL) {   // check current value
+            $val = $this->value;
+        } elseif (isset($vals[$this->name])) {
             $val = $vals[$this->name] !== NULL ? $vals[$this->name] : $this->value;
         } else {
             $val = '';
@@ -800,7 +802,36 @@ class Field
     {
         return 'TEXT';
     }
- 
+
+
+    /**
+     * Automatically generate a field value.
+     *
+     * The site admin can effectively override this function by creating a
+     * CUSTOM_profile_autogen() function which takes the field name & type
+     * as arguments, or a CUSTOM_profile_autogen_{fieldname} function.
+     * The second form takes precedence over the first.
+     *
+     * @since   version 0.0.3
+     * @param   array   $A      Field definition and values
+     * @param   integer $uid    Optional user ID.  Zero is acceptable here.
+     * @return  string          Value to give the field
+     */
+     public function AutoGen()
+     {
+        if (!is_object($A) || empty($A)) {
+            return COM_makeSID();
+        }
+        $function = 'CUSTOM_profile_autogen_' . $this->name;
+        if (function_exists($function)) {
+            return $function($this, $this->uid);
+        } elseif (function_exists('CUSTOM_profile_autogen')) {
+            return CUSTOM_profile_autogen($this, $this->uid);
+        } else {
+            return COM_makeSID();
+        }
+     }
+
 }   // class Field
 
 ?>

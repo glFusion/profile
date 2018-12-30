@@ -23,10 +23,10 @@
  * in the function name. The internal fields names are typically
  * "prf_{name}" and can be seen in the profile item list.
  *
- * @param   object  $A      Field Object
+ * @param   object  $Fld    Field Object
  * @return  string          Field Content
  */
-/*function CUSTOM_profile_autogen_prf_state($A)
+/*function CUSTOM_profile_autogen_prf_state($Fld)
 {
     return 'CA';
 }*/
@@ -36,19 +36,19 @@
  * This function handles all field names and types that are not handled
  * by a field-specific function (see above).
  *
- * @param   object  $A      Field Object
+ * @param   object  $Fld    Field Object
  * @return  string          Field Content
  */
-/*function CUSTOM_profile_autogen($A)
+/*function CUSTOM_profile_autogen($Fld)
 {
-    switch ($A->name) {
+    switch ($Fld->name) {
         case 'prf_membershipid':
             // Generate a random Membership ID
             return 'member' . rand(1,99);
             break;
     }
 
-    switch ($A->type) {
+    switch ($Fld->type) {
         case 'text':
             // Return a static text value
             return "I'm a text field";

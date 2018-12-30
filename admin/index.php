@@ -3,9 +3,9 @@
  * Entry point to administration functions for the Custom Profile plugin
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2009-2012 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
  * @package     profile
- * @version     1.2.0
+ * @version     v1.2.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -32,12 +32,12 @@ if (!SEC_hasRights('profile.admin')) {
 USES_lib_admin();
 USES_profile_functions();
 
-$expected = array('edit', 'savedef', 'deletedef', 'move',
-        'movelist', 'deletelist',
-            'permreset', 'permresetconfirm',
-            'searchusers', 'dousersearch',
-            'lists', 'editlist', 'savelist', 'cancellist',
-            'mode');
+$expected = array(
+    'edit', 'savedef', 'deletedef', 'move', 'movelist', 'deletelist',
+    'permreset', 'permresetconfirm', 'searchusers', 'dousersearch',
+    'lists', 'editlist', 'savelist', 'cancellist',
+    'mode',
+);
 $action = '';
 foreach($expected as $provided) {
     if (isset($_POST[$provided])) {
@@ -210,143 +210,6 @@ $display .= $T->finish($T->get_var('output'));
 $display .= COM_siteFooter();
 echo $display;
 exit;
-
-
-/**
- * Displays a form for editing a profile definition.
- *
- * @deprecated version 1.2.0
- * @param   integer $id     Database ID of item to edit, 0 for new item
- * @return  string          HTML for the form
- */
-function X_PRF_adminForm($id)
-{
-    global $_TABLES, $_CONF, $LANG_PROFILE, $LANG_ADMIN, $_PRF_CONF;
-
-    $retval = '';
-
-    $id = (int)$id;
-    $F = \Profile\Field::getInstance($id);
-    $T = PRF_getTemplate('profile', 'editform', 'admin');
-    /*if ($id > 0) {
-        // Existing item, retrieve it
-        $sql = "SELECT *
-                FROM {$_TABLES['profile_def']}
-                WHERE id='$id'";
-        $result = DB_query($sql);
-        if (DB_numRows($result) != 1) return '';
-        $A = DB_fetchArray($result, false);
-
-        $is_sys = (int)$A['sys'];
-
-        // return nothing if this is a system item and can't be edited
-        if ($is_sys) {
-            $T->set_var('is_sys', 'true');
-            //echo COM_refresh(PRF_ADMIN_URL . '/index.php?msg=101');
-            //exit;
-        }
-
-        $T->set_var('editing', 'true');
-    } else {
-        // New item, create empty array
-        $A = array(
-            'group_id'      => $_PRF_CONF['defgroup'],
-            'perm_owner'    => $_PRF_CONF['default_permissions'][0],
-            'perm_group'    => $_PRF_CONF['default_permissions'][1],
-            'perm_members'  => $_PRF_CONF['default_permissions'][2],
-            'perm_anon'     => $_PRF_CONF['default_permissions'][3],
-            'enabled'       => 1,
-            'show_in_profile' => 1,
-            'type'          => 'text',    // So there's a default value
-        );
-        $T->set_var('editing', '');
-    }
-
-    $F = \Profile\Field::getInstance($A);
-    */
-
-    // Instantiate a class to handle default values
-    /*$classname = 'prf' . $A['type'];
-    if (class_exists($classname)) {
-        $F = new $classname($A['name'], $A['value']);
-    } else {
-        $F = new prfText($A['name'], $A['value']);
-    }*/
-
-    // Create the selection list for the "Position After" dropdown.
-    // Include all options *except* the current one, and select the last one
-    // for new items, the "no change" option for existing items.
-    $sql = "SELECT orderby, name
-            FROM {$_TABLES['profile_def']}
-            WHERE id <> '$id'
-            ORDER BY orderby ASC";
-    $res1 = DB_query($sql);
-    $orderby_options = '';
-    $cnt = DB_numRows($res1);
-    for ($i = 1; $i <= $cnt; $i++) {
-        $B = DB_fetchArray($res1, false);
-        $orderby = (int)$B['orderby'] + 1;
-        if ($id == 0) {
-            $sel = $i == $cnt ? PRF_SELECTED : '';
-        } else {
-            $sel = '';
-        }
-        $orderby_options .= "<option value=\"$orderby\" $sel>{$B['name']}</option>\n";
-    }
-
-    // Create the "Field Type" dropdown.  This is disabled for system items
-    // in the template
-    $type_options = '';
-    foreach ($LANG_PROFILE['fld_types'] as $option => $opt_desc) {
-        $sel = $A['type'] == $option ? PRF_SELECTED : '';
-        $type_options .= "<option value=\"$option\" $sel>$opt_desc</option>\n";
-    }
-
-    // Populate the options specific to certain field types
-    $opts = isset($A['options']) ? PRF_getOpts($A['options']) : array();
-
-    // Set up the field-specific inputs for value selection or default value
-    $T->set_var($F->editValues());
-
-    if (!isset($opts['input_format'])) $opts['input_format'] = '';
-    $T->set_var(array(
-        'id'        => isset($A['id']) ? $A['id'] : 0,
-        'name'      => isset($A['name']) ? $A['name'] : '',
-        'type'      => isset($A['type']) ? $A['type'] : 'text',
-        'oldtype'   => isset($A['type']) ? $A['type'] : 'text',
-        'prompt'    => isset($A['prompt']) ? $A['prompt'] : '',
-        'ena_chk'   => (isset($A['enabled']) && $A['enabled'] == 1) ? PRF_CHECKED : '',
-        'user_reg_chk' => (isset($A['user_reg']) && $A['user_reg'] == 1) ? PRF_CHECKED : '',
-        'req_chk'   => (isset($A['required']) && $A['required'] == 1) ? PRF_CHECKED : '',
-        'in_prf_chk' => (isset($A['show_in_profile']) && $A['show_in_profile'] == 1) ? PRF_CHECKED : '',
-        'spancols_chk' => (isset($opts['spancols']) && $opts['spancols'] == 1) ? PRF_CHECKED : '',
-        'orderby'   => $A['orderby'],
-        'format'    => isset($opts['format']) ? $opts['format'] : '',
-        'input_format' => \Profile\Field\date::DateFormatSelect($opts['input_format']),
-        'doc_url'   => PRF_getDocURL('profile_def.html'),
-        'mask'      => isset($opts['mask']) ? $opts['mask'] : '',
-        'vismask'   => isset($opts['vismask']) ? $opts['vismask'] : '',
-        'autogen_chk' => (isset($opts['autogen']) && $opts['autogen'] == 1) ?
-                        PRF_CHECKED : '',
-        'stripmask_chk' => (isset($opts['stripmask']) && $opts['stripmask']  == 1) ?
-                        PRF_CHECKED : '',
-        'group_dropdown' => SEC_getGroupDropdown($A['group_id'], 3),
-        'permissions' => PRF_getPermissionsHTML(
-                $A['perm_owner'],$A['perm_group'],
-                $A['perm_members'],$A['perm_anon']),
-        'plugin_options' => COM_optionList($_TABLES['plugins'],
-                        'pi_name,pi_name', $A['plugin'], 0, 'pi_enabled=1'),
-        'help_text' => isset($opts['help_text']) ?
-                htmlspecialchars($opts['help_text']) : '',
-        'dt_input_format' => \Profile\Field\date::DateFormatSelect($opts['input_format']),
-        'orderby_selection' => $orderby_options,
-        'type_options' => $type_options,
-    ) );
-    $T->parse('output', 'editform');
-    $retval .= $T->finish($T->get_var('output'));
-
-    return $retval;
-}
 
 
 /**

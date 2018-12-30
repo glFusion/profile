@@ -359,8 +359,6 @@ function plugin_profilevariablesdisplay_profile($uid, &$template)
         return '';
     }
 
-    USES_profile_functions();
-
     $T = new Template(PRF_PI_PATH . 'templates/');
     $T->set_file(array(
         'block' => 'profileblock.thtml',
@@ -375,7 +373,7 @@ function plugin_profilevariablesdisplay_profile($uid, &$template)
     $items = 0;     // counter to check if any items are actually displayed
     $isAdmin = PRF_isManager();
     foreach ($A as $data) {
-// TODO: show variables to the user if owner perm set
+        // TODO: show variables to the user if owner perm set
         // Admin can see all fields, they'll be styled to indicate not public.
         if (!$data->isPublic() && !$isAdmin) continue;
         $value = $data->FormatValue();
@@ -422,11 +420,6 @@ function plugin_profilesave_profile($uid=0)
         $uid = (int)$_USER['uid'];
     }
 
-    //USES_profile_functions();
-    //PRF_saveData($_POST, $uid);
-    //USES_profile_class_profile();
-    //$P = new Profile();
-    //$P->Save($_POST);
     $P = \Profile\Profile::getInstance($uid);
     $P->Save($_POST);
 }
@@ -446,10 +439,6 @@ function plugin_user_create_profile($uid = 0)
     if ($uid == 0)
         return;
 
-    //USES_profile_functions();
-    //PRF_saveData($_POST, $uid, 'registration');
-    //USES_profile_class_profile();
-    //$P = new Profile($uid);
     $P = \Profile\Profile::getInstance($uid);
     $P->Save($_POST, 'registration');
 }
@@ -487,69 +476,6 @@ function PRF_setUserValues($uid=0)
     } else {
         return $A;
     }
-}
-
-
-/**
- * Retrieve all the profile definitions and data items for the current or supplied user ID.
- * An empty array is returned in case of a database error.  The typical
- * cause would be when the code is updated and the plugin upgrade function
- * hasn't yet been run to update the database.
- *
- * @param   integer $uid    Optional user ID, current user if empty
- * @param   string  $key    Specific key to retrieve, all if blank
- * @param   integer $access Access level needed.  Used to allow admin access
- * @return  array           Array of profile objects
- * @deprecated v1.2.0
- */
-function XPRF_getDefs($uid = 0, $key = '', $access = 2)
-{
-    global $_TABLES, $_USER, $LANG_PROFILE, $_PRF_CONF;
-
-    return \Profile\Profile::getInstance($uid);
-
-    //USES_profile_class_item();
-
-    // Default to current user if nothing else provided.  Zero is valid
-    // if this is a new user registration, though return will be empty.
-    $uid = $uid == 0 ? (int)$_USER['uid'] : (int)$uid;
-
-    $sql = "SELECT * FROM {$_TABLES['profile_def']} pd
-            WHERE pd.enabled=1 ";
-    if ($key != '') {
-        $sql .= " AND pd.name = '" . DB_escapeString($key) . "' ";
-    }
-
-    // Make sure the current user has access to this user's field:
-    if ($uid > 0 && $access > 0) {
-        $sql .= PRF_getPermSQL('AND', $uid, $access, 'pd');
-    }
-    $sql .= " ORDER BY pd.orderby";
-
-    $res = DB_query($sql, 1);
-    if (DB_error()) {
-        COM_errorLog("PRF_getDefs() error: $sql");
-        return array();
-    }
-
-    // Get the data record for this field
-    $sql = "SELECT * FROM {$_TABLES['profile_data']} WHERE puid='$uid'";
-    $res1 = DB_query($sql, 1);
-    if (DB_error()) return array();
-    $vals = DB_fetchArray($res1, false);
-
-    $F = array();
-    while ($def = DB_fetchArray($res, false)) {
-        //$classname = 'prf' . $tmp['type'];
-        /*if (isset($vals[$def['name']])) {
-            $def['value'] = $vals[$def['name']];
-        } else {
-            $def['value'] = NULL;
-        }*/
-        $value = isset($vals[$def['name']]) ? $vals[$def['name']] : NULL;
-        $F[$def['name']] = \Profile\Field::getInstance($def, $value, $uid);
-    }
-    return $F;
 }
 
 
@@ -905,9 +831,7 @@ function plugin_templatesetvars_profile($templatename, &$template)
     global $_PRF_CONF;
 
     if ($templatename == 'registration') {
-        //USES_profile_functions();
         $existingPluginFields = $template->get_var('plugin_fields');
-        //$pluginFields = $existingPluginFields . PRF_editForm('registration');
         $P = \Profile\Profile::getInstance(1);
         $pluginFields = $existingPluginFields . $P->Edit('registration');
         $template->set_var('plugin_fields', $pluginFields);

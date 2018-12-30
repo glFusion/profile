@@ -47,7 +47,6 @@ $T->set_var('myself', $_SERVER['PHP_SELF']);
 $T->set_var('srchval', $srchval == '' ? 'Search' : $srchval);
 
 // Create the SQL to locate site members.
-//$grplist = PRF_GetGroups($group);
 $group = (int)$group;
 if ($group < 1) $group = 13;    // Avoid nasty surprises
 
@@ -105,26 +104,30 @@ $result = DB_query($sql);
 $totalEntries = DB_numRows($result);
 $maxList = isset($_PRF_CONF['perpage']) ? (int)$_PRF_CONF['perpage'] : 20;
 if ($maxList < 1) $maxList = 20;
-if ($totalEntries <= $maxList)
+if ($totalEntries <= $maxList) {
     $totalPages = 1;
-elseif ($totalEntries % $maxList == 0)
+} elseif ($totalEntries % $maxList == 0) {
     $totalPages = $totalEntries / $maxList;
-else
+} else {
     $totalPages = ceil($totalEntries / $maxList);
+}
 
 $page = COM_applyFilter(PRF_getParam('start'), true);
-if ($page < 1 || $page > $totalPages)
+if ($page < 1 || $page > $totalPages) {
     $page = 1;
+}
 
-if ($totalEntries == 0)
+if ($totalEntries == 0) {
     $startEntry = 0;
-else
+} else {
     $startEntry = $maxList * $page - $maxList + 1;
+}
 
-if ($page == $totalPages)
+if ($page == $totalPages) {
     $endEntry = $totalEntries;
-else
+} else {
     $endEntry = $maxList * $page;
+}
 
 $prePage = $page - 1;
 $nextPage = $page + 1;
@@ -192,69 +195,8 @@ while ($row = DB_fetchArray($result)) {
 
 $T->parse('output', 'footer');
 echo $T->finish($T->get_var('output'));
-
 echo COM_siteFooter();
 
-
-/**
- *  Retrieve the groups to show in the selection dropdown.
- *  Takes the list from the configuration, converts it to an array
- *  and gets the corresponding names from the database.  If a name
- *  is given in the configuraton for a group, that name is used instead.
- *
- *  @param  string  &$group Pointer to the group to use as selected
- *  @return array   Array of id=>groupname values
- */
-function X_PRF_GetGroups(&$group)
-{
-    global $_TABLES, $_PRF_CONF;
-
-    $A = array();
-
-    // If "no group" is an option, prepend it and use 0 as the value.
-    /*if ($nogroup) {
-        $A['None'] = 0;
-    }*/
-
-    // If we're excluding rather than including groups, then make
-    // the query negative.
-    $grplist = DB_escapeString($_PRF_CONF['groups']);
-    $exclude = $_PRF_CONF['exclude_groups'] == true ? 'NOT' : '';
-
-    $sql = "SELECT grp_id, grp_name FROM {$_TABLES['groups']}";
-
-    // If a group list is specified, add it as a condition with the
-    // specified keyword.
-    if ($grplist!= '') {
-        $sql .= " WHERE grp_id $NOT IN ($grplist)";
-    }
-
-    $sql .= " ORDER BY grp_name ASC";
-    //echo $sql;
-
-    $result = DB_query($sql);
-    if ($result && DB_numRows($result) > 0) {
-        $firstgroup = 0;
-        while ($row = DB_fetchArray($result)) {
-
-            if ($firstgroup == 0)
-                $firstgroup = $row['grp_id'];
-
-            if (isset($_PRF_CONF['group_names'][$row['grp_id']])) {
-                $row['grp_name'] =
-                    $_PRF_CONF['group_names'][$row['grp_id']];
-            }
-
-            $A[$row['grp_id']] = htmlspecialchars($row['grp_name']);
-
-        }
-
-        if (!isset($A[$group]))
-            $group = $firstgroup;
-    }
-
-    return $A;
-}
 
 /**
  * Get a parameter from $_POST or $_GET.
