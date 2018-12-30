@@ -4,7 +4,7 @@
     <description>Provides the ability to add and modify extended profile fields from within glFusion</description>
     <version>1.2.0</version>
     <glfusionversion>1.7.0</glfusionversion>
-    <phpversion>5.3.0</phpversion>
+    <phpversion>7.0.0</phpversion>
     <url>http://www.leegarner.com</url>
     <maintainer>Lee Garner</maintainer>
     <requires>lglib,1.0.7</requires>
