@@ -198,16 +198,24 @@ function service_getValues_profile($args, &$output, &$svc_msg)
 
     if (isset($args['item'])) {
         $items = $args['item'];
-        if (!is_array($items)) {
-            $items = array($items);
-        }
-
-        foreach ($items as $item) {
-            if (isset($A[$item])) {
-                $output[$item] = $A[$item]->FormatValue();
+        if ($items == '*') {
+            // Getting the formatted value for all items
+            foreach ($A as $key=>$item) {
+                $output[$key] = $A[$item]->FormatValue();
+            }
+        } else {
+            // Getting the formatted value for one or more specific items
+            if (!is_array($items)) {
+                $items = array($items);
+            }
+            foreach ($items as $item) {
+                if (isset($A[$item])) {
+                    $output[$item] = $A[$item]->FormatValue();
+                }
             }
         }
     } else {
+        // Just getting the item objects for all items
         foreach ($A as $key=>$item) {
             $output[$key] = $item;
         }
