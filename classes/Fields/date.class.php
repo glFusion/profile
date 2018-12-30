@@ -366,26 +366,31 @@ function {$this->name}_onUpdate(cal)
      * @param   array   $vals   Array of values
      * @return  boolean     True if data is valid, False if not
      */
-    public function validData($vals)
+    public function validData($vals = NULL)
     {
         // This function uses the field name and the $vals array to construct
         // month, day and year values. $value is unused
 
-        if (!is_array($vals)) {
-            // Can't be valid data
-            return false;
-        }
-
         if ($this->required) {
-            $month = isset($vals[$this->name . '_month']) ?
+            if ($vals === NULL) {   // checking current value
+                $parts = explode(' ', $this->value);
+                $dt = explode('-', $parts[0]);
+                $year = $dt[0];
+                $month = isset($dt[1]) ? $dt[1] : 0;
+                $day = isset($dt[2]) ? $dt[2] : 0;
+            } elseif (is_array($vals)) {
+                $month = isset($vals[$this->name . '_month']) ?
                     (int)$vals[$this->name . '_month'] : 0;
-            $day = isset($vals[$this->name . '_day']) ?
+                $day = isset($vals[$this->name . '_day']) ?
                     (int)$vals[$this->name . '_day'] : 0;
-            $year = isset($vals[$this->name . '_year']) ?
+                $year = isset($vals[$this->name . '_year']) ?
                     (int)$vals[$this->name . '_year'] : 0;
-            if (!\LGLib\Date_Calc::isValidDate($day, $month, $year)) return false;
+            } else {
+                return false;
+            }
+            return checkdate($month, $day, $year);
         }
-        return true;
+        return true;    // a value is not required
     }
 
 
