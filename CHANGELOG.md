@@ -2,14 +2,15 @@
 
 ## Version 1.2.0
 Release TBD
+- Enable web services to allow `PLG_invokeService()` to be used
 - Fix namespace usage
-- Implement caching for glFusion 1.8.0+
+- Implement caching for glFusion 2.0.0+
 - Refactor profile field classes by type
-- Add privacy_export function
+- Add `privacy_export()` function
 - Require LGLib 1.0.7+ for NameParser class
-- Ensure that sys_fname and sys_lname fields are created during update if missing.
+- Ensure that `sys_fname` and `sys_lname` fields are created during update if missing.
 - Remove realtime field validation if using uikit
-- Update README to indicate reliance on LGLib plugin and lglib_messages header var.
+- Update README to indicate reliance on LGLib plugin and `lglib_messages` header var.
 - Add PDF membership list
 - Shows a reminder message at login to users who have no email address.
 - UIKit template updates
