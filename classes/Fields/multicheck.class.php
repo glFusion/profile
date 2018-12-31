@@ -78,17 +78,26 @@ class multicheck extends \Profile\Field
 
 
     /**
-     * Return the formatted string value.
+     * Return the formatted string value, or an empty strin on error.
      *
      * @param   integer $value  Not used, just for consistency
      * @return  string          String corresponding to value.
      */
-    public function FormatValue($value = '')
+    public function FormatValue($value = NULL)
     {
+        // If a value is not supplied, use the current value
+        if ($value === NULL) {
+            $value = $this->value;
+        }
+        // If the value is a string, unserialize it into an array
         if (is_string($value)) $value = @unserialize($value);
-        if (!is_array($value)) $value = $this->value;
-        if (is_array($value)) $formatted = implode(', ', $value);
-        else $formatted = '';
+
+        // Check again that it is an array (unserialize may have failed)
+        if (is_array($value)) {
+            $formatted = implode(', ', $value);
+        } else {
+            $formatted = '';
+        }
         return $formatted;
     }
 
@@ -146,7 +155,7 @@ class multicheck extends \Profile\Field
      */
     public function prepareToSave($vals)
     {
-        return @serialize($vals[$name]);
+        return @serialize($vals[$this->name]);
     }
 
 
