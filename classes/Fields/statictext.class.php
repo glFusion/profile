@@ -26,7 +26,7 @@ class statictext extends \Profile\Field
      * @param   mixed   $value  Optional value to assign
      * @param   integer $uid    Optional user ID
      */
-    public function __construct($item, $value='', $uid='')
+    public function __construct($item=NULL, $value='', $uid='')
     {
         parent::__construct($item, $value, $uid);
         $this->value = $this->getOption('value');

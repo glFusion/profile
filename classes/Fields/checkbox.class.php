@@ -26,7 +26,7 @@ class checkbox extends \Profile\Field
      * @param   mixed   $value  Optional value to assign
      * @param   integer $uid    Optional user ID, current user by default
      */
-    public function __construct($item, $value='', $uid='')
+    public function __construct($item=NULL, $value='', $uid='')
     {
         parent::__construct($item, $value, $uid);
     }

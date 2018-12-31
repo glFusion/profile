@@ -64,8 +64,7 @@ class Field
         if (is_array($item)) {
             $A = $item;
         } elseif ($item !== NULL) {
-            $sql = "SELECT *
-                    FROM {$_TABLES['profile_def']}
+            $sql = "SELECT * FROM {$_TABLES['profile_def']}
                     WHERE name='" . DB_escapeString($item) . "'";
             $res = DB_query($sql);
             $A = DB_fetchArray($res, false);
@@ -78,6 +77,7 @@ class Field
             $this->perm_group = $_PRF_CONF['default_permissions'][1];
             $this->perm_members = $_PRF_CONF['default_permissions'][2];
             $this->perm_anon = $_PRF_CONF['default_permissions'][3];
+            $this->enabled = 1;
         }
 
         // Override the item's value if one is provided.
@@ -445,7 +445,15 @@ class Field
             $id = 0;
             $type = 'text';
         }
-        //if (!isset($defs[$id])) {
+        $classname = __NAMESPACE__ . '\\Fields\\' . $type;
+
+        // For a new field being created, don't cache anything.
+        // Just construct the appropriate class and return it.
+        if ($id == 0) {
+            return new $classname();
+        }
+
+        if (!isset($defs[$id])) {
             if (is_array($A)) {     // should be array at this point
                 $classname = __NAMESPACE__ . '\\Fields\\' . $type;
                 if (class_exists($classname)) {
@@ -458,12 +466,12 @@ class Field
                 // Failsafe if no field is found, e.g. when creating a new one
                 $cls = new Fields\text('', '', $uid);
             }
-            $defs[$id] = $cls;  // save for subsequent requests
-        //}
+            $defs[$id] = $cls;  // save for subsequent requests, if not new
+        }
         // Always set the value if defined, allows for repeated calls
         // for different users, e.g. in a profile list.
-            $defs[$id]->value = $value;
-            $defs[$id]->uid = $uid;
+        $defs[$id]->value = $value;
+        $defs[$id]->uid = $uid;
         return $defs[$id];
     }
 
@@ -619,7 +627,7 @@ class Field
         // the values.
         $sql = $this->getDataSql($A);
         if (!empty($sql)) {
-            $sql .= "ALTER TABLE {$_TABLES['profile_data']} $sql";
+            $sql = "ALTER TABLE {$_TABLES['profile_data']} $sql";
             //echo $sql;die;
             DB_query($sql, 1);
             if (DB_error()) {
@@ -630,6 +638,7 @@ class Field
         // After all default options are set, allow the field types to
         // provide their own.
         $this->setOptions($A);
+
         // This serializes any options set
         //$A['options'] = PRF_setOpts($options);
         $options = DB_escapeString(@serialize($this->options));

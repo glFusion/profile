@@ -117,7 +117,7 @@ function multichk_insertRow(list) {
   <input type="hidden" name="oldtype" value="{type}" />
   <fieldset>
     <div class="uk-form-row">
-      <label for="name" class="uk-form-label">{$LANG_PROFILE['fieldname']}
+      <label class="uk-form-label">{$LANG_PROFILE['fieldname']}
         <span id="hlp_fieldname" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
@@ -135,7 +135,7 @@ function multichk_insertRow(list) {
     </div>
 
     <div class="uk-form-row">
-      <label for="prompt" class="uk-form-label">{$LANG_PROFILE['textprompt']}
+      <label class="uk-form-label">{$LANG_PROFILE['textprompt']}
         <span id="hlp_prompt" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
@@ -144,7 +144,7 @@ function multichk_insertRow(list) {
     </div>
 
     <div class="uk-form-row">
-      <label for="help_text" class="uk-form-label">{$LANG_PROFILE['help_text']}
+      <label class="uk-form-label">{$LANG_PROFILE['help_text']}
         <span id="hlp_helptext" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
@@ -171,7 +171,7 @@ function multichk_insertRow(list) {
     </div>
 
     <div id="plugin" style="display:none;" class="uk-form-row">
-      <label for="plugin" class="uk-form-label">Plugin
+      <label class="uk-form-label">Plugin
         <a href="#" class="toolbar" 
           onclick="popupWindow('{doc_url}#desc_type', 'Help', 640, 480, 1);return false;">
           <img src="{layout_url}/images/button_help.png" alt="" /></a>
@@ -185,7 +185,7 @@ function multichk_insertRow(list) {
     </div>
 
     <div id="text_size" class="uk-form-row">
-      <label for="size" class="uk-form-label">{$LANG_PROFILE['inputlen']}
+      <label class="uk-form-label">{$LANG_PROFILE['inputlen']}
         <span id="hlp_length" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
@@ -194,7 +194,7 @@ function multichk_insertRow(list) {
     </div>
 
     <div id="text_maxlen" class="uk-form-row">
-      <label for="maxlen" class="uk-form-label">{$LANG_PROFILE['maxlen']}:
+      <label class="uk-form-label">{$LANG_PROFILE['maxlen']}:
         <span id="hlp_length" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
@@ -203,7 +203,7 @@ function multichk_insertRow(list) {
     </div>
 
     <div id="cols" class="uk-form-row">
-      <label for="f_cols" class="uk-form-label">{$LANG_PROFILE['columns']}
+      <label class="uk-form-label">{$LANG_PROFILE['columns']}
         <span id="hlp_rowcol" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
@@ -212,7 +212,7 @@ function multichk_insertRow(list) {
     </div>
 
     <div id="rows" class="uk-form-row">
-      <label for="f_rows" class="uk-form-label">{$LANG_PROFILE['rows']}
+      <label class="uk-form-label">{$LANG_PROFILE['rows']}
         <span id="hlp_rowcol" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
@@ -221,7 +221,7 @@ function multichk_insertRow(list) {
     </div>
 
     <div id="value" class="uk-form-row">
-      <label for="f_value" class="uk-form-label">{$LANG_PROFILE['value']}
+      <label class="uk-form-label">{$LANG_PROFILE['value']}
         <span id="hlp_default" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
@@ -230,7 +230,7 @@ function multichk_insertRow(list) {
     </div>
 
     <div id="static_value" class="uk-form-row">
-      <label for="f_static" class="uk-form-label">{$LANG_PROFILE['value']}
+      <label class="uk-form-label">{$LANG_PROFILE['value']}
         <span id="hlp_value" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
@@ -239,7 +239,7 @@ function multichk_insertRow(list) {
     </div>
 
     <div id="selvalues" class="uk-form-row">
-      <label for="fieldValuesList" class="uk-form-label">{$LANG_PROFILE['value']}
+      <label class="uk-form-label">{$LANG_PROFILE['value']}
         <span id="hlp_value" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
@@ -267,7 +267,7 @@ function multichk_insertRow(list) {
     </div>
 
     <div id="chk_defvalue" class="uk-form-row">
-      <label for="f_chkdefval" class="uk-form-label">{$LANG_PROFILE['defvalue']}
+      <label class="uk-form-label">{$LANG_PROFILE['defvalue']}
         <span id="hlp_default" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
@@ -277,7 +277,7 @@ function multichk_insertRow(list) {
     </div>
 
     <div id="defvalue" class="uk-form-row">
-      <label for="f_defval" class="uk-form-label">{$LANG_PROFILE['defvalue']}
+      <label class="uk-form-label">{$LANG_PROFILE['defvalue']}
         <span id="hlp_default" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
@@ -287,7 +287,7 @@ function multichk_insertRow(list) {
     </div>
 
     <div id="date_showtime" class="uk-form-row">
-      <label for="f_showtime" class="uk-form-label">{$LANG_PROFILE['showtime']}?
+      <label class="uk-form-label">{$LANG_PROFILE['showtime']}?
         <span id="hlp_24hr" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
@@ -307,7 +307,7 @@ function multichk_insertRow(list) {
     </div>
 
     <div id="dt_input_format" class="uk-form-row">
-      <label for="f_dt_format" class="uk-form-label">{$LANG_PROFILE['input_format']}
+      <label class="uk-form-label">{$LANG_PROFILE['input_format']}
         <span id="hlp_input_format" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
