@@ -21,10 +21,10 @@ global $_CONF, $_PRF_CONF;
  * then no upgrade section is required.  The version is bumped in
  * functions.inc.
  *
- * @param   string  $current_ver Current installed version to be upgraded
+ * @param   boolean $dvlp   True to ignore errors (development update)
  * @return  integer Error code, 0 for success
  */
-function profile_do_upgrade($current_ver)
+function profile_do_upgrade($dvlp = false)
 {
     global $_PRF_CONF, $_PLUGIN_INFO;
     
@@ -53,7 +53,7 @@ function profile_do_upgrade($current_ver)
         if (!profile_upgrade_1_0_2()) return false;
     }
 
-    if (!COM_checkVersion($current_ver, '1.0.0')) {
+    if (!COM_checkVersion($current_ver, '1.1.0')) {
         $current_ver = '1.1.0';
         COM_errorLog("Updating Profile Plugin to $current_ver");
         if (!profile_upgrade_1_1_0()) return false;
@@ -74,13 +74,13 @@ function profile_do_upgrade($current_ver)
     if (!COM_checkVersion($current_ver, '1.1.3')) {
         $current_ver = '1.1.3';
         COM_errorLog("Updating Profile Plugin to $current_ver");
-        if (!profile_upgrade_1_1_3()) return false;
+        if (!profile_upgrade_1_1_3($dvlp)) return false;
     }
 
-    if (!COM_checkVersion($current_ver, '1.1.3')) {
+    if (!COM_checkVersion($current_ver, '1.1.4')) {
         $current_ver = '1.1.4';
         COM_errorLog("Updating Profile Plugin to $current_ver");
-        if (!profile_upgrade_1_1_4()) return false;
+        if (!profile_upgrade_1_1_4($dvlp)) return false;
     }
 
     // Update the plugin configuration
@@ -100,28 +100,32 @@ function profile_do_upgrade($current_ver)
 /**
  * Actually perform any sql updates.
  *
- * @param   string $version  Version being upgraded TO
- * @param   array  $sql      Array of SQL statement(s) to execute
+ * @param   string  $version    Version being upgraded TO
+ * @param   array   $sql        Array of SQL statement(s) to execute
+ * @param   boolean $dvlp       True to ignore SQL errors and continue
+ * @#return boolean     True on success, False on error
  */
-function profile_do_upgrade_sql($version, $sql='')
+function profile_do_upgrade_sql($version, $sql='', $dvlp=false)
 {
     global $_TABLES, $_PRF_CONF;
 
     // If no sql statements passed in, return success
-    if (!is_array($sql))
+    if (!is_array($sql)) {
         return true;
+    }
 
     // Execute SQL now to perform the upgrade
     COM_errorLOG("--Updating glProfile to version $version");
+    $errmsg = 'SQL Error during Profile plugin update';
+    if ($dvlp) $errmsg .= ' (ignored)';
     foreach ($sql as $query) {
         //COM_errorLOG("Profile Plugin $version update: Executing SQL => $query");
         DB_query($query, 1);
         if (DB_error()) {
-            COM_errorLog("SQL Error during Profile plugin update: $sql",1);
-            return false;
+            COM_errorLog("$errmsg: $query",1);
+            if (!$dvlp) return false;
         }
     }
-
     return true;
 }
 
@@ -540,9 +544,7 @@ function profile_upgrade_1_1_3()
     // for the 1.1.3 and 1.1.4 update since the SQL wasn't include in new
     // installations for 1.1.3
     $sql = array();
-    $r = DB_query("SHOW COLUMNS FROM {$_TABLES['profile_def']}
-            LIKE 'show_in_profile'");
-    if (DB_numRows($r) < 1) {
+    if (!_PRFtableHasColumn('profile_def', 'show_in_profile')) {
         $sql[] = "ALTER TABLE {$_TABLES['profile_def']}
             ADD show_in_profile tinyint(1) NOT NULL DEFAULT 1 AFTER user_reg";
     }
@@ -579,26 +581,20 @@ function profile_upgrade_1_1_3()
  * Upgrade to version 1.1.4.
  * Adds first and last name fields to the profile data.
  *
+ * @param   boolean $dvlp   True to ignore SQL errors
  * @return  boolean     True on success, False on error
  */
-function profile_upgrade_1_1_4()
+function profile_upgrade_1_1_4($dvlp=false)
 {
     global $_TABLES, $LANG_PROFILE, $_PRF_CONF;
 
     COM_errorLog('Performing 1.1.3 SQL updates if needed');
-    profile_upgrade_1_1_3();
-
-    // New configuration item(s)
-    $c = config::get_instance();
-    if ($c->group_exists($_PRF_CONF['pi_name'])) {
-        $c->add('list_allow_pdf', $_PRF_DEFAULT['list_allow_pdf'], 
-                'select', 0, 2, 3, 20, true, $_PRF_CONF['pi_name']);
-    }
+    profile_upgrade_1_1_3($dvlp);
 
     $sql = array();
-    $x = DB_numRows(DB_query("SHOW COLUMNS FROM {$_TABLES['profile_def']}
-        LIKE 'sys_fname'"));
-    if ($x < 1) {
+    $add_name_parts = false;
+    if (!_PRFtableHasColumn('profile_def', 'sys_fname')) {
+        $add_name_parts = true;
         $sql[] = "ALTER TABLE {$_TABLES['profile_data']}
             ADD sys_fname varchar(40) AFTER sys_parent";
         $sql[] = "INSERT INTO {$_TABLES['profile_def']}
@@ -608,9 +604,8 @@ function profile_upgrade_1_1_4()
                 (41, 'sys_fname', 'fname', 0, 0, 0, '{$LANG_PROFILE['fname']}',
                     'a:2:{s:4:\"size\";i:40;s:9:\"maxlength\";i:80;}', 1, 2)";
     }
-    $x = DB_numRows(DB_query("SHOW COLUMNS FROM {$_TABLES['profile_def']}
-        LIKE 'sys_lname'"));
-    if ($x < 1) {
+    if (!_PRFtableHasColumn('profile_def', 'sys_lname')) {
+        $add_name_parts = true;
         $sql[] = "ALTER TABLE {$_TABLES['profile_data']}
             ADD sys_lname varchar(40) AFTER sys_fname";
         $sql[] = "INSERT INTO {$_TABLES['profile_def']}
@@ -625,9 +620,7 @@ function profile_upgrade_1_1_4()
     // missing from the definition table and add the definition if
     // needed.
     // The def was omitted when the sample data was originally added.
-    $r = DB_query("SHOW COLUMNS FROM {$_TABLES['profile_data']}
-            LIKE 'prf_phone'");
-    if (DB_numRows($r) == 1) {
+    if (_PRFtableHasColumn('profile_data', 'prf_phone')) {
         $r2 = DB_count($_TABLES['profile_def'], 'name', 'prf_phone');
         if ($r2 == 0) {
             $sql[] = "INSERT INTO {$_TABLES['profile_def']}
@@ -641,24 +634,26 @@ function profile_upgrade_1_1_4()
         }
     }
 
-    if (!profile_do_upgrade_sql('1.1.4', $sql)) return false;
+    if (!profile_do_upgrade_sql('1.1.4', $sql, $dvlp)) return false;
 
-    $sql = "SELECT uid, fullname FROM {$_TABLES['users']}";
-    $res = DB_query($sql);
-    while ($A = DB_fetchArray($res, false)) {
-        // use username if fullname is empty
-        // fullname may be empty, but username can't be
-        if ($A['fullname'] == '') $A['fullname'] = $A['username'];
-        $fname = DB_escapeString(\LGLib\NameParser::F($A['fullname']));
-        $lname = DB_escapeString(\LGLib\NameParser::L($A['fullname']));
-        $uid = (int)$A['uid'];
-        $sql = "UPDATE {$_TABLES['profile_data']} SET
-                sys_fname='$fname', sys_lname='$lname'
-                WHERE puid=$uid";
-        DB_query($sql, 1);
-        if (DB_error()) {
-            COM_errorLog("Error executing sql in profile 1.1.4 update: $sql");
-            return false;
+    if ($add_name_parts) {
+        $sql = "SELECT uid, fullname FROM {$_TABLES['users']}";
+        $res = DB_query($sql);
+        while ($A = DB_fetchArray($res, false)) {
+            // use username if fullname is empty
+            // fullname may be empty, but username can't be
+            if ($A['fullname'] == '') $A['fullname'] = $A['username'];
+            $fname = DB_escapeString(\LGLib\NameParser::F($A['fullname']));
+            $lname = DB_escapeString(\LGLib\NameParser::L($A['fullname']));
+            $uid = (int)$A['uid'];
+            $sql = "UPDATE {$_TABLES['profile_data']} SET
+                    sys_fname='$fname', sys_lname='$lname'
+                    WHERE puid=$uid";
+            DB_query($sql, 1);
+            if (DB_error()) {
+                COM_errorLog("Error executing sql in profile 1.1.4 update: $sql");
+                if (!$dvlp) return false;
+            }
         }
     }
     return profile_do_set_version('1.1.4');
@@ -725,6 +720,23 @@ function PRF_remove_old_files()
             @unlink("$path/$file");
         }
     }
+}
+
+
+/**
+ * Check if a column exists in a table
+ *
+ * @param   string  $table      Table Key, defined in paypal.php
+ * @param   string  $col_name   Column name to check
+ * @return  boolean     True if the column exists, False if not
+ */
+function _PRFtableHasColumn($table, $col_name)
+{
+    global $_TABLES;
+
+    $col_name = DB_escapeString($col_name);
+    $res = DB_query("SHOW COLUMNS FROM {$_TABLES[$table]} LIKE '$col_name'");
+    return DB_numRows($res) == 0 ? false : true;
 }
 
 ?>
