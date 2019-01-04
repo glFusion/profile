@@ -1,10 +1,8 @@
 {# begin {templatelocation} #}
-<tr>
-  <td style="width:100px;">
-    <label for="sys_directory">{prf_prompt}:</label>
-  </td>
-  <td>
+<div class="uk-form-row uk-margin-small-top">
+  <label class="uk-form-label" for="sys_directory">{prf_prompt}</label>
+  <div class="uk-form-controls">
     {prf_field}
-  </td>
-</tr>
+  </div>
+</div>
 {# end {templatelocation} #}

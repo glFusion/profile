@@ -1,15 +1,9 @@
 {# begin {templatelocation} #}
-{!if is_uikit}
 <nav class="uk-navbar uk-margin-top">
   <div class="uk-navbar-content">
   {$LANG_PROFILE['block_title']}
   </div>
 </nav>
-{!else}
-<div class="profile-header">
-  {$LANG_PROFILE['block_title']}
-</div>
-{!endif}
 <table class="pluginProfileBlock uk-table uk-table-striped uk-table-condensed">
 <!-- BEGIN profile_row -->
   <tr class="profile_{pubprv}"><td>

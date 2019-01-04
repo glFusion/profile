@@ -429,9 +429,10 @@ function PRF_getField_profile($fieldname, $fieldvalue, $A, $icon_arr)
         break;
 
     case 'edit':
-        $retval = COM_createLink('<i class="' . $_PRF_CONF['_iconset'] .
-                '-edit prf-icon-info" data-uk-tooltip title="' . $LANG_ADMIN['edit'] . '"></i>',
-                PRF_ADMIN_URL . '/index.php?edit=x&amp;id=' . $A['id']);
+        $retval = COM_createLink(
+            '<i class="uk-icon uk-icon-edit prf-icon-info" data-uk-tooltip title="' . $LANG_ADMIN['edit'] . '"></i>',
+            PRF_ADMIN_URL . '/index.php?edit=x&amp;id=' . $A['id']
+        );
        break;
 
     case 'edituser':
@@ -442,10 +443,13 @@ function PRF_getField_profile($fieldname, $fieldvalue, $A, $icon_arr)
     case 'delete':
         if (!$A['sys']) {
             $retval = COM_createLink(
-                '<i class="' . $_PRF_CONF['_iconset'] . '-trash-o prf-icon-danger" ' .
-                    "onclick=\"return confirm('{$LANG_PROFILE['q_conf_del']}');\"" .
-                    'title="' . $LANG_ADMIN['delete'] . '" data-uk-tooltip></i>',
-                PRF_ADMIN_URL . '/index.php?deletedef=x&id=' . $A['id']
+                '<i class="uk-icon uk-icon-trash prf-icon-danger"></i>',
+                PRF_ADMIN_URL . '/index.php?deletedef=x&id=' . $A['id'],
+                array(
+                    'onclick' => "return confirm('{$LANG_PROFILE['q_conf_del']}');",
+                    'title' => $LANG_ADMIN['delete'],
+                    'data-uk-tooltip' => '',
+                )
             );
         }
         break;

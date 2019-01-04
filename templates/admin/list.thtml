@@ -1,10 +1,5 @@
 {# begin {templatelocation} #}
 <script type="text/javascript">
-{!if mootools}
-window.addEvent('domready',function() {
-    var myValidator = new fValidator("frm1");
-});
-{!endif}
 function insertRow(list) {
     var count = list.getElementsByTagName('li').length;
     var new_element = document.createElement('li');
@@ -18,95 +13,90 @@ function insertRow(list) {
 </script>
 
 <form id="frm1" action="{site_url}/admin/plugins/profile/index.php"
-    method="post">
+    class="uk-form-horizontal" method="post">
 <input type="hidden" name="oldid" value="{listid}" />
 <fieldset>
-<table>
-<tr>
-  <td width="150">{$LANG_PROFILE['listid']}:
-  </td>
-  <td>
-    <a href="#" class="toolbar" 
+  <div class="uk-form-row">
+    <label class="uk-form-label" for="f_listid">{$LANG_PROFILE['listid']}
+      <a href="#" class="toolbar" 
         onclick="popupWindow('{doc_url}#desc_name', 'Help', 640, 480, 1);return false;"><img src="{layout_url}/images/button_help.png" alt="" /></a>
-    {!if mootools}
-    <input type="text" class="fValidate['required']" size="32" name="listid"
-    {!else}
-    <input type="text" class="required" size="32" name="listid"
-    {!endif}
+    </label>
+    <div class="uk-form-controls">
+      <input type="text" required class="required" size="32" name="listid"
         value="{listid}" id="f_listid" />
-  </td>
-</tr>
+    </div>
+  </div>
 
-<tr>
-  <td>{$LANG_PROFILE['title']}:</td>
-  <td>
-    <a href="#" class="toolbar" 
+  <div class="uk-form-row">
+    <label class="uk-form-label" for="f_title">{$LANG_PROFILE['title']}
+      <a href="#" class="toolbar" 
         onclick="popupWindow('{doc_url}#desc_title', 'Help', 640, 480, 1);return false;"><img src="{layout_url}/images/button_help.png" alt="" /></a>
-    {!if mootools}
-    <input type="text" class="fValidate['required']" size="80"
-    {!else}
-    <input type="text" class="required" size="80"
-    {!endif}
+    </label>
+    <div class="uk-form-controls">
+      <input type="text" required class="required" size="80"
         name="title" value="{title}" id="f_title" />
-  </td>
-</tr>
+    </div>
+  </div>
 
-<tr>
-  <td width="150">{$LANG_PROFILE['list_view_grp']}:</td>
-  <td>
-    <a href="#" class="toolbar" 
+  <div class="uk-form-row">
+    <label class="uk-form-label" for="group_id">{$LANG_PROFILE['list_view_grp']}
+      <a href="#" class="toolbar" 
         onclick="popupWindow('{doc_url}#desc_group', 'Help', 640, 480, 1);return false;"><img src="{layout_url}/images/button_help.png" alt="" /></a>
-    <select name="group_id">
-    {view_grp_select}
-    </select>
-  </td>
-</tr>
+    </label>
+    <div class="uk-form-controls">
+      <select name="group_id" id="group_id">
+        {view_grp_select}
+      </select>
+    </div>
+  </div>
 
-<tr>
-  <td width="150">{$LANG_PROFILE['list_incl_grp']}:</td>
-  <td>
-    <a href="#" class="toolbar" 
+  <div class="uk-form-row">
+    <label class="uk-form-label" for="incl_grp">{$LANG_PROFILE['list_incl_grp']}
+      <a href="#" class="toolbar" 
         onclick="popupWindow('{doc_url}#desc_incl_grp', 'Help', 640, 480, 1);return false;"><img src="{layout_url}/images/button_help.png" alt="" /></a>
-    <select name="incl_grp">
-    {incl_grp_select}
-    </select>
-  </td>
-</tr>
+    </label>
+    <div class="uk-form-controls">
+      <select name="incl_grp" id="incl_grp">
+        {incl_grp_select}
+      </select>
+    </div>
+  </div>
 
-<tr>
-  <td width="150">{$LANG_PROFILE['incl_user_stat']}:</td>
-  <td>
-    <a href="#" class="toolbar" 
+  <div class="uk-form-row">
+    <label class="uk-form-label">{$LANG_PROFILE['incl_user_stat']}
+      <a href="#" class="toolbar" 
         onclick="popupWindow('{doc_url}#desc_incl_user_stat', 'Help', 640, 480, 1);return false;"><img src="{layout_url}/images/button_help.png" alt="" /></a>
-    <input type="checkbox" name="incl_user_stat[]" value="3" {ustat_chk3} />{lang_active}
-    <input type="checkbox" name="incl_user_stat[]" value="0" {ustat_chk0} />{lang_disabled}
-    <input type="checkbox" name="incl_user_stat[]" value="1" {ustat_chk1} />{lang_activation}
-    <input type="checkbox" name="incl_user_stat[]" value="2" {ustat_chk2} />{lang_approval}
-    <input type="checkbox" name="incl_user_stat[]" value="4" {ustat_chk4} />{lang_verification}
-  </td>
-</tr>
+    </label>
+    <div class="uk-form-controls">
+      <input type="checkbox" name="incl_user_stat[]" value="3" {ustat_chk3} />{lang_active}
+      <input type="checkbox" name="incl_user_stat[]" value="0" {ustat_chk0} />{lang_disabled}
+      <input type="checkbox" name="incl_user_stat[]" value="1" {ustat_chk1} />{lang_activation}
+      <input type="checkbox" name="incl_user_stat[]" value="2" {ustat_chk2} />{lang_approval}
+      <input type="checkbox" name="incl_user_stat[]" value="4" {ustat_chk4} />{lang_verification}
+    </div>
+  </div>
 
-<tr>
-  <td width="150">{$LANG_PROFILE['incl_exp_stat']}:</td>
-  <td>
-    <a href="#" class="toolbar" 
+  <div class="uk-form-row">
+    <label class="uk-form-label">{$LANG_PROFILE['incl_exp_stat']}
+      <a href="#" class="toolbar" 
         onclick="popupWindow('{doc_url}#desc_incl_exp_stat', 'Help', 640, 480, 1);return false;"><img src="{layout_url}/images/button_help.png" alt="" /></a>
-    <input type="checkbox" name="incl_exp_stat[]" {exp_chk1} value="1">{$LANG_PROFILE['current']}&nbsp;&nbsp;
-    <input type="checkbox" name="incl_exp_stat[]" {exp_chk2} value="2">{$LANG_PROFILE['arrears']}
-    <input type="checkbox" name="incl_exp_stat[]" {exp_chk4} value="4">{$LANG_PROFILE['expired']}
-  </td>
-</tr>
+    </label>
+    <div class="uk-form-controls">
+      <input type="checkbox" name="incl_exp_stat[]" {exp_chk1} value="1">{$LANG_PROFILE['current']}&nbsp;&nbsp;
+      <input type="checkbox" name="incl_exp_stat[]" {exp_chk2} value="2">{$LANG_PROFILE['arrears']}
+      <input type="checkbox" name="incl_exp_stat[]" {exp_chk4} value="4">{$LANG_PROFILE['expired']}
+    </div>
+  </div>
 
-<tr>
-  <td width="150">{$LANG_PROFILE['orderby']}:</td>
-  <td>
-    <a href="#" class="toolbar" 
+  <div class="uk-form-row">
+    <label class="uk-form-label" for="orderby">{$LANG_PROFILE['orderby']}
+      <a href="#" class="toolbar" 
         onclick="popupWindow('{doc_url}#desc_orderby', 'Help', 640, 480, 1);return false;"><img src="{layout_url}/images/button_help.png" alt="" /></a>
-    <input type="text" name="orderby" size="4" value="{orderby}" />
-  </td>
-</tr>
-
-</table>
+    </label>
+    <div class="uk-form-controls">
+      <input type="text" id="orderby" name="orderby" size="4" value="{orderby}" />
+    </div>
+  </div>
 
 <table class="pluginProfileListTable">
 <tr>

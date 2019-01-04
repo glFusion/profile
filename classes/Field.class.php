@@ -486,7 +486,8 @@ class Field
     {
         global $_TABLES, $_CONF, $LANG_PROFILE, $LANG_ADMIN, $_PRF_CONF;
 
-        $T = PRF_getTemplate('profile', 'editform', 'admin');
+        $T = new \Template(PRF_PI_PATH . '/templates/admin');
+        $T->set_file('editform', 'profile.thtml');
 
         $fields = self::getAll(false);
         /*$sql = "SELECT id, orderby, name

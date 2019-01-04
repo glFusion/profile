@@ -148,12 +148,12 @@ class Profile
             break;
         }
 
-        $T = PRF_getTemplate($template_name, 'editform');
+        $T = new \Template(PRF_PI_PATH . '/templates');
+        $T->set_file('editform', $template_name . '.thtml');
         $T->set_var(array(
             'uid'       => $this->uid,
             'form_id'   => $form_id,
             'have_jquery' => isset($_SYSTEM['disable_jquery']) && $_SYSTEM['disable_jquery'] ? '' : 'true',
-            'iconset'   => $_PRF_CONF['_iconset'],
         ) );
 
         // Flag to make sure calendar javascript is added only once.  It's

@@ -174,8 +174,7 @@ class date extends \Profile\Field
 
         if (!$this->readonly) {
             // If not a readonly field, add the date picker image & js
-            $datepick .= '<i class="' . $_PRF_CONF['_iconset'] .
-                    '-calendar tooltip" title="' .
+            $datepick .= '<i class="uk-icon uk-icon--calendar tooltip" title="' .
                     $LANG_PROFILE['select_date'] . '" id="' .
                     $this->name . '_trigger"></i>';
             $timeformat = $this->getOption('timeformat', 0);

@@ -89,8 +89,6 @@ if (isset($_PLUGINS) && is_array($_PLUGINS) && in_array('profile', $_PLUGINS)) {
 }
 
 $_PRF_CONF['now'] = date('Y-m-d H:i:s');
-$_PRF_CONF['_is_uikit'] = $_SYSTEM['framework'] == 'uikit' ? true : false;
-$_PRF_CONF['_iconset'] = $_PRF_CONF['_is_uikit'] ? 'uk-icon' : 'fa fa';
 
 /** Import plugin-specific functions */
 function USES_profile_functions()
@@ -323,7 +321,8 @@ function plugin_profileedit_profile($uid, $panel, $fieldset)
     $retval = '';
 
     if ($panel == 'privacy' && $fieldset == 'privacy') {
-        $T = PRF_getTemplate('profile_privacy', 'profile');
+        $T = new \Template(__DIR__ . '/templates');
+        $T->set_file('profile', 'profile_privacy.thtml');
         $P = \Profile\Profile::getInstance($uid);
         if (isset($P->fields['sys_directory'])) {
             $T->set_var(array(
@@ -363,7 +362,6 @@ function plugin_profilevariablesdisplay_profile($uid, &$template)
     $T->set_file(array(
         'block' => 'profileblock.thtml',
     ));
-    $T->set_var('is_uikit', $_PRF_CONF['_is_uikit']);
     $A = \Profile\Profile::getInstance($uid)->fields;
     if (empty($A)) {
         return '';
@@ -1046,33 +1044,6 @@ function PRF_isAdmin()
         }
     }
     return $isAdmin;
-}
-
-
-/**
- * Helper function to get a template object.
- *
- * @param   string  $name   Base name of template, e.g. "editor"
- * @param   string  $id     ID of template, e.g. "editform"
- * @param   string  $path   Optional path if not "templates/"
- * @return  string      Full filename, e.g. "editor.uikit.thtml"
- */
-function PRF_getTemplate($name, $id, $path='')
-{
-    global $_PRF_CONF;
-
-    // May use "switch" later, for now there are only two options
-    $tpltype = $_PRF_CONF['_is_uikit'] ? '.uikit' : '';
-    $filename = "$name$tpltype.thtml";
-    if (substr($path, 0, 9) != 'templates') {
-        $path = 'templates/' . $path;
-    }
-    if (!file_exists(PRF_PI_PATH . "$path/$filename")) {
-        $filename = "$name.thtml";
-    }
-    $T = new Template(PRF_PI_PATH . $path);
-    $T->set_file($id, $filename);
-    return $T;
 }
 
 

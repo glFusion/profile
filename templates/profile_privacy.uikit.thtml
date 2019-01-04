@@ -1,8 +1,0 @@
-{# begin {templatelocation} #}
-<div class="uk-form-row uk-margin-small-top">
-  <label class="uk-form-label" for="sys_directory">{prf_prompt}</label>
-  <div class="uk-form-controls">
-    {prf_field}
-  </div>
-</div>
-{# end {templatelocation} #}

@@ -2,6 +2,7 @@
 
 ## Version 1.2.0
 Release TBD
+- Remove support for non-uikit themes
 - Enable web services to allow `PLG_invokeService()` to be used
 - Fix namespace usage
 - Implement caching for glFusion 2.0.0+

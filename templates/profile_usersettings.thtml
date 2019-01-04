@@ -1,48 +1,33 @@
 {# begin {templatelocation} #}
-<script language="javascript" type="text/javascript">
-//window.addEvent('domready',function() {
-//    var myValidator = new fValidator("profileform");
-//});
-</script>
 <div id="pe_profileprefs" class="jsenabled_hide">
-<fieldset class="pluginProfileForm">
-  <legend>{$LANG_PROFILE['fieldset1']}</legend>
-<table class="pluginProfileBlock">
+  <fieldset data-uk-margin>
+    <legend>{$LANG_PROFILE['fieldset1']}</legend>
+    <div class="uk-panel uk-panel-box">
 <!-- BEGIN QueueRow -->
-<tr>
-{!if spancols}
-  <td colspan="2">
-{!else}
-  <td>
-{!endif}
-{!if prompt}
-    {prompt}:
-{!endif}
-{!if spancols}
-{!else}
-  </td>
-  <td>
-{!endif}
-    {field}
+      <div class="uk-form-row">
+        <label class="uk-form-label" for="{fld_name}">{prompt}</label>
+        <div class="uk-form-controls">
+          {field}
+          <span class="prfInfoIcons">&nbsp;
 {!if is_static}
 {!else}
   {!if is_visible}
-    <i class="{iconset}-user prf-icon-info tooltip" title="{$LANG_PROFILE['hlp_visible']}"></i>
+            <i class="uk-icon uk-icon-user prf-icon-info tooltip" title="{$LANG_PROFILE['hlp_visible']}"></i>
   {!else}
-    <i class="{iconset}-user-secret prf-icon-disabled tooltip" title="{$LANG_PROFILE['hlp_invisible']}"></i>
+            <i class="uk-icon uk-icon-user-secret prf-icon-disabled tooltip" title="{$LANG_PROFILE['hlp_invisible']}"></i>
   {!endif}
   {!if is_required}
-    <i class="{iconset}-warning prf-icon-danger tooltip" title="{$LANG_PROFILE['hlp_required']}"></i>
+            <i class="uk-icon uk-icon-warning prf-icon-danger tooltip" title="{$LANG_PROFILE['hlp_required']}"></i>
   {!endif}
   {!if help_text}
-    <i class="{iconset}-question-circle prf-icon-info tooltip" title="{help_text}"></i>
+            <i class="uk-icon uk-icon-question-circle prf-icon-info tooltip" title="{help_text}"></i>
   {!endif}
 {!endif}
-  </td>
-</tr>
+          </span>
+        </div>
+      </div>
 <!-- END QueueRow -->
-</table>
-
-</fieldset>
+    </div>
+  </fieldset>
 </div>
 {# end {templatelocation} #}

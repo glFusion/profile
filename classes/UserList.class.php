@@ -458,7 +458,7 @@ class UserList
     public function Render($autotag=false)
     {
         global $_CONF, $_TABLES, $LANG_ADMIN, $LANG_PROFILE, $_PRF_CONF,
-                $LANG_ADMIN, $_SYSTEM;
+                $LANG_ADMIN;
 
         if ($this->listid == '') {
             // Get the first list if none specified, return empty string
@@ -474,15 +474,9 @@ class UserList
         if (!$this->isAdmin &&
                 ($this->listid == '' || !SEC_inGroup($this->group_id)) ) {
             if (!$autotag) {
-                if ($_SYSTEM['framework'] == 'uikit') {
-                    $retval .= '<div class="uk-alert uk-alert-danger">'.
+                $retval .= '<div class="uk-alert uk-alert-danger">'.
                         $LANG_PROFILE['list_none_avail'] .
                         '</div>';
-                } else {
-                    $retval .= '<span class="alert">' .
-                        $LANG_PROFILE['list_none_avail'] .
-                        '</span>';
-                }
                 if (COM_isAnonUser()) {
                     // If anonymous, assume that there might be a list if they
                     // log in
@@ -795,9 +789,10 @@ class UserList
     public function Edit()
     {
         global $_CONF, $_TABLES, $LANG_PROFILE, $LANG_ACCESS, $_PLUGINS,
-                $LANG28, $LANG04, $_SYSTEM;
+                $LANG28, $LANG04;
 
-        $T = PRF_getTemplate('list', 'editform', 'admin');
+        $T = new \Template(PRF_PI_PATH . '/templates/admin');
+        $T->set_file('editform', 'list.thtml');
         $T->set_var(array(
             'listid'        => $this->listid,
             'orderby'       => $this->orderby,
@@ -813,7 +808,6 @@ class UserList
             'referrer'      => isset($_POST['referrer']) ?
                     $_POST['referrer'] : PRF_ADMIN_URL . '/index.php?lists=x',
             'doc_url'   => PRF_getDocURL('list_def.html'),
-            'mootools' => $_SYSTEM['disable_mootools'] ? '' : 'true',
         ) );
 
         foreach (array(1,2,4) as $stat) {
@@ -1260,14 +1254,14 @@ function PRF_getListField($fieldname, $fieldvalue, $A, $icon_arr, $extras)
     switch($fieldname) {
     case 'edit':
         $retval = COM_createLink(
-            '<i class="' . $_PRF_CONF['_iconset'] . '-edit"></i>',
+            '<i class="uk-icon uk-icon-edit"></i>',
             "{$_CONF['site_admin_url']}/user.php?edit=x&amp;uid={$A['uid']}"
         );
         break;
 
     case 'delete':
         $retval = COM_createLink(
-            '<i class="' . $_PRF_CONF['_iconset'] . '-trash-o prf-icon-danger"></i>',
+            '<i class="uk-icon uk-icon-trash-o prf-icon-danger"></i>',
             "{$pi_admin_url}/list.php?action=delete&id={$A['id']}",
             array(
                 'onclick' => "return confirm('Do you really want to delete this item?');",
