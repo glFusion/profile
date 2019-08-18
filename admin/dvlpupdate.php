@@ -7,10 +7,10 @@
  * Only updates from the previous released version.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2018 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2019 Lee Garner <lee@leegarner.com>
  * @package     profile
- * @version     0.4.0
- * @since       0.4.0
+ * @version     1.1.4
+ * @since       1.1.4
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -30,7 +30,7 @@ if (function_exists('CACHE_clear')) {
 \Profile\Cache::clear();
 
 // Force the plugin version to the previous version and do the upgrade
-$_PLUGIN_INFO['profile']['pi_version'] = '1.1.3';
+$_PLUGIN_INFO['profile']['pi_version'] = '1.1.2';
 profile_do_upgrade(true);
 
 // need to clear the template cache so do it here
