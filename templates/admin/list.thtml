@@ -10,53 +10,79 @@ function insertRow(list) {
     //document.getElementById('vName'+count).hide().slideDown('medium').focus();
     document.getElementById('vName'+count).focus();
 }
+var ConfigDocUrl = '{doc_url}';
+$(document).ready(function() {
+    $('.tooltip_cfg').tooltipster({
+        contentAsHTML: true,
+        animation: 'fade',
+        trigger: 'click',
+        iconDesktop: true,
+        iconTouch: true,
+        functionBefore: function(origin, continueTooltip) {
+            var attrHref = ConfigDocUrl;
+            var ajobj = $(this);
+            $.get(attrHref, function(data) {
+                var confVar = ajobj.attr('id');
+                if (data.indexOf(confVar) > 0) {
+                    var desc = $(data).find('#desc_' + confVar + ' dd:first').text();
+                    //var a = $(data).find('a[name=desc_' + confVar + ']');
+                    //var tds = a.parent().parent().children("td");
+                    //var desc = tds.eq(1).html();
+                    origin.tooltipster('content', desc);
+                } else {
+                    origin.tooltipster('content', 'No Help Text Found');
+                    console.log('Unable to find help text for desc_%s',confVar);
+                }
+                continueTooltip();
+            });
+        }
+    });
+});
 </script>
 
 <form id="frm1" action="{site_url}/admin/plugins/profile/index.php"
-    class="uk-form-horizontal" method="post">
+    class="uk-form uk-form-horizontal" method="post">
 <input type="hidden" name="oldid" value="{listid}" />
 <fieldset>
   <div class="uk-form-row">
     <label class="uk-form-label" for="f_listid">{$LANG_PROFILE['listid']}
-      <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_name', 'Help', 640, 480, 1);return false;"><img src="{layout_url}/images/button_help.png" alt="" /></a>
+      <span id="name" class="tooltip_cfg tooltipstered"></span>
     </label>
     <div class="uk-form-controls">
       <input type="text" required class="required" size="32" name="listid"
         value="{listid}" id="f_listid" />
+      <i class="uk-icon uk-icon-warning uk-text-danger tooltip" title="{$LANG_PROFILE['required']}"></i>
     </div>
   </div>
 
   <div class="uk-form-row">
     <label class="uk-form-label" for="f_title">{$LANG_PROFILE['title']}
-      <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_title', 'Help', 640, 480, 1);return false;"><img src="{layout_url}/images/button_help.png" alt="" /></a>
+      <span id="title" class="tooltip_cfg tooltipstered"></span>
     </label>
     <div class="uk-form-controls">
       <input type="text" required class="required" size="80"
         name="title" value="{title}" id="f_title" />
+      <i class="uk-icon uk-icon-warning uk-text-danger tooltip" title="{$LANG_PROFILE['required']}"></i>
     </div>
   </div>
 
   <div class="uk-form-row">
-    <label class="uk-form-label" for="group_id">{$LANG_PROFILE['list_view_grp']}
-      <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_group', 'Help', 640, 480, 1);return false;"><img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <label class="uk-form-label">{$LANG_PROFILE['list_view_grp']}
+      <span id="group" class="tooltip_cfg tooltipstered"></span>
     </label>
     <div class="uk-form-controls">
-      <select name="group_id" id="group_id">
+      <select name="group_id">
         {view_grp_select}
       </select>
     </div>
   </div>
 
   <div class="uk-form-row">
-    <label class="uk-form-label" for="incl_grp">{$LANG_PROFILE['list_incl_grp']}
-      <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_incl_grp', 'Help', 640, 480, 1);return false;"><img src="{layout_url}/images/button_help.png" alt="" /></a>
+    <label class="uk-form-label">{$LANG_PROFILE['list_incl_grp']}
+      <span id="incl_grp" class="tooltip_cfg tooltipstered"></span>
     </label>
     <div class="uk-form-controls">
-      <select name="incl_grp" id="incl_grp">
+      <select name="incl_grp">
         {incl_grp_select}
       </select>
     </div>
@@ -64,8 +90,7 @@ function insertRow(list) {
 
   <div class="uk-form-row">
     <label class="uk-form-label">{$LANG_PROFILE['incl_user_stat']}
-      <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_incl_user_stat', 'Help', 640, 480, 1);return false;"><img src="{layout_url}/images/button_help.png" alt="" /></a>
+      <span id="incl_user_stat" class="tooltip_cfg tooltipstered"></span>
     </label>
     <div class="uk-form-controls">
       <input type="checkbox" name="incl_user_stat[]" value="3" {ustat_chk3} />{lang_active}
@@ -78,8 +103,7 @@ function insertRow(list) {
 
   <div class="uk-form-row">
     <label class="uk-form-label">{$LANG_PROFILE['incl_exp_stat']}
-      <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_incl_exp_stat', 'Help', 640, 480, 1);return false;"><img src="{layout_url}/images/button_help.png" alt="" /></a>
+      <span id="incl_exp_stat" class="tooltip_cfg tooltipstered"></span>
     </label>
     <div class="uk-form-controls">
       <input type="checkbox" name="incl_exp_stat[]" {exp_chk1} value="1">{$LANG_PROFILE['current']}&nbsp;&nbsp;
@@ -90,8 +114,7 @@ function insertRow(list) {
 
   <div class="uk-form-row">
     <label class="uk-form-label" for="orderby">{$LANG_PROFILE['orderby']}
-      <a href="#" class="toolbar" 
-        onclick="popupWindow('{doc_url}#desc_orderby', 'Help', 640, 480, 1);return false;"><img src="{layout_url}/images/button_help.png" alt="" /></a>
+      <span id="orderby" class="tooltip_cfg tooltipstered"></span>
     </label>
     <div class="uk-form-controls">
       <input type="text" id="orderby" name="orderby" size="4" value="{orderby}" />
@@ -116,11 +139,11 @@ function insertRow(list) {
   </td>
   <td>
     <input type="text" size="3" name="order[{fld_name}]" value="{order}" />&nbsp;
-    {!if public_field}
-    <img src="{site_url}/profile/images/visible.png" width="16" height="16" class="gl_mootip" title="{$LANG_PROFILE['hlp_visible']}" />
-    {!else}
-    <img src="{site_url}/profile/images/invisible.png" width="16" height="16" class="gl_mootip" title="{$LANG_PROFILE['hlp_invisible']}" />
-    {!endif}
+{!if public_field}
+    <i class="uk-icon uk-icon-user uk-text-success tooltip" title="{$LANG_PROFILE['hlp_visible']}"></i>
+{!else}
+    <i class="uk-icon uk-icon-user-secret uk-text-disabled tooltip" title="{$LANG_PROFILE['hlp_invisible']}"></i>
+{!endif}
     <input type="hidden" name="fld_id[{fld_name}]" value="{fld_name}" />
     </td>
   <td>{fld_name} {fld_opt}</td>
@@ -155,9 +178,13 @@ function insertRow(list) {
 
 </fieldset>
 
-<input class="uk-button uk-button-success" name="savelist" type="submit" value="{$LANG_ADMIN['submit']}" />
-<input class="uk-button" name="reset" type="reset" value="{$LANG_PROFILE['reset']}" />
-<input class="uk-button uk-button-primary" name="cancellist" type="submit" value="{$LANG_ADMIN['cancel']}"
-    onclick="javascript:document.location.href='{referrer}';" />
+<button class="uk-button uk-button-success" name="savelist" type="submit">{$LANG_ADMIN['submit']}</button>
+<button class="uk-button" name="reset" type="reset">{$LANG_PROFILE['reset']}</button>
+<button class="uk-button uk-button-primary" name="cancellist" type="submit"
+    onclick="javascript:document.location.href='{referrer}';">{$LANG_ADMIN['cancel']}</button>
+{!if canDelete}
+<button class="uk-button uk-button-danger" style="float:right;" name="deletelist" value="{listid}" type="submit"
+    onclick="return confirm('{$LANG_PROFILE['q_conf_del']}');">{$LANG_ADMIN['delete']}</button>
+{!endif}
 </form>
 {# end {templatelocation} #}

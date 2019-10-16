@@ -3,7 +3,7 @@
  * Entry point to administration functions for the Custom Profile plugin
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2019 Lee Garner <lee@leegarner.com>
  * @package     profile
  * @version     v1.2.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
@@ -80,11 +80,6 @@ case 'edit':
     $view = 'editform';
     break;
 
-case 'deletelist':
-    DB_delete($_TABLES['profile_lists'], 'listid', $actionval);
-    $view = 'lists';
-    break;
-
 case 'savedef':
     // Save or update a profile definition
     $F = Profile\Field::getInstance($_POST);
@@ -130,6 +125,14 @@ case 'deletedef':
     DB_delete($_TABLES['profile_def'], 'id', $id);
     break;
 
+case 'deletelist':
+    $listid = $actionval;
+    if (!empty($listid)) {
+        Profile\UserList::Delete($listid);
+    }
+    COM_refresh(PRF_ADMIN_URL . '/index.php?lists');
+    break;
+
 case 'savelist':
     if (isset($_POST['oldid']) && !empty($_POST['oldid'])) {
         $listid = $_POST['oldid'];
@@ -140,7 +143,7 @@ case 'savelist':
         $L = new Profile\UserList($listid);
         $L->Save($_POST);
     }
-    $view = 'lists';
+    COM_refresh(PRF_ADMIN_URL . '/index.php?lists');
     break;
 
 case 'cancellist':
@@ -148,8 +151,7 @@ case 'cancellist':
     break;
 
 case 'dousersearch':
-    //$content .= PRF_adminMenu('searchusers');
-    $content .= PRF_searchUsers($_POST);
+    $content .= Profile\Search::searchUsers($_POST);
     $view = 'none';     // We handled the content
     break;
 }
@@ -167,7 +169,6 @@ case 'lists':
     break;
 
 case 'editlist':
-    //$content .= PRF_adminMenu('list_edit_help');
     $L = new Profile\UserList($actionval);
     $content .= $L->Edit();
     break;
@@ -181,8 +182,7 @@ case 'none':
     break;
 
 case 'searchusers':
-//    $content .= PRF_adminMenu('searchusers', 'hlp_search_users');
-    $content .= PRF_searchUsersForm();
+    $content .= Profile\Search::searchUsersForm();
     break;
 
 default:
@@ -200,12 +200,11 @@ $T = new Template(PRF_PI_PATH. 'templates/admin/');
 $T->set_file('admin', 'index.thtml');
 $T->set_var(array(
     'version'       => "{$LANG32[36]}: {$_PRF_CONF['pi_version']}",
-    'menu'          => PRF_adminMenu($view),
+    'menu'          => Profile\Menu::Admin($view),
     'page_content'  => $content,
+    'pi_icon'       => plugin_geticon_profile(),
 ) );
 $T->parse('output','admin');
-//$display .= PRF_adminMenu($view);
-//$display .= $content;
 $display .= $T->finish($T->get_var('output'));
 $display .= COM_siteFooter();
 echo $display;
@@ -221,54 +220,68 @@ function PRF_listLists()
 {
     global $_CONF, $_TABLES, $LANG_ADMIN, $LANG_PROFILE;
 
-    $retval = '';
+    $retval = '<p><a class="uk-button uk-button-success" href="' .
+        PRF_ADMIN_URL . '/index.php?editlist=">' . $LANG_PROFILE['newlist'] .
+        '</a></p>';
 
     $header_arr = array(
-        array('text' => $LANG_ADMIN['edit'],
+        array(
+            'text' => $LANG_ADMIN['edit'],
             'field' => 'edit',
             'sort' => false,
             'align'=>'center',
         ),
-        array('text' => $LANG_PROFILE['orderby'],
+        array(
+            'text' => $LANG_PROFILE['orderby'],
             'field' => 'orderby',
             'sort' => false,
             'align' => 'center',
         ),
-        array('text' => $LANG_PROFILE['listid'],
+        array(
+            'text' => $LANG_PROFILE['listid'],
             'field' => 'listid',
             'sort' => true,
         ),
-        array('text' => $LANG_PROFILE['title'],
+        array(
+            'text' => $LANG_PROFILE['title'],
             'field' => 'title',
             'sort' => true,
         ),
-        array('text' => $LANG_ADMIN['delete'],
+        array(
+            'text' => $LANG_ADMIN['delete'],
             'field' => 'delete',
             'sort' => false,
             'align' => 'center',
         ),
     );
 
-    $defsort_arr = array('field' => 'orderby', 'direction' => 'asc');
+    $defsort_arr = array(
+        'field' => 'orderby',
+        'direction' => 'asc',
+    );
 
-    $retval .= COM_startBlock('', '',
-                              COM_getBlockTemplate('_admin_block', 'header'));
-
-    // Create the admin menu
-    //$retval .= PRF_adminMenu('list_list_help');
+    $retval .= COM_startBlock(
+        '', '',
+        COM_getBlockTemplate('_admin_block', 'header')
+    );
 
     $text_arr = array();
-
-    $query_arr = array('table' => 'profile_lists',
-        'sql' => "SELECT *
-               FROM
-                    {$_TABLES['profile_lists']}",
+    $extra = array(
+        'list_count' => DB_count($_TABLES['profile_lists']),
+    );
+    $query_arr = array(
+        'table' => 'profile_lists',
+        'sql' => "SELECT * FROM {$_TABLES['profile_lists']}",
         'query_fields' => array('title'),
         'default_filter' => ''
     );
     $form_arr = '';
-    $retval .= ADMIN_list('profile', 'PRF_getField_list', $header_arr,
-                    $text_arr, $query_arr, $defsort_arr, '', '', '', $form_arr);
+    $retval .= ADMIN_list(
+        'profile',
+        'PRF_getField_list',
+        $header_arr, $text_arr, $query_arr, $defsort_arr,
+        '', $extra, '', $form_arr
+    );
     $retval .= COM_endBlock(COM_getBlockTemplate('_admin_block', 'footer'));
     return $retval;
 }
@@ -283,7 +296,7 @@ function PRF_listLists()
  * @param   array   $icon_arr   Array of system icons
  * @return  string              HTML for the field cell
  */
-function PRF_getField_list($fieldname, $fieldvalue, $A, $icon_arr)
+function PRF_getField_list($fieldname, $fieldvalue, $A, $icon_arr, $extra)
 {
     global $_CONF, $LANG_ACCESS, $LANG_PROFILE, $LANG_ADMIN;
 
@@ -304,7 +317,7 @@ function PRF_getField_list($fieldname, $fieldvalue, $A, $icon_arr)
 
     case 'delete':
         $retval = COM_createLink(
-                '<i class="uk-icon uk-icon-trash-o prf-icon-danger"></i>',
+                '<i class="uk-icon uk-icon-remove uk-text-danger"></i>',
                 PRF_ADMIN_URL . '/index.php?deletelist=' . $A['listid'],
                 array(
                     'title' => $LANG_ADMIN['delete'],
@@ -321,24 +334,22 @@ function PRF_getField_list($fieldname, $fieldvalue, $A, $icon_arr)
        break;
 
     case 'orderby':
-        $retval = COM_createLink(
-                '<img src="' . PRF_PI_URL .
-                '/images/up.png" height="16" width="16" border="0" />',
-                PRF_ADMIN_URL . '/index.php?movelist=up&id=' . $A['listid'],
-                array(
-                    'title' => $LANG_PROFILE['move_up'],
-                    'data-uk-tooltip' => '',
-                )
-            ) .
-            COM_createLink(
-                '<img src="' . PRF_PI_URL .
-                    '/images/down.png" height="16" width="16" border="0" />',
-                PRF_ADMIN_URL . '/index.php?movelist=down&id=' . $A['listid'],
-                array(
-                    'title' => $LANG_PROFILE['move_dn'],
-                    'data-uk-tooltip' => '',
-                )
+        if ($fieldvalue > 10) {
+            $retval = COM_createLink(
+                '<i class="uk-icon uk-icon-arrow-up uk-icon-justify"></i>',
+                PRF_ADMIN_URL . '/index.php?movelist=up&id=' . $A['listid']
             );
+        } else {
+            $retval = '<i class="uk-icon uk-icon-justify">&nbsp;</i>';
+        }
+        if ($fieldvalue < $extra['list_count'] * 10) {
+            $retval .= COM_createLink(
+                '<i class="uk-icon uk-icon-arrow-down uk-icon-justify"></i>',
+                PRF_ADMIN_URL . '/index.php?movelist=down&id=' . $A['listid']
+            );
+        } else {
+            $retval .= '<i class="uk-icon uk-icon-justify">&nbsp;</i>';
+        }
         break;
 
     default:
@@ -360,47 +371,87 @@ function PRF_listFields()
 {
     global $_CONF, $_TABLES, $LANG_ADMIN, $LANG_PROFILE;
 
-    $retval = '';
+    $retval = '<p><a class="uk-button uk-button-success" href="' .
+        PRF_ADMIN_URL . '/index.php?edit=x">' . $LANG_PROFILE['add_profile_item'] .
+        '</a></p>';
 
     $header_arr = array(
-        array('text' => $LANG_ADMIN['edit'], 'field' => 'edit',
-                'sort' => false, 'align' => 'center'),
-        array('text' => $LANG_PROFILE['orderby'], 'field' => 'orderby',
-                'sort' => true, 'align' => 'center'),
-        array('text' => $LANG_PROFILE['name'], 'field' => 'name',
-                'sort' => true),
-        array('text' => $LANG_PROFILE['type'], 'field' => 'type',
-                'sort' => true),
-        array('text' => $LANG_PROFILE['enabled'], 'field' => 'enabled',
-                'sort' => true, 'align' => 'center'),
-        array('text' => $LANG_PROFILE['required'], 'field' => 'required',
-                'sort' => true, 'align' => 'center'),
-        array('text' => $LANG_PROFILE['user_reg'], 'field' => 'user_reg',
-                'sort' => true, 'align' => 'center'),
-        //array('text' => $LANG_PROFILE['readonly'], 'field' => 'readonly',
-        //        'sort' => false),
-        array('text' => $LANG_ADMIN['delete'], 'field' => 'delete',
-                'sort' => false, 'align' => 'center'),
+        array(
+            'text' => $LANG_ADMIN['edit'],
+            'field' => 'edit',
+            'sort' => false,
+            'align' => 'center',
+        ),
+        array(
+            'text' => $LANG_PROFILE['orderby'],
+            'field' => 'orderby',
+            'sort' => true,
+            'align' => 'center',
+        ),
+        array(
+            'text' => $LANG_PROFILE['name'],
+            'field' => 'name',
+            'sort' => true,
+        ),
+        array(
+            'text' => $LANG_PROFILE['type'],
+            'field' => 'type',
+            'sort' => true,
+        ),
+        array(
+            'text' => $LANG_PROFILE['enabled'],
+            'field' => 'enabled',
+            'sort' => true,
+            'align' => 'center',
+        ),
+        array(
+            'text' => $LANG_PROFILE['required'],
+            'field' => 'required',
+            'sort' => true,
+            'align' => 'center',
+        ),
+        array(
+            'text' => $LANG_PROFILE['user_reg'],
+            'field' => 'user_reg',
+            'sort' => true,
+            'align' => 'center',
+        ),
+        array(
+            'text' => $LANG_ADMIN['delete'],
+            'field' => 'delete',
+            'sort' => false,
+            'align' => 'center',
+        ),
     );
 
-    $defsort_arr = array('field' => 'orderby', 'direction' => 'asc');
+    $defsort_arr = array(
+        'field' => 'orderby',
+        'direction' => 'asc',
+    );
 
-    $retval .= COM_startBlock('', '',
-                              COM_getBlockTemplate('_admin_block', 'header'));
-
-    // Create the admin menu
-    //$retval .= PRF_adminMenu();
+    $retval .= COM_startBlock(
+        '', '',
+        COM_getBlockTemplate('_admin_block', 'header')
+    );
 
     $text_arr = array();
+    $extra = array(
+        'prf_count' => DB_count($_TABLES['profile_def']),
+    );
 
-    $query_arr = array('table' => 'profile_def',
+    $query_arr = array(
+        'table' => 'profile_def',
         'sql' => "SELECT * FROM {$_TABLES['profile_def']}",
         'query_fields' => array('name', 'type', 'value'),
         'default_filter' => '',
     );
     $form_arr = array();
-    $retval .= ADMIN_list('profile', 'PRF_getField_profile', $header_arr,
-                    $text_arr, $query_arr, $defsort_arr, '', '', '', $form_arr);
+    $retval .= ADMIN_list(
+        'profile',
+        'PRF_getField_profile',
+        $header_arr, $text_arr, $query_arr, $defsort_arr,
+        '', $extra, '', $form_arr
+    );
     $retval .= COM_endBlock(COM_getBlockTemplate('_admin_block', 'footer'));
 
     return $retval;
@@ -416,7 +467,7 @@ function PRF_listFields()
  * @param   array   $icon_arr   Array of system icons
  * @return  string              HTML for the field cell
  */
-function PRF_getField_profile($fieldname, $fieldvalue, $A, $icon_arr)
+function PRF_getField_profile($fieldname, $fieldvalue, $A, $icon_arr, $extra)
 {
     global $_CONF, $LANG_ACCESS, $_PRF_CONF, $LANG_ADMIN, $LANG_PROFILE;
 
@@ -424,26 +475,30 @@ function PRF_getField_profile($fieldname, $fieldvalue, $A, $icon_arr)
 
     switch($fieldname) {
     case 'username':
-        $retval = COM_createLink($fieldvalue, $_CONF['site_url'] .
-                '/users.php?mode=profile&amp;uid=' . $A['uid']);
+        $retval = COM_createLink(
+            $fieldvalue,
+            $_CONF['site_url'] . '/users.php?mode=profile&amp;uid=' . $A['uid']
+        );
         break;
 
     case 'edit':
         $retval = COM_createLink(
-            '<i class="uk-icon uk-icon-edit prf-icon-info" data-uk-tooltip title="' . $LANG_ADMIN['edit'] . '"></i>',
+            '<i class="uk-icon uk-icon-edit" data-uk-tooltip title="' . $LANG_ADMIN['edit'] . '"></i>',
             PRF_ADMIN_URL . '/index.php?edit=x&amp;id=' . $A['id']
         );
        break;
 
     case 'edituser':
-        $retval = COM_createLink($icon_arr['edit'],
-                "{$_CONF['site_url']}/admin/user.php?edit=x&amp;uid={$A['uid']}");
+        $retval = COM_createLink(
+            '<i class="uk-icon uk-icon-edit" data-uk-tooltip title="' . $LANG_ADMIN['edit'] . '"></i>',
+            "{$_CONF['site_url']}/admin/user.php?edit=x&amp;uid={$A['uid']}"
+        );
         break;
 
     case 'delete':
         if (!$A['sys']) {
             $retval = COM_createLink(
-                '<i class="uk-icon uk-icon-trash prf-icon-danger"></i>',
+                '<i class="uk-icon uk-icon-remove uk-text-danger"></i>',
                 PRF_ADMIN_URL . '/index.php?deletedef=x&id=' . $A['id'],
                 array(
                     'onclick' => "return confirm('{$LANG_PROFILE['q_conf_del']}');",
@@ -490,23 +545,26 @@ function PRF_getField_profile($fieldname, $fieldvalue, $A, $icon_arr)
         break;
 
     case 'orderby':
-        $retval = COM_createLink(
-                '<img src="' . PRF_PI_URL .
-                    '/images/up.png" height="16" width="16" border="0" ' .
-                    'data-uk-tooltip title="' . $LANG_PROFILE['move_up'] . '"/>',
+        if ($fieldvalue > 10) {
+            $retval = COM_createLink(
+                '<i class="uk-icon uk-icon-arrow-up uk-icon-justify"></i>',
                 PRF_ADMIN_URL . '/index.php?move=up&id=' . $A['id']
-            ) .
-            COM_createLink(
-                '<img src="' . PRF_PI_URL .
-                    '/images/down.png" height="16" width="16" border="0" ' .
-                    'data-uk-tooltip title="' . $LANG_PROFILE['move_dn'] . '"/>',
+            );
+        } else {
+            $retval = '<i class="uk-icon uk-icon-justify">&nbsp;</i>';
+        }
+        if ($fieldvalue < $extra['prf_count'] * 10) {
+            $retval .= COM_createLink(
+                '<i class="uk-icon uk-icon-arrow-down uk-icon-justify"></i>',
                 PRF_ADMIN_URL . '/index.php?move=down&id=' . $A['id']
             );
+        } else {
+            $retval .= '<i class="uk-icon uk-icon-justify">&nbsp;</i>';
+        }
         break;
 
     default:
         $retval = $fieldvalue;
-
     }
 
     return $retval;
@@ -655,10 +713,10 @@ function PRF_saveDefs($A)
     case 'select':
     case 'radio':
         $newvals = array();
-        if (!isset($A['selvalues']) || !is_array($A['selvalues'])) {
-            $A['selvalues'] = array();
+        if (!isset($A['select_values']) || !is_array($A['select_values'])) {
+            $A['select_values'] = array();
         }
-        foreach ($A['selvalues'] as $val) {
+        foreach ($A['select_values'] as $val) {
             if (!empty($val)) {
                 $newvals[] = $val;
             }
@@ -666,8 +724,8 @@ function PRF_saveDefs($A)
         $options['default'] = '';
         if (isset($A['sel_default'])) {
             $default = (int)$A['sel_default'];
-            if (isset($A['selvalues'][$default])) {
-                $options['default'] = $A['selvalues'][$default];
+            if (isset($A['select_values'][$default])) {
+                $options['default'] = $A['select_values'][$default];
             }
         }
         //$options['values'] = serialize($newvals);
@@ -810,56 +868,6 @@ function PRF_moveRow($table, $id_fld, $id_val, $where)
 }
 
 
-
-/**
- * Create the admin menu at the top of the list and form pages.
- *
- * @param   string  $page   Current page key
- * @return  string      HTML for admin menu section
- */
-function PRF_adminMenu($page='list')
-{
-    global $_CONF, $LANG_PROFILE, $_PRF_CONF, $LANG01;
-
-    $menu_arr = array ();
-    if ($page == '')
-        $page = 'list';
-
-    $help_text = isset($LANG_PROFILE['help'][$page]) ? $LANG_PROFILE['help'][$page] : '';
-
-    if ($page == 'list') {
-        $menu_arr[] = array('url' => PRF_ADMIN_URL . '/index.php?edit=x',
-            'text' => '<span class="prfNewAdminItem">' .
-                $LANG_PROFILE['add_profile_item'] . '</span>');
-    } else {
-        $menu_arr[] = array('url' => PRF_ADMIN_URL . '/index.php',
-            'text' => $LANG_PROFILE['list_profiles']);
-    }
-
-    if ($page == 'lists') {
-        $menu_arr[] = array('url' => PRF_ADMIN_URL . '/index.php?editlist=',
-            'text' => '<span class="prfNewAdminItem">' .
-                $LANG_PROFILE['newlist'] . '</span>');
-    } else {
-        $menu_arr[] = array('url' => PRF_ADMIN_URL . '/index.php?lists=x',
-            'text' => $LANG_PROFILE['lists']);
-    }
-
-    $menu_arr[] = array('url' => PRF_ADMIN_URL . '/index.php?permreset=x',
-            'text' => $LANG_PROFILE['reset_perms']);
-
-    $menu_arr[] = array('url' => PRF_ADMIN_URL . '/index.php?searchusers=x',
-            'text' => $LANG_PROFILE['search_users']);
-
-    $menu_arr[] = array('url' => $_CONF['site_admin_url'],
-            'text' => $LANG01[53]);
-
-    $retval = ADMIN_createMenu($menu_arr, $help_text,
-                    plugin_geticon_profile());
-    return $retval;
-}
-
-
 /**
  * Present a form verifying that all permissions should be reset.
  *
@@ -871,7 +879,6 @@ function PRF_permResetForm()
     $T->set_file('bulkperms', 'bulkperms.thtml');
     $T->parse('output', 'bulkperms');
 
-    //$retval = PRF_adminMenu('', 'hlp_reset_perms');
     return $T->finish($T->get_var('output'));
 }
 
@@ -892,137 +899,6 @@ function PRF_permReset()
                 perm_anon = {$_PRF_CONF['default_permissions'][3]}";
     //echo $sql;die;
     DB_query($sql);
-}
-
-
-/**
- * Create a form to collect search parameters for users.
- *
- * @since   version 1.1.0
- * @return  string      HTML for form
- */
-function PRF_searchUsersForm()
-{
-    global $_TABLES, $LANG_PROFILE;
-
-    $T = new Template(PRF_PI_PATH . 'templates/admin');
-    $T->set_file('searchform', 'search.thtml');
-
-    $sql = "SELECT *
-            FROM {$_TABLES['profile_def']}
-            WHERE enabled = 1
-            AND type <> 'static' " .
-            COM_getPermSQL('AND', 0, 2) .
-            ' ORDER BY orderby ASC';
-    $res = DB_query($sql);
-    while ($A = DB_fetchArray($res, false)) {
-        $F = Profile\Field::getInstance($A);
-        $T->set_block('searchform', 'FldRow', 'frow');
-        $T->set_var(array(
-            'fld_prompt'    => $F->prompt,
-            'fld_name'      => $F->name,
-            'fld_input'     => $F->searchFormOpts(),
-            'fld_empty'     => true,
-        ) );
-        $T->parse('frow', 'FldRow', true);
-    }
-
-    $T->parse('output', 'searchform');
-    return $T->finish($T->get_var('output'));
-}
-
-
-/**
- * Search for users based on the parameters entered in PRF_searchUserForm().
- *
- * @since   version 1.1.0
- * @param   array   $vals   Search values (e.g. $_POST)
- * @return  string          HTML  for user list
- */
-function PRF_searchUsers($vals)
-{
-    global $_TABLES, $LANG_ADMIN, $LANG_PROFILE;
-
-    $sql = "SELECT * FROM {$_TABLES['profile_def']}
-            WHERE enabled=1 " . COM_getPermSQL('AND', 0, 2);
-    $res = DB_query($sql);
-    $fields = array();
-    while ($A = DB_fetchArray($res, false)) {
-        if ($A['type'] != 'static') {
-            $fields[$A['name']] = $A;
-            $sql_flds[] = '`data`.`' . $A['name'] . '`';
-        }
-    }
-    $sql_fldnames = implode(',', $sql_flds);
-
-    $flds = array();
-    foreach ($fields as $f_name=>$fld) {
-        if (!isset($_POST[$f_name]) || $_POST[$f_name] == '-1') continue;   // signifies "any"
-        $F = Profile\Field::getInstance($fld);
-        $f_name = DB_escapeString($f_name);
-        switch($F->type) {
-        case 'Xdate':
-            if (isset($_POST['empty'][$f_name])) {
-                $flds[] = "(`data`.`$f_name` = '' OR `data`.`$f_name` IS NULL OR `data`.`$f_name` LIKE '0000-00-00%')";
-            } else {
-                $mods = array('<', '<=', '>', '>=', '=', '<>');
-                $value = sprintf('%04d-%02d-%02d', $_POST[$f_name . '_year'],
-                    $_POST[$f_name . '_month'], $_POST[$f_name . '_day']);
-                if ($value == '0000-00-00') continue;
-                if (!isset($_POST[$f_name . '_mod'])) {
-                    $flds[] = "`data`.`$f_name` LIKE '%$value%'";
-                } else {
-                    $mod = in_array($_POST[$f_name . '_mod'], $mods) ? $_POST[$f_name . '_mod'] : '=';
-                    $flds[] = "`data`.`$f_name` $mod '$value'";
-                }
-            }
-            break;
-        default:
-            $x = $F->createSearchSQL($_POST);
-            if (!empty($x)) {
-                $flds[] = $x;
-            }
-/*            $value = DB_escapeString($_POST[$f_name]);
-            if (isset($_POST['empty'][$f_name])) {
-                $flds[] = "(`data`.`$f_name` = '' OR `data`.`$f_name` IS NULL)";
-            } elseif ($_POST[$f_name] !== '') {
-                $flds[] = "`data`.`$f_name` like '%{$value}%'";
-            }*/
-            break;
-        }
-    }
-
-    if (is_array($flds) && !empty($flds))
-        $fld_sql = implode(' OR ', $flds);
-    else
-        $fld_sql = ' 1 = 1 ';
-
-    $sql = "SELECT u.*, $sql_fldnames
-            FROM {$_TABLES['users']} u
-            LEFT JOIN {$_TABLES['profile_data']} data
-            ON u.uid = data.puid
-            WHERE ($fld_sql)";
-    //echo $sql;die;
-    $res = DB_query($sql);
-    if (!$res || DB_error()) {
-        return COM_showMessageText($LANG_PROFILE['query_error']);
-    }
-
-    $retval = '';
-    $header_arr = array(
-        array('text' => $LANG_ADMIN['edit'], 'field' => 'edituser', 'sort' => false),
-        array('text' => 'Username', 'field' => 'username'),
-        array('text' => 'Fullname', 'field' => 'fullname', 'sort' => true),
-    );
-
-    $data_arr = array();
-    $text_arr = array();
-    while ($A = DB_fetchArray($res, false)) {
-        $data_arr[] = $A;
-    }
-    $retval = ADMIN_simpleList('PRF_getField_profile', $header_arr, $text_arr,
-            $data_arr, '', '', '');
-    return $retval;
 }
 
 ?>

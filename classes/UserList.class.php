@@ -122,8 +122,9 @@ class UserList
         if ($this->isAdmin) {
             $this->access_sql = '';
         } else {
-            if (!is_array($_GROUPS))
+            if (!is_array($_GROUPS)) {
                 $_GROUPS = SEC_getUserGroups($_USER['uid']);
+            }
             $this->access_sql = 'WHERE group_id in (' .
                                 implode(',', $_GROUPS) . ')';
         }
@@ -156,10 +157,11 @@ class UserList
     {
         global $_TABLES, $LANG_PROFILE;
 
-        if ($listid == '')
+        if ($listid == '') {
             $listid = $this->listid;
-        else
+        } else {
             $listid = COM_sanitizeID($listid, false);
+        }
 
         $res = DB_query("SELECT * FROM {$_TABLES['profile_lists']}
                     WHERE listid='$listid'", 1);
@@ -582,12 +584,13 @@ class UserList
 
         $T = new \Template(PRF_PI_PATH . 'templates/');
         $T->set_file('list', 'memberlist.thtml');
-
         $T->set_var(array(
-            'list_contents' => ADMIN_list('membership_list_'.$this->listid,
-                __NAMESPACE__ . '\PRF_getListField',
+            'list_contents' => ADMIN_list(
+                'membership_list_' . $this->listid,
+                array(__CLASS__, 'getListField'),
                 $header_arr, $text_arr, $query_arr, $defsort_arr,
-                $this->pi_filter, $extras, '', $form_arr),
+                $this->pi_filter, $extras, '', $form_arr
+            ),
             'export_link'   => $exportlink,
             'pdf_link'      => $pdflink,
             'html_link'     => $htmllink,
@@ -806,8 +809,9 @@ class UserList
             'lang_approval' => $LANG28[44],
             'lang_activation' => $LANG04[116],
             'referrer'      => isset($_POST['referrer']) ?
-                    $_POST['referrer'] : PRF_ADMIN_URL . '/index.php?lists=x',
+                $_POST['referrer'] : PRF_ADMIN_URL . '/index.php?lists=x',
             'doc_url'   => PRF_getDocURL('list_def.html'),
+            'canDelete'     => $this->isNew ? false : true,
         ) );
 
         foreach (array(1,2,4) as $stat) {
@@ -991,7 +995,59 @@ class UserList
         $sql = $sql_action . $sql_fields . $sql_where;
         //echo $sql;die;
         DB_query($sql);
-        //PRF_reorderDef('profile_lists', 'listid');
+        self::reOrder();
+    }
+
+
+    /**
+     * Reorder all items in a table.
+     * Table name is abstracted to support both list and definition tables.
+     *
+     * @param  string  $table  Name of table
+     * @param  string  $id_fld Name of "id" field
+     */
+    public static function reOrder()
+    {
+        global $_TABLES;
+
+        $sql = "SELECT listid, orderby
+            FROM {$_TABLES['profile_lists']}
+            ORDER BY orderby ASC;";
+        $result = DB_query($sql, 1);
+        if (!$result) return;
+
+        $order = 10;
+        $stepNumber = 10;
+        $changed = false;
+        while ($A = DB_fetchArray($result, false)) {
+            if ($A['orderby'] != $order) {  // only update incorrect ones
+                $changed = true;
+                $sql = "UPDATE {$_TABLES['profile_lists']}
+                    SET orderby = '$order'
+                    WHERE listid = '" . DB_escapeString($A['listid']) . "'";
+                DB_query($sql);
+            }
+            $order += $stepNumber;
+        }
+        if ($changed) {
+            Cache::clear();
+        }
+    }
+
+
+    /**
+     * Delete a list definition.
+     *
+     * @param   string  $listid ID of list to remove
+     */
+    public static function Delete($listid)
+    {
+        global $_TABLES;
+
+        if (!empty($listid)) {
+            DB_delete($_TABLES['profile_lists'], 'listid', DB_escapeString($listid));
+            Cache::clear();
+        }
     }
 
 
@@ -1220,147 +1276,152 @@ class UserList
         }
     }
 
-}   // class UserList
 
+    /**
+     * Get the display value for a give list field.
+     * Custom fields require a lookup to the profile_def table to find out
+     * how to display the values.  Known fields, from the users table, can
+     * be handled more simply.
+     *
+     * @param   string  $fieldname      Name of field, from the header array
+     * @param   mixed   $fieldvalue     Value of current field
+     * @param   array   $A              Array of all fieldnames & values
+     * @param   array   $icon_arr       Array of system icons (not used)
+     * @param   array   $extras         Extra data passed in verbatim
+     * @return  string          Value to display for the current field
+     */
+    public static function getListField($fieldname, $fieldvalue, $A, $icon_arr, $extras)
+    {
+        global $_CONF, $LANG_ACCESS, $LANG_PROFILE, $_PRF_CONF, $_TABLES;
 
-/**
- * Get the display value for a give list field.
- * Custom fields require a lookup to the profile_def table to find out
- * how to display the values.  Known fields, from the users table, can
- * be handled more simply.
- *
- * @param   string  $fieldname      Name of field, from the header array
- * @param   mixed   $fieldvalue     Value of current field
- * @param   array   $A              Array of all fieldnames & values
- * @param   array   $icon_arr       Array of system icons (not used)
- * @param   array   $extras         Extra data passed in verbatim
- * @return  string          Value to display for the current field
- */
-function PRF_getListField($fieldname, $fieldvalue, $A, $icon_arr, $extras)
-{
-    global $_CONF, $LANG_ACCESS, $LANG_PROFILE, $_PRF_CONF, $_TABLES;
+        $retval = '';
+        $pi_admin_url = PRF_ADMIN_URL;
+        static $custflds = array(); // static array of field info to save lookups
 
-    $retval = '';
-    $pi_admin_url = PRF_ADMIN_URL;
-    static $custflds = array(); // static array of field info to save lookups
-
-    if ($A['sys_directory'] === NULL || $A['sys_directory'] == 1)
-        $cls = 'profile_public';
-    else
-        $cls = 'profile_private';
-    $beg = '<span class="' . $cls . '">';
-    $end = '</span>';
-
-    switch($fieldname) {
-    case 'edit':
-        $retval = COM_createLink(
-            '<i class="uk-icon uk-icon-edit"></i>',
-            "{$_CONF['site_admin_url']}/user.php?edit=x&amp;uid={$A['uid']}"
-        );
-        break;
-
-    case 'delete':
-        $retval = COM_createLink(
-            '<i class="uk-icon uk-icon-trash-o prf-icon-danger"></i>',
-            "{$pi_admin_url}/list.php?action=delete&id={$A['id']}",
-            array(
-                'onclick' => "return confirm('Do you really want to delete this item?');",
-            )
-        );
-       break;
-
-    case 'fullname':
-        if ($fieldvalue == '' || $fieldvalue == ', ') {
-            $fieldvalue = $A['username'];
-        }
-        if ($A['name_format'] == 1) {
-            /*$parts = NameParser::Parse($fieldvalue);
-            $fieldvalue = NameParser::LCF($fieldvalue);
-            if ($parts['suffix'] != '') {
-                $fieldvalue .= ' ' . $parts['suffix'];
-            }*/
-            // Fix single-word fullnames, like "Cher"
-            if ($fieldvalue == $A['realfullname'] . ', ' . $A['realfullname']) {
-                $fieldvalue = $A['realfullname'];
-            }
-        }
-        $retval = COM_createLink($fieldvalue,
-            $_CONF['site_url'] . '/users.php?mode=profile&uid=' . $A['uid']);
-        break;
-
-    case 'username':
-        $retval = COM_createLink($fieldvalue,
-            $_CONF['site_url'] . '/users.php?mode=profile&uid=' . $A['uid']);
-        break;
-
-    case 'sys_directory':
-        $retval = $fieldvalue == 1 ? $LANG_PROFILE['yes'] : $LANG_PROFILE['no'];
-        break;
-
-    case 'sys_membertype':
-    case 'email':
-        $retval = $fieldvalue;
-        break;
-
-    case 'sys_expires':
-        if ($A['exp_diff'] == NULL) {
-            // Not a real expiration date entered, ignore
-            return '';
-        }
-
-        if ($A['exp_diff'] > $_PRF_CONF['grace_expired']) {
-            $status = 'expired';
-        } elseif ($A['exp_diff'] > 0) {
-            $status = 'arrears';
+        if ($A['sys_directory'] === NULL || $A['sys_directory'] == 1) {
+            $cls = 'profile_public';
         } else {
-            $status = 'current';
+            $cls = 'profile_private';
         }
+        $beg = '<span class="' . $cls . '">';
+        $end = '</span>';
 
-        $F = new Fields\date($fieldname, $fieldvalue);
-        $fieldvalue = $F->FormatValue();
-        $retval = "<span class=\"profile_$status\">{$fieldvalue}</span>";
-        break;
+        switch($fieldname) {
+        case 'edit':
+            $retval = COM_createLink(
+                '<i class="uk-icon uk-icon-edit"></i>',
+                "{$_CONF['site_admin_url']}/user.php?edit=x&amp;uid={$A['uid']}"
+            );
+            break;
 
-    case 'avatar':
-        $retval = USER_getPhoto($A['uid'], $A['photo'], $A['email']);
-        break;
+        case 'delete':
+            $retval = COM_createLink(
+                '<i class="uk-icon uk-icon-remove-o uk-text-danger"></i>',
+                "{$pi_admin_url}/list.php?action=delete&id={$A['id']}",
+                array(
+                    'onclick' => "return confirm('Do you really want to delete this item?');",
+                )
+            );
+           break;
 
-    default:
-        if (isset($extras['f_info'][$fieldname]['disp_func'])) {
-            // A field-specific callback function. A plugin has specified this
-            // function, so we'll just call it without the protection of
-            // invokeService()
-            $function = $extras['f_info'][$fieldname]['disp_func'];
-            $retval = $function($fieldname, $fieldvalue, $A, $icon_arr, $extras);
-        } else {
-            // An unknown field type, we have to look it up and figure out how
-            // to display the value. This has to be done for every field in
-            // every record, so use $custflds to minimize DB calls.
-            if (!isset($custflds[$fieldname])) {
-                $custflds[$fieldname] = DB_fetchArray(
-                    DB_query("SELECT * FROM {$_TABLES['profile_def']}
-                        WHERE name='$fieldname'", 1), false);
+        case 'fullname':
+            if ($fieldvalue == '' || $fieldvalue == ', ') {
+                $fieldvalue = $A['username'];
             }
-            if ($custflds[$fieldname]) {
-                // A custom profile field was found.
-                /*$classname = 'prf' . $custflds[$fieldname]['type'];
-                if (class_exists($classname)) {
-                    $F = new $classname($custflds[$fieldname], $fieldvalue, $A['uid']);
-                } else {
-                    $F = new prfText($custflds[$fieldname], $fieldvalue, $A['uid']);
+            if ($A['name_format'] == 1) {
+                /*$parts = NameParser::Parse($fieldvalue);
+                $fieldvalue = NameParser::LCF($fieldvalue);
+                if ($parts['suffix'] != '') {
+                    $fieldvalue .= ' ' . $parts['suffix'];
                 }*/
-                $F = Field::getInstance($custflds[$fieldname], $fieldvalue, $A['uid']);
-                $retval = $F->FormatValue();
-            } else {
-                // The field is probably from a plugin.
-                $retval = $fieldvalue;
+                // Fix single-word fullnames, like "Cher"
+                if ($fieldvalue == $A['realfullname'] . ', ' . $A['realfullname']) {
+                    $fieldvalue = $A['realfullname'];
+                }
             }
-        }
-        break;
+            $retval = COM_createLink(
+                $fieldvalue,
+                $_CONF['site_url'] . '/users.php?mode=profile&uid=' . $A['uid']
+            );
+            break;
 
+        case 'username':
+            $retval = COM_createLink(
+                $fieldvalue,
+                $_CONF['site_url'] . '/users.php?mode=profile&uid=' . $A['uid']
+            );
+            break;
+
+        case 'sys_directory':
+            $retval = $fieldvalue == 1 ? $LANG_PROFILE['yes'] : $LANG_PROFILE['no'];
+            break;
+
+        case 'sys_membertype':
+        case 'email':
+            $retval = $fieldvalue;
+            break;
+
+        case 'sys_expires':
+            if ($A['exp_diff'] == NULL) {
+                // Not a real expiration date entered, ignore
+                return '';
+            }
+
+            if ($A['exp_diff'] > $_PRF_CONF['grace_expired']) {
+                $status = 'expired';
+            } elseif ($A['exp_diff'] > 0) {
+                $status = 'arrears';
+            } else {
+                $status = 'current';
+            }
+
+            $F = new Fields\date($fieldname, $fieldvalue);
+            $fieldvalue = $F->FormatValue();
+            $retval = "<span class=\"profile_$status\">{$fieldvalue}</span>";
+            break;
+
+        case 'avatar':
+            $retval = USER_getPhoto($A['uid'], $A['photo'], $A['email']);
+            break;
+
+        default:
+            if (isset($extras['f_info'][$fieldname]['disp_func'])) {
+                // A field-specific callback function. A plugin has specified this
+                // function, so we'll just call it without the protection of
+                // invokeService()
+                $function = $extras['f_info'][$fieldname]['disp_func'];
+                $retval = $function($fieldname, $fieldvalue, $A, $icon_arr, $extras);
+            } else {
+                // An unknown field type, we have to look it up and figure out how
+                // to display the value. This has to be done for every field in
+                // every record, so use $custflds to minimize DB calls.
+                if (!isset($custflds[$fieldname])) {
+                    $custflds[$fieldname] = DB_fetchArray(
+                        DB_query("SELECT * FROM {$_TABLES['profile_def']}
+                            WHERE name='$fieldname'", 1), false);
+                }
+                if ($custflds[$fieldname]) {
+                    // A custom profile field was found.
+                    /*$classname = 'prf' . $custflds[$fieldname]['type'];
+                    if (class_exists($classname)) {
+                        $F = new $classname($custflds[$fieldname], $fieldvalue, $A['uid']);
+                    } else {
+                        $F = new prfText($custflds[$fieldname], $fieldvalue, $A['uid']);
+                    }*/
+                    $F = Field::getInstance($custflds[$fieldname], $fieldvalue, $A['uid']);
+                    $retval = $F->FormatValue();
+                } else {
+                    // The field is probably from a plugin.
+                    $retval = $fieldvalue;
+                }
+            }
+            break;
+
+        }
+
+        return $beg . $retval . $end;
     }
 
-    return $beg . $retval . $end;
-}
+}   // class UserList
 
 ?>
