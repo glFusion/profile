@@ -1,15 +1,15 @@
 <?php
 /**
-*   Home page for the Custom Profile plugin.
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2010 Lee Garner <lee@leegarner.com>
-*   @package    profile
-*   @version    1.0.2
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Home page for the Custom Profile plugin.
+ *
+ * @author     Lee Garner <lee@leegarner.com>
+ * @copyright  Copyright (c) 2009-2019 Lee Garner <lee@leegarner.com>
+ * @package    profile
+ * @version    1.2.0
+ * @license    http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 
 /** Include common functions */
 require_once '../lib-common.php';
@@ -46,22 +46,29 @@ $T ->set_file(array(
 $T->set_var('myself', $_SERVER['PHP_SELF']);
 $T->set_var('srchval', $srchval == '' ? 'Search' : $srchval);
 
-// Create the SQL to locate site members.
-$group = (int)$group;
-if ($group < 1) $group = 13;    // Avoid nasty surprises
-
-// If we're excluding rather than including groups, then make
-// the query negative.
 $grplist = DB_escapeString($conf_grplist);
 if (empty($grplist)) {
     echo COM_siteFooter();
     exit;
 }
 
-$exclude = isset($_PRF_CONF['exclude_groups']) &&
-                $_PRF_CONF['exclude_groups'] == true ? 'NOT' : '';
-$sel_list = COM_optionList($_TABLES['groups'], 'grp_id, grp_name', $group, 1,
-    "grp_id $NOT IN ($grplist)");
+// If no group specified in the URL, get the first of the allowed groups.
+if ($group < 1) {
+    $grps = explode(',', $conf_grplist);
+    $group = $grps[0];
+}
+$group = (int)$group;
+
+// If we're excluding rather than including groups, then make
+// the query negative.
+$exclude = isset($_PRF_CONF['exclude_groups']) && $_PRF_CONF['exclude_groups'] == true ? 'NOT' : '';
+$sel_list = COM_optionList(
+    $_TABLES['groups'],
+    'grp_id, grp_name',
+    $group,
+    1,
+    "grp_id $NOT IN ($grplist)"
+);
 $T->set_var('grp_select', $sel_list);
 
 $min_uid = isset($_PRF_CONF['include_admin']) &&
@@ -79,11 +86,11 @@ $sql = "SELECT u.uid, u.fullname, u.email, u.homepage, u.photo
 if ($srchval != '' && !empty($_PRF_CONF['search_fields'])) {
     $srchvals = explode(' ', $srchval);
     $phrases = array();
-    if (!isset($_PRF_CONF['search_fields']) ||
-            !is_array($_PRF_CONF['search_fields'])) {
-        $_PRF_CONF['search_fields'] = array();
+    if (!isset($_PRF_CONF['search_fields'])) {
+        $_PRF_CONF['search_fields'] = '';
     }
-    foreach ($_PRF_CONF['search_fields'] as $field) {
+    $search_fields = explode(',', $_PRF_CONF['search_fields']);
+    foreach ($search_fields as $field) {
         $phrase = array();
         foreach ($srchvals as $value) {
             $value = DB_escapeString($value);
@@ -166,16 +173,20 @@ $img_width = isset($_PRF_CONF['img_width']) && (int)$_PRF_CONF['img_width'] > 0 
             (int)$_PRF_CONF['img_width'] : 100;
 
 while ($row = DB_fetchArray($result)) {
-        $photo = USER_getPhoto ($row['uid'], $row['photo'], $row['email'],
-                                $img_width, 0);
-        $caption = "{$row['fullname']}<br />{$row['homepage']}";
-        if (isset($_PRF_CONF['show_email']) && $_PRF_CONF['show_email'] == true) {
-            $caption .= '<br />' . $row['email'];
-        }
+    $photo = USER_getPhoto(
+        $row['uid'],
+        $row['photo'],
+        $row['email'],
+        $img_width, 0
+    );
+    $caption = "{$row['fullname']}<br />{$row['homepage']}";
+    if (isset($_PRF_CONF['show_email']) && $_PRF_CONF['show_email'] == true) {
+        $caption .= '<br />' . $row['email'];
+    }
 
-        $T->set_var('fullname', htmlspecialchars($row['fullname']));
-        $T->set_var('caption', htmlspecialchars($caption));
-        $T->set_var('img_width', $img_width);
+    $T->set_var('fullname', htmlspecialchars($row['fullname']));
+    $T->set_var('caption', htmlspecialchars($caption));
+    $T->set_var('img_width', $img_width);
 
         if ($show_profile_link == true ||
             (isset($_PRF_CONF['link_own_profile']) &&

@@ -13,5 +13,5 @@
 </div>
 <div>
 {pagemenu}
-</div>
-<div>
+<div style="clear:both; margin-top:10px;">
+  <ul class="uk-grid uk-grid-width-small-1-4 uk-grid-width-medium-1-5 uk-grid-width-large-1-6 uk-text-center">
