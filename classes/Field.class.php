@@ -562,6 +562,7 @@ class Field
             'dt_input_format' => Fields\date::DateFormatSelect($this->getOption('input_format', 0)),
             'orderby_selection' => $orderby_options,
             'type_options' => $type_options,
+            'removeRowIcon' => $this->getRemoveRowIcon(),   // to place in javascript
         ) );
         $T->parse('output', 'editform');
         return $T->finish($T->get_var('output'));
@@ -768,6 +769,8 @@ class Field
 
     /**
      * Create the search sql for this field.
+     * This is the default function where there is a single value for a field,
+     * e.g. text, textarea, radio
      *
      * @param   array   $post   Values from $_POST
      * @param   string  $tbl    Table indicator
@@ -777,15 +780,15 @@ class Field
     {
         if (!isset($post[$this->name])) return '';
 
-        $fld = '';
+        $sql = '';
         if (isset($post['empty'][$this->name])) {
-            $fld = "(`{$tbl}`.`{$this->name}` = '' OR
+            $sql = "(`{$tbl}`.`{$this->name}` = '' OR
                      `{$tbl}`.`{$this->name}` IS NULL)";
         } elseif (isset($post[$this->name]) && $post[$this->name] !== '') {
             $value = DB_escapeString($post[$this->name]);
-            $fld = "`{$tbl}`.`{$this->name}` like '%{$value}%'";
+            $sql = "`{$tbl}`.`{$this->name}` like '%{$value}%'";
         }
-        return $fld;
+        return $sql;
     }
 
 
@@ -840,7 +843,21 @@ class Field
         } else {
             return COM_makeSID();
         }
-     }
+    }
+
+
+    /**
+     * Get the icon and javascript call to remove a row from the option list.
+     * Common for multi-option field types like radio, select and multi-checkbox.
+     *
+     * @return  string  HTML for row removal icon
+     */
+    protected function getRemoveRowIcon()
+    {
+        return '<i class="uk-icon uk-icon-remove uk-text-danger" ' .
+            'data-uk-tooltip title="Remove Row" ' .
+            'onclick="javascript:return removeRow(this);"></i>';
+    }
 
 }   // class Field
 

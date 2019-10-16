@@ -3,7 +3,7 @@
  * Class to handle multi-check profile items.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2018 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2018-2019 Lee Garner <lee@leegarner.com>
  * @package     profile
  * @version     1.2.0
  * @since       1.2.0
@@ -61,7 +61,6 @@ class multicheck extends \Profile\Field
         }
 
         $fld = '';
-        $i = 0;
         if (!is_array($this->value)) $this->value = @unserialize($this->value);
         if (!is_array($this->value)) $this->value = array();
         foreach ($this->options['values'] as $id=>$value) {
@@ -71,7 +70,6 @@ class multicheck extends \Profile\Field
                     "name=\"{$this->name}[$id]\" id=\"{$this->name}_$id\" " .
                     "value=\"$value\" $sel {$this->_frmReadonly} />&nbsp;" .
                     $value . '</span>' . LB;
-            $i++;
         }
         return $fld;
     }
@@ -125,23 +123,24 @@ class multicheck extends \Profile\Field
      */
     public function editValues()
     {
+        $multichk_input = '';
         if (!empty($this->options['values'])) {
-            $multichk_input = '';
             $defaults = $this->getOption('default', array());
             if (!is_array($defaults)) $defaults = array();
             foreach ($this->options['values'] as $key=>$valdata) {
-                $multichk_input .= '<li><input type="text" id="multiName' . $key .
-                        '" value="' . $valdata. '" name="multichk_values['.$key.']" />';
+                $multichk_input .= '<tr><td><input type="text" value="' .
+                    $valdata. '" name="multichk_values[]" /></td>';
                 $sel = in_array($valdata, $defaults) ? PRF_CHECKED : '';
-                $multichk_input .= "<input type=\"checkbox\" name=\"multichk_default[$key]\"
-                        value=\"$valdata\" $sel />";
-                $multichk_input .= '</li>' . "\n";
-                $i++;
+                $multichk_input .= '<td><input type="checkbox" name="multichk_default[]" value="' .
+                    $valdata . '" ' . $sel  . '/></td>';
+                $multichk_input .= '<td>' . $this->getRemoveRowIcon() . '</td>';
+                $multichk_input .= "</tr>\n";
             }
         } else {
-            $values = array();
-            $multichk_input = '<li><input type="text" id="multiName0" value=""
-                    name="multichk_values[0]" /></li>' . "\n";
+            $multichk_input .= '<tr><td><input type="text" value="" name="multichk_values[]" /></td>';
+            $multichk_input .= '<td><input type="checkbox" name="multichk_default[]" value="" /></td>';
+            $multichk_input .= '<td>' . $this->getRemoveRowIcon() . '</td>';
+            $multichk_input .= "</tr>\n";
         }
         return array('multichk_input'=>$multichk_input);
     }
@@ -172,8 +171,8 @@ class multicheck extends \Profile\Field
         $opts = $this->getOption('values', array());
         foreach ($opts as $valname) {
             $fld .= '<input type="checkbox" name="'.$this->name .
-                        '[]" value="' . htmlendities($valname, ENT_QUOTES) .
-                        '" />'.$valname.'&nbsp;';
+                '[]" value="' . htmlentities($valname, ENT_QUOTES) .
+                '" />'.$valname.'&nbsp;';
         }
         return $fld;
     }
@@ -205,7 +204,36 @@ class multicheck extends \Profile\Field
         $this->options['default'] = $defaults;
         return $this->options;
     }
- 
+
+
+    /**
+     * Get the user search SQL for multicheck fields.
+     * `$post` should contain an array of text values.
+     *
+     * @param   array   $post   Array of values from `$_POST`
+     * @param   string  $tbl    Table prefix used in parent search
+     * @return  string      SQL query portion
+     */
+    public function createSearchSQL($post, $tbl='data')
+    {
+        if (!isset($post[$this->name])) return '';
+
+        if (isset($post['empty'][$this->name])) {
+            $sql = "(`{$tbl}`.`{$this->name}` = '' OR
+                     `{$tbl}`.`{$this->name}` IS NULL)";
+        } else {
+            $sql = array();
+            foreach ($post[$this->name] as $val) {
+                $value = DB_escapeString($val);
+                $sql[]  = "`{$tbl}`.`{$this->name}` like '%{$value}%'";
+            }
+            if (!empty($sql)) {
+                $sql = '(' . implode(' AND ', $sql) . ')';
+            }
+        }
+        return $sql;
+    }
+
 }
 
 ?>

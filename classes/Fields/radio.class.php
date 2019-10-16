@@ -15,9 +15,11 @@ namespace Profile\Fields;
 
 /**
  * Class for radio button fields.
+ * Radio buttons are essentially the same as Select options
+ * except for the rendered field.
  * @package profile
  */
-class radio extends \Profile\Field
+class radio extends select
 {
     /**
      * Constructor.
@@ -27,7 +29,7 @@ class radio extends \Profile\Field
      * @param   string  $value  Optional value to assign, serialized array
      * @param   integer $uid    Optional user ID, current user by default
      */
-    public function __construct($item=NULL, $value='', $uid = '')
+    public function XX__construct($item=NULL, $value='', $uid = '')
     {
         parent::__construct($item, $value, $uid);
         if (!isset($this->options['values'])) {
@@ -77,25 +79,26 @@ class radio extends \Profile\Field
      *
      * @return  array   Array of name=>value pairs for Template::set_var()
      */
-    public function editValues()
+    public function XeditValues()
     {
         $listinput = '';
         $i = 0;
         if (!empty($this->options['values'])) {
             foreach ($this->options['values'] as $valname) {
-                $listinput .= '<li><input type="text" id="vName' . $i .
-                        '" value="' . $valname . '" name="selvalues[]" />';
+                $listinput .= '<tr><td><input type="text" value="' . $valname . '" name="select_values[]" /></td>';
                 $sel = $this->getOption('default') == $valname ?
                         PRF_CHECKED : '';
-                $listinput .= "<input type=\"radio\" name=\"sel_default\"
-                        value=\"$i\" $sel />";
-                $listinput .= '</li>' . "\n";
+                $listinput .= '<td><input type="radio" name="sel_default" value="' . $i . '" ' . $sel . '/></td>';
+                $listinput .= '<td>' . $this->getRemoveRowIcon() . '</td>';
+                $listinput .= "</tr>\n";
                 $i++;
             }
         } else {
             $thie->options['values'] = array();
-            $listinput = '<li><input type="text" id="vName0" value=""
-                name="selvalues[]" /></li>' . "\n";
+            $listinput = '<tr><td><input type="text" value="" name="select_values[]" /></td>';
+            $listinput .= '<td><input type="radio" name="sel_default" value="0" ' . PRF_CHECKED . '/></td>';
+            $listinput .= '<td>' . $this->getRemoveRowIcon() . '</td>';
+            $listinput .= "</tr>\n";
         }
         return array('list_input'=>$listinput);
     }
@@ -107,7 +110,7 @@ class radio extends \Profile\Field
      * @param   array   $vals   Array of all submitted values
      * @return  mixed           String to be saved for this item
      */
-    public function prepareToSave($vals)
+    public function XprepareToSave($vals)
     {
         if (!isset($vals[$this->name])) {
             if (empty($this->value)) {
@@ -125,7 +128,7 @@ class radio extends \Profile\Field
      *
      * @return  string      HTML input options
      */
-    public function searchFormOpts()
+    public function XsearchFormOpts()
     {
         global $LANG_PROFILE;
 
@@ -146,18 +149,19 @@ class radio extends \Profile\Field
      * @param  array   $A      Form values
      * @return array           Array of options to save
      */
-    public function setOptions($A)
+    public function XsetOptions($A)
     {
         $newvals = array();
-        if (!isset($A['selvalues']) || !is_array($A['selvalues'])) {
-            $A['selvalues'] = array();
+        if (!isset($A['select_values']) || !is_array($A['select_values'])) {
+            $A['select_values'] = array();
         }
-        foreach ($A['selvalues'] as $val) {
+        foreach ($A['select_values'] as $val) {
             if (!empty($val)) {
                 $newvals[] = $val;
             }
         }
-        $this->options['default'] = '';
+        $def_idx = PRF_getVar($A, 'sel_default', 'integer', 0);
+        $this->options['default'] = PRF_getVar($newvals, $def_idx);
         $this->options['values'] = $newvals;
         return $this->options;
     }

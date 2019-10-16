@@ -44,6 +44,7 @@ $LANG_PROFILE = array(
 'hlp_fld_def_option_name' => 'Enter the default option name',
 'hlp_fld_chkbox_default' => 'Enter "1" for checked, "0" for unchecked.',
 'hlp_no_change_system' => 'Cannot change name or type for system fields.',
+'hlp_chk_if_default' => 'Check this box to have the value selected by default for new entries.',
 
 'orderby'   => 'Order',
 'name'      => 'Name',

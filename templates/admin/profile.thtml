@@ -84,28 +84,32 @@ function PRF_changeType(value)
   
 }
 
-function sel_insertRow(list) {
-    var count = list.getElementsByTagName('li').length;
-    var new_element = document.createElement('li');
-    new_element.innerHTML = 
-            '<input id=\"vName'+count+'\" name=\"selvalues[]\" />' +
-        '<input type="radio" name="sel_default" value="' + count + '" />';
-    list.insertBefore(new_element, list.lastChild);
-    //document.getElementById('vName'+count).hide().slideDown('medium').focus();
-    document.getElementById('vName'+count).focus();
+// Add a row to the values table for multicheck, select or radio types
+function insertRow(name, single_def) {
+    var tbl_id = name + '_fieldValuesList';
+    var_val_name = name + '_values';
+    var def_name = name + '_default';
+
+    if (single_def) {
+        var def_type = "radio";
+    } else {
+        var def_type = "checkbox";
+    }
+    $('#' + tbl_id).append('<tr>' +
+        '<td><input type="text" value="" name="' + name + '_values[]" /></td>' +
+        '<td><input type="' + def_type + '" name="' + name + '_default[]" value="1" /></td>' +
+        '<td>{removeRowIcon}</td>' +
+        '</tr>'
+    );
+    return false;
 }
 
-function multichk_insertRow(list) {
-    var count = list.getElementsByTagName('li').length;
-    var new_element = document.createElement('li');
-    new_element.innerHTML = 
-        '<input id=\"multiName'+count+'\" name=\"multichk_values['+count+']\" />' +
-        '<input type=\"checkbox\" name=\"multichk_default['+count+']\" value=\"1\" />';
-    list.insertBefore(new_element, list.lastChild);
-    //document.getElementById('multiName'+count).hide().slideDown('medium').focus();
-    document.getElementById('multiName'+count).focus();
+// Remove a row from the values table for multicheck, select or radio types
+function removeRow(elem)
+{
+    $(elem).parent().parent().remove();
+    return false;
 }
-
 </script>
 
 <form class="uk-form uk-form-horizontal" id="frm1"
@@ -129,7 +133,7 @@ function multichk_insertRow(list) {
         <input type="hidden" name="sys" value="0" />
         <input type="text" required size="32" name="name" id="name"
           value="{name}" onblur="javascript:setName(this);" />
-        <i class="uk-icon uk-icon-exclamation-triangle prf-icon-danger tooltip" title="{$LANG_PROFILE['required']}"></i>
+        <i class="uk-icon uk-icon-exclamation-triangle uk-text-danger tooltip" title="{$LANG_PROFILE['required']}"></i>
         {!endif}
       </div>
     </div>
@@ -243,12 +247,22 @@ function multichk_insertRow(list) {
         <span id="hlp_value" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
-        <img src="{layout_url}/images/addchild.png"
-          class="gl_mootip" title="{$LANG_PROFILE['add_value']}"
-          onclick="javascript:sel_insertRow(document.getElementById('fieldValuesList'));" />
-        <ul id="fieldValuesList">
+        <table id="select_fieldValuesList">
+          <thead>
+          <tr>
+            <th>{$LANG_PROFILE['value']}</th>
+            <th><i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_PROFILE['hlp_chk_if_default']}"></i></th>
+            <th>
+                <i class="uk-icon uk-icon-plus-circle uk-text-success" data-uk-tooltip
+                title="{$LANG_PROFILE['add_value']}"
+                onclick="javascript:insertRow('select', true);" /></i>
+            </th>
+          </tr>
+          </thead>
+          <tbody>
           {list_input}
-        </ul>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -257,12 +271,24 @@ function multichk_insertRow(list) {
         <span id="hlp_value" class="tooltip_cfg tooltipstered"></span> 
       </label>
       <div class="uk-form-controls">
-        <img src="{layout_url}/images/addchild.png"
-          class="gl_mootip" title="{$LANG_PROFILE['add_value']}"
-          onclick="javascript:multichk_insertRow(document.getElementById('multichk_fieldValuesList'));" />
-        <ul id="multichk_fieldValuesList">
+        <!--<ul id="multichk_fieldValuesList">-->
+        <table id="multichk_fieldValuesList">
+          <thead>
+          <tr>
+            <th>{$LANG_PROFILE['value']}</th>
+            <th><i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_PROFILE['hlp_chk_if_default']}"></i></th>
+            <th>
+                <i class="uk-icon uk-icon-plus-circle uk-text-success" data-uk-tooltip
+                  title="{$LANG_PROFILE['add_value']}"
+                  onclick="javascript:insertRow('multichk', false);" /></i>
+            </th>
+          </tr>
+          </thead>
+          <tbody>
           {multichk_input}
-        </ul>
+          </tbody>
+        </table>
+        <!--</ul>-->
       </div>
     </div>
 
@@ -413,6 +439,7 @@ function multichk_insertRow(list) {
 {!if is_sys}
 {!else}
   <button class="uk-button uk-button-danger" type="submit" name="deletedef" value="{$LANG_ADMIN['delete']}" 
+    style="float:right;"
     onclick="return confirm('Do you really want to delete this item?');">{$LANG_ADMIN['delete']}</button>
 {!endif}
 </div>

@@ -70,22 +70,22 @@ class select extends \Profile\Field
     public function editValues()
     {
         $listinput = '';
-        $i = 0;
         if (!empty($this->options['values'])) {
+            $i = 0;
             foreach ($this->options['values'] as $valname) {
-                $listinput .= '<li><input type="text" id="vName' . $i .
-                        '" value="' . $valname . '" name="selvalues[]" />';
-                $sel = $this->getOption('default') == $valname ?
-                        PRF_CHECKED : '';
-                $listinput .= "<input type=\"radio\" name=\"sel_default\"
-                        value=\"$i\" $sel />";
-                $listinput .= '</li>' . "\n";
+                $listinput .= '<tr><td><input type="text" value="' . $valname . '" name="select_values[]" /></td>';
+                $sel = $this->getOption('default') == $valname ? PRF_CHECKED : '';
+                $listinput .= '<td><input type="radio" name="sel_default" value="' . $i . '" ' . $sel . '/></td>';
+                $listinput .= '<td>' . $this->getRemoveRowIcon() . '</td>';
+                $listinput .= "</tr>\n";
                 $i++;
             }
         } else {
-            $thie->options['values'] = array();
-            $listinput = '<li><input type="text" id="vName0" value=""
-                name="selvalues[]" /></li>' . "\n";
+            $this->options['values'] = array();
+            $listinput .= '<tr><td><input type="text" value="" name="select_values[]" /></td>' . "\n";
+                $listinput .= '<td><input type="radio" name="sel_default" value="0" ' . $sel . '/></td>';
+            $listinput .= '<td>' . $this->getRemoveRowIcon() . '</td>';
+            $listinput .= "</tr>\n";
         }
         return array('list_input'=>$listinput);
     }
@@ -116,8 +116,16 @@ class select extends \Profile\Field
     public function searchFormOpts()
     {
         global $LANG_PROFILE;
-
         $fld = '';
+        $opts = $this->getOption('values', array());
+        foreach ($opts as $valname) {
+            $fld .= '<input type="checkbox" name="'.$this->name .
+                '[]" value="' . htmlentities($valname, ENT_QUOTES) .
+                '" />'.$valname.'&nbsp;';
+        }
+        return $fld;
+
+        /*$fld = '';
         $opts = $this->getOption('values', array());
         foreach ($opts as $valname) {
             $fld .= '<input type="radio" name="'.$this->name .
@@ -126,7 +134,7 @@ class select extends \Profile\Field
         }
         $fld .= '<input type="radio" name="'.$this->name .
                 '" value="-1" ' . PRF_CHECKED . '/>' . $LANG_PROFILE['any'];
-        return $fld;
+        return $fld;*/
     }
 
 
@@ -139,17 +147,47 @@ class select extends \Profile\Field
     public function setOptions($A)
     {
         $newvals = array();
-        if (!isset($A['selvalues']) || !is_array($A['selvalues'])) {
-            $A['selvalues'] = array();
+        if (!isset($A['select_values']) || !is_array($A['select_values'])) {
+            $A['select_values'] = array();
         }
-        foreach ($A['selvalues'] as $val) {
+        foreach ($A['select_values'] as $val) {
             if (!empty($val)) {
                 $newvals[] = $val;
             }
         }
-        $this->options['default'] = '';
+        $def_idx = PRF_getVar($A, 'sel_default', 'integer', 0);
+        $this->options['default'] = PRF_getVar($newvals, $def_idx);
         $this->options['values'] = $newvals;
         return $this->options;
+    }
+
+
+    /**
+     * Get the user search SQL for multicheck fields.
+     * `$post` should contain an array of text values.
+     *
+     * @param   array   $post   Array of values from `$_POST`
+     * @param   string  $tbl    Table prefix used in parent search
+     * @return  string      SQL query portion
+     */
+    public function createSearchSQL($post, $tbl='data')
+    {
+        if (!isset($post[$this->name])) return '';
+
+        if (isset($post['empty'][$this->name])) {
+            $sql = "(`{$tbl}`.`{$this->name}` = '' OR
+                     `{$tbl}`.`{$this->name}` IS NULL)";
+        } else {
+            $sql = array();
+            foreach ($post[$this->name] as $val) {
+                $value = DB_escapeString($val);
+                $sql[]  = "`{$tbl}`.`{$this->name}` like '%{$value}%'";
+            }
+            if (!empty($sql)) {
+                $sql = '(' . implode(' OR ', $sql) . ')';
+            }
+        }
+        return $sql;
     }
 
 }
