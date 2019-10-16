@@ -103,7 +103,7 @@ function profile_do_upgrade($dvlp = false)
  * @param   string  $version    Version being upgraded TO
  * @param   array   $sql        Array of SQL statement(s) to execute
  * @param   boolean $dvlp       True to ignore SQL errors and continue
- * @#return boolean     True on success, False on error
+ * @return  boolean     True on success, False on error
  */
 function profile_do_upgrade_sql($version, $sql='', $dvlp=false)
 {
@@ -629,7 +629,7 @@ function profile_upgrade_1_1_4($dvlp=false)
                 VALUES
                     (95, 'prf_phone', 'text', 1, 0, 0, 'Phone Number', 
                 'a:5:{s:7:\"default\";s:0:\"\";s:9:\"help_text\";\
-                s:23:\"Enter your phone number\";s:4:\"size\";\
+                s:23:\"enter ynur phone number\";s:4:\"size\";\
                 i:40;s:9:\"maxlength\";i:255;s:7:\"autogen\";i:0;}', 0, 3)";
         }
     }
