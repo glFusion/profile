@@ -54,11 +54,12 @@ class pdfList extends htmlList
             }
         }
 
+        // Render the list as HTML, then use Html2Pdf to create the PDF.
         $content = parent::Render($filename);
 
         USES_lglib_class_html2pdf();
         try {
-            $html2pdf = new \HTML2PDF('P', 'A4', 'en');
+            $html2pdf = new \Spipu\Html2Pdf\Html2Pdf('P', 'A4', 'en');
             //$html2pdf->setModeDebug();
             $html2pdf->setDefaultFont('Arial');
             $html2pdf->writeHTML($content);
