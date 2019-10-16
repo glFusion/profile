@@ -30,7 +30,7 @@
 
       <dl id="desc_hlp_fieldname">
         <dt>Field Name</dt>
-        <dd>This is the name of the custom field used in the database. It must be unique.</dd>
+        <dd>This is the name of the custom field used in the database. It must be unique. To ensure no conflict with reserved SQL names, "prf_" will be prepended to the field name.</dd>
       </dl>
 
       <dl id="desc_hlp_prompt">
@@ -63,11 +63,6 @@
           <dd>(Type=text, date, checkbox) Enter the default value for this field. Date = YYYY-MM-DD, Time = HH:MM:SS. Checkbox checked by default.</dd>
       </dl>
 
-      <dl id="desc_hlp_values">
-          <dt>Values</dt>
-          <dd>(Type=select, radio, multi-check) Enter the available values for this field. Radio Buttons, Dropdown: Select the item to be used as the default. Multi-Checkbox: Check each item that should be checked by default.</dd>
-      </dl>
-
       <dl id="desc_hlp_24hr">
           <dt>Time Format</dt>
           <dd>(Type=date) Select the format for time display, either 12- or 24-hour. Select &quot;None&quot; to suppress the time entry and display.</dt>
@@ -85,7 +80,7 @@
 
       <dl id="desc_hlp_value">
           <dt>Value</dt>
-          <dd>(Type=radio, dropdown) This is a string which indicates the possible values for dropdown selections and radio buttons. The format is "value:text;value:text;..."  For example, to have two radio buttons labeled "Red" and "Blue", which return values of "R" and "B" respectively, you would enter "R:Red;B:Blue" as the value.<p>(Type=static) Enter the literal text or HTML that should be displayed for this field.</p></dd>
+          <dd>(Type=radio, dropdown, multichk) These are the options presented for multiple selections. Check the checkbox or radio button to set one or more options as the defaults. Use the (+) and (x) icons to add or remove elements. Options with empty values are discarded.<p>(Type=static) Enter the literal text or HTML that should be displayed for this field.</p></dd>
       </dl>
 
       <dl id="desc_hlp_enabled">

@@ -11,15 +11,15 @@
 {!if is_static}
 {!else}
   {!if is_visible}
-        <i class="uk-icon uk-icon-user prf-icon-info tooltip" title="{$LANG_PROFILE['hlp_visible']}"></i>
+        <i class="uk-icon uk-icon-user uk-text-success tooltip" title="{$LANG_PROFILE['hlp_visible']}"></i>
   {!else}
-        <i class="uk-icon uk-icon-user-secret prf-icon-disabled tooltip" title="{$LANG_PROFILE['hlp_invisible']}"></i>
+        <i class="uk-icon uk-icon-user-secret uk-text-disabled tooltip" title="{$LANG_PROFILE['hlp_invisible']}"></i>
   {!endif}
   {!if is_required}
-        <i class="uk-icon uk-icon-warning prf-icon-danger tooltip" title="{$LANG_PROFILE['hlp_required']}"></i>
+        <i class="uk-icon uk-icon-warning uk-text-danger tooltip" title="{$LANG_PROFILE['hlp_required']}"></i>
   {!endif}
   {!if help_text}
-        <i class="uk-icon uk-icon-question-circle prf-icon-info tooltip" title="{help_text}"></i>
+        <i class="uk-icon uk-icon-question-circle tooltip" title="{help_text}"></i>
   {!endif}
 {!endif}
     </span>

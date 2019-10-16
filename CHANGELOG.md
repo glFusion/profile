@@ -16,6 +16,9 @@ Release TBD
 - Shows a reminder message at login to users who have no email address.
 - UIKit template updates
 - Change toggle AJAX from XML to JSON
+- Fix user search for multi-option items.
+- Modernize using UIkit icons.
+- Add dvlpupdate.php development update utility.
 
 ## Version 1.1.3
 Released 2013-06-13
@@ -28,7 +31,7 @@ Released 2011-11-04
 - 0000484: [Administration] Remove grace period for arrears (lee) - resolved.
 - 0000474: [Lists] Add a selection to the list definition for user status (lee) - resolved.
 - 0000475: [Lists] Searching a list containing values from other plugins causes a SQL error (lee) - resolved.
-- 0000467: [Administration] Hard-coded table names in PRF_saveData() (lee) - resolved.
+- 0000467: [Administration] Hard-coded table names in `PRF_saveData()` (lee) - resolved.
 [7 issues]
 
 ## Version 1.1.1
