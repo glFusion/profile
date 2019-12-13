@@ -550,7 +550,7 @@ function profile_upgrade_1_1_3()
     }
 
     $need_update = false;   // assume it's done and check if it's needed
-    $r = DB_query("SHOW COLUMNS FROM {$_TABLES['profile_lists']} LIKE 'incl_user_state'");
+    $r = DB_query("SHOW COLUMNS FROM {$_TABLES['profile_lists']} LIKE 'incl_user_stat'");
     $A = DB_fetchArray($r, false);
     if ($A['Type'] !== 'varchar(64)') {
         $sql[] = "ALTER TABLE {$_TABLES['profile_lists']}
