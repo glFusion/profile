@@ -23,7 +23,7 @@ $_SQL['profile_def'] = "CREATE TABLE {$_TABLES['profile_def']} (
   `required` tinyint(1) NOT NULL DEFAULT '1',
   `user_reg` tinyint(1) NOT NULL DEFAULT '0',
   `show_in_profile` tinyint(1) NOT NULL DEFAULT '1',
-  `prompt` varchar(80) COLLATE utf8_unicode_ci DEFAULT '',
+  `prompt` text COLLATE utf8_unicode_ci DEFAULT '',
   `options` text COLLATE utf8_unicode_ci,
   `group_id` mediumint(8) unsigned NOT NULL DEFAULT '1',
   `perm_owner` tinyint(1) unsigned NOT NULL DEFAULT '3',
