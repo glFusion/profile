@@ -3,10 +3,10 @@
  * Upgrade routines for the Custom Profile plugin
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2009-2016 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2019 Lee Garner <lee@leegarner.com>
  * @package     profile
- * @version     1.1.4
- * @license     http://opensource.org/licenses/gpl-2.0.php 
+ * @version     1.2.0
+ * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
  */
@@ -27,7 +27,7 @@ global $_CONF, $_PRF_CONF;
 function profile_do_upgrade($dvlp = false)
 {
     global $_PRF_CONF, $_PLUGIN_INFO;
-    
+
     if (isset($_PLUGIN_INFO[$_PRF_CONF['pi_name']])) {
         if (is_array($_PLUGIN_INFO[$_PRF_CONF['pi_name']])) {
             // glFusion > 1.6.5
@@ -81,6 +81,12 @@ function profile_do_upgrade($dvlp = false)
         $current_ver = '1.1.4';
         COM_errorLog("Updating Profile Plugin to $current_ver");
         if (!profile_upgrade_1_1_4($dvlp)) return false;
+    }
+
+    if (!COM_checkVersion($current_ver, '1.2.0')) {
+        $current_ver = '1.2.0';
+        COM_errorLog("Updating Profile Plugin to $current_ver");
+        if (!profile_upgrade_1_2_0($dvlp)) return false;
     }
 
     // Update the plugin configuration
@@ -515,7 +521,7 @@ function profile_upgrade_1_1_2()
                 perm_owner, perm_group, perm_members, perm_anon
             ) VALUES (
                 999, 'sys_parent', 'account', 0, 0, 0,
-                '{$LANG_PROFILE['parent_uid']}', 
+                '{$LANG_PROFILE['parent_uid']}',
                 'a:1:{s:7:\"default\";s:1:\"0\";}', 1, $grp_id,
                 0, 3, 0, 0
             )",
@@ -569,7 +575,7 @@ function profile_upgrade_1_1_3()
             if ($ustat == -1) $ustat = array(1,2,3,4);
             else $ustat = array($ustat);
             $nstat = DB_escapeString(@serialize($ustat));
-            DB_query("UPDATE {$_TABLES['profile_lists']} SET 
+            DB_query("UPDATE {$_TABLES['profile_lists']} SET
                     incl_user_stat = '$nstat' WHERE listid='$listid'");
         }
     }
@@ -589,7 +595,7 @@ function profile_upgrade_1_1_4($dvlp=false)
     global $_TABLES, $LANG_PROFILE, $_PRF_CONF;
 
     COM_errorLog('Performing 1.1.3 SQL updates if needed');
-    profile_upgrade_1_1_3($dvlp);
+    profile_upgrade_1_1_3(true);
 
     $sql = array();
     $add_name_parts = false;
@@ -627,7 +633,7 @@ function profile_upgrade_1_1_4($dvlp=false)
                 (orderby, name, type, enabled, required, user_reg,
                 prompt, options, sys, perm_owner)
                 VALUES
-                    (95, 'prf_phone', 'text', 1, 0, 0, 'Phone Number', 
+                    (95, 'prf_phone', 'text', 1, 0, 0, 'Phone Number',
                 'a:5:{s:7:\"default\";s:0:\"\";s:9:\"help_text\";\
                 s:23:\"enter ynur phone number\";s:4:\"size\";\
                 i:40;s:9:\"maxlength\";i:255;s:7:\"autogen\";i:0;}', 0, 3)";
@@ -657,6 +663,26 @@ function profile_upgrade_1_1_4($dvlp=false)
         }
     }
     return profile_do_set_version('1.1.4');
+}
+
+
+/**
+ * Upgrade to version 1.2.0
+ * Changes the prompt field to `text`.
+ *
+ * @param   boolean $dvlp   True to ignore SQL errors
+ * @return  boolean     True on success, False on error
+ */
+function profile_upgrade_1_2_0($dvlp=false)
+{
+    global $_TABLES, $LANG_PROFILE, $_PRF_CONF;
+
+    $sql = array(
+        "ALTER TABLE {$_TABLES['profile_def']}
+            CHANGE `prompt` `prompt` text COLLATE utf8_unicode_ci DEFAULT ''",
+    );
+    if (!profile_do_upgrade_sql('1.2.0', $sql, $dvlp)) return false;
+    return profile_do_set_version('1.2.0');
 }
 
 
