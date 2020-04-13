@@ -68,7 +68,7 @@ class radio extends select
                 name=\"{$this->name}\"
                 id=\"{$this->name}_{$value}\"
                 value=\"" . htmlentities($value, ENT_QUOTES) .
-                "\" $sel {$this->_frmReadonly}/>$value&nbsp;\n";
+                "\" $sel {$this->_frmReadonly}/>&nbsp;$value&nbsp;\n";
         }
         return $fld;
     }
