@@ -105,14 +105,14 @@ class textarea extends \Profile\Field
      * Actually gets the options array specific to this field.
      *
      * @param   array   $A      Form values
-     * @return  array           Array of options to save
+     * @return  object  $this
      */
     public function setOptions($A)
     {
         // Set the size and maxlength to reasonable values
         $this->options['rows'] = isset($A['rows']) ? (int)$A['rows'] : 5;
         $this->options['cols'] = isset($A['cols']) ? (int)$A['cols'] : 80;
-        return $this->options;
+        return $this;
     }
 
 }

@@ -165,13 +165,14 @@ class checkbox extends \Profile\Field
      * Actually gets the options array specific to this field.
      *
      * @param   array   $A      Form values
+     * @return  object  $this
      * @return  array           Array of options to save
      */
     public function setOptions($A)
     {
         $this->options['value'] = 1;
         $this->options['default'] = isset($A['chkdefvalue']) ? 1 : 0;
-        return $this->options;
+        return $this;
     }
 
 

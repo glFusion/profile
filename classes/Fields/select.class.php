@@ -142,7 +142,7 @@ class select extends \Profile\Field
      * Actually gets the options array specific to this field.
      *
      * @param   array   $A      Form values
-     * @return  array           Array of options to save
+     * @return  object  $this
      */
     public function setOptions($A)
     {
@@ -158,7 +158,7 @@ class select extends \Profile\Field
         $def_idx = PRF_getVar($A, 'sel_default', 'integer', 0);
         $this->options['default'] = PRF_getVar($newvals, $def_idx);
         $this->options['values'] = $newvals;
-        return $this->options;
+        return $this;
     }
 
 

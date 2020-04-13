@@ -73,12 +73,12 @@ class statictext extends \Profile\Field
      * Actually gets the options array specific to this field.
      *
      * @param   array   $A      Form values
-     * @return  array           Array of options to save
+     * @return  object  $this
      */
     public function setOptions($A)
     {
         $this->options['value'] = trim($A['static_val']);
-        return $this->options;
+        return $this;
     }
 
 

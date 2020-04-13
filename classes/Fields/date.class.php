@@ -496,7 +496,7 @@ function {$this->name}_onUpdate(cal)
      * Actually gets the options array specific to this field.
      *
      * @param   array   $A      Form values
-     * @return  array           Array of options to save
+     * @return  object  $this
      */
     public function setOptions($A)
     {
@@ -516,7 +516,7 @@ function {$this->name}_onUpdate(cal)
                 $_PRF_CONF['def_dt_format'];
         $this->options['input_format'] = isset($A['dt_input_format']) ?
                 $A['dt_input_format'] : $_PRF_CONF['date_format'];
-        return $this->options;
+        return $this;
     }
 
 

@@ -182,7 +182,7 @@ class multicheck extends \Profile\Field
      * Actually gets the options array specific to this field.
      *
      * @param   array   $A      Form values
-     * @return  array           Array of options to save
+     * @return  object  $this
      */
     public function setOptions($A)
     {
@@ -202,7 +202,7 @@ class multicheck extends \Profile\Field
         // Set options as arrays; they'll be serialized later
         $this->options['values'] = $newvals;
         $this->options['default'] = $defaults;
-        return $this->options;
+        return $this;
     }
 
 

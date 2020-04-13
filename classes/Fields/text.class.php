@@ -44,13 +44,13 @@ class text extends \Profile\Field
      * Actually gets the options array specific to this field.
      *
      * @param   array   $A      Form values
-     * @return  array           Array of options to save
+     * @return  object  $this
      */
     public function setOptions($A)
     {
         $this->options['maxlength'] = min((int)$A['maxlength'], 255);
         $this->options['size'] = min((int)$A['size'], 80);
-        return $this->options;
+        return $this;
     }
 
 
