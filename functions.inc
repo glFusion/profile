@@ -321,19 +321,23 @@ function plugin_profileedit_profile($uid, $panel, $fieldset)
     $retval = '';
 
     if ($panel == 'privacy' && $fieldset == 'privacy') {
-        $T = new \Template(__DIR__ . '/templates');
-        $T->set_file('profile', 'profile_privacy.thtml');
-        $P = \Profile\Profile::getInstance($uid);
-        if (isset($P->fields['sys_directory'])) {
+        $P = Profile\Profile::getInstance($uid);
+        $dir_fld = $P->getField('sys_directory');
+        if ($dir_fld) {
+            $T = new Template(__DIR__ . '/templates');
+            $T->set_file('profile', 'profile_privacy.thtml');
             $T->set_var(array(
-                'prf_prompt'    => $P->fields['sys_directory']->prompt,
-                'prf_field'     => $P->fields['sys_directory']->FormField(),
+                'prf_prompt'    => $dir_fld->getPrompt(),
+                'prf_field'     => $dir_fld->FormField(),
             ) );
             $T->parse('output', 'profile');
             $retval .= $T->finish($T->get_var('output'));
         }
-    } elseif ( ($panel == 'useredit') || ($panel == '' && $fieldset == '') ) {
-        $P = \Profile\Profile::getInstance($uid);
+    } elseif (
+        $panel == 'useredit' ||
+        ($panel == '' && $fieldset == '')
+    ) {
+        $P = Profile\Profile::getInstance($uid);
         $retval .= $P->Edit('edit', $uid);
     }
     return $retval;
@@ -362,7 +366,7 @@ function plugin_profilevariablesdisplay_profile($uid, &$template)
     $T->set_file(array(
         'block' => 'profileblock.thtml',
     ));
-    $A = \Profile\Profile::getInstance($uid)->fields;
+    $A = Profile\Profile::getInstance($uid)->getFields();
     if (empty($A)) {
         return '';
     }
@@ -373,12 +377,14 @@ function plugin_profilevariablesdisplay_profile($uid, &$template)
     foreach ($A as $data) {
         // TODO: show variables to the user if owner perm set
         // Admin can see all fields, they'll be styled to indicate not public.
-        if (!$data->isPublic() && !$isAdmin) continue;
+        if (!$data->isPublic() && !$isAdmin) {
+            continue;
+        }
         $value = $data->FormatValue();
         if ($_PRF_CONF['showemptyvals'] || !empty($value)) {
             $T->set_block('block', 'profile_row', 'prow');
             $T->set_var(array(
-                'descrip'   => htmlspecialchars($data->prompt),
+                'descrip'   => htmlspecialchars($data->getPrompt()),
                 'value'     => $value,
                 'showvisicons' => $showvisicons ? 'true' : '',
                 'is_visible' => $showvisicons && $data->isPublic() ? 'true' : '',
@@ -392,8 +398,10 @@ function plugin_profilevariablesdisplay_profile($uid, &$template)
     if ($items > 0) {
         $T->parse('output', 'block');
         $existingFields = $template->get_var('plugin_fields');
-        $template->set_var('plugin_fields',
-            $existingFields . $T->finish($T->get_var('output')));
+        $template->set_var(
+            'plugin_fields',
+            $existingFields . $T->finish($T->get_var('output'))
+        );
     } else {
         return '';
     }
@@ -418,7 +426,7 @@ function plugin_profilesave_profile($uid=0)
         $uid = (int)$_USER['uid'];
     }
 
-    $P = \Profile\Profile::getInstance($uid);
+    $P = Profile\Profile::getInstance($uid);
     $P->Save($_POST);
 }
 
@@ -437,7 +445,7 @@ function plugin_user_create_profile($uid = 0)
     if ($uid == 0)
         return;
 
-    $P = \Profile\Profile::getInstance($uid);
+    $P = Profile\Profile::getInstance($uid);
     $P->Save($_POST, 'registration');
 }
 
@@ -457,13 +465,12 @@ function PRF_setUserValues($uid=0)
 
     //USES_profile_class_profile();
 
-    if ($uid == 0) $uid = $_USER['uid'];
+    if ($uid == 0) {
+        $uid = $_USER['uid'];
+    }
     $uid = (int)$uid;
     $A = array();
-    //$P = new Profile($uid);
-
-    $fields = \Profile\Profile::getInstance($uid)->fields;
-    foreach ($fields as $name => $data) {
+    foreach (Profile\Profile::getInstance($uid)->getFields() as $name => $data) {
         $A[$name] = $data->FormatValue();
     }
     if ($uid == 0) {
@@ -654,7 +661,7 @@ function plugin_autotags_profile($op, $content = '', $autotag = '')
 
         case 'profile_list':
             $item_id = COM_applyFilter($autotag['parm1']);
-            $PL = new \Profile\UserList($item_id);
+            $PL = new Profile\UserList($item_id);
             if (isset($opts['menu'])) $PL->showMenu();
             if (isset($opts['export'])) $PL->showExport();
             if (isset($opts['extras'])) $PL->hasExtras();

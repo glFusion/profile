@@ -1056,16 +1056,20 @@ class UserList
      * This property determines whether the export link is shown by Render().
      *
      * @param   boolean $value  New value to set, default = true
+     * @return  object  $this
      */
     public function showExport($value = TRUE)
     {
-        if ($value !== FALSE &&
-                ($this->isAdmin || SEC_hasRights('profile.export'))) {
+        if (
+            $value !== FALSE &&
+            ($this->isAdmin || SEC_hasRights('profile.export'))
+        ) {
             $value = TRUE;
         } else {
             $value = FALSE;
         }
         $this->show_export = $value;
+        return $this;
     }
 
 
@@ -1074,11 +1078,13 @@ class UserList
      * This property determines whether the menu of lists is shown by Render().
      *
      * @param   boolean $value  New value to set, default = true
+     * @return  object  $this
      */
     public function showMenu($value = true)
     {
         if ($value !== FALSE) $value = TRUE;
         $this->showMenu = $value;
+        return $this;
     }
 
 
@@ -1087,11 +1093,13 @@ class UserList
      * This property determines whether the search form is shown with the list.
      *
      * @param   boolean $value  New value to set, default = true
+     * @return  object  $this
      */
     public function hasExtras($value = true)
     {
         if ($value !== FALSE) $value = TRUE;
         $this->hasExtras = $value;
+        return $this;
     }
 
 
@@ -1167,8 +1175,12 @@ class UserList
             'incl_user_stat' => $this->incl_user_stat,
         );
         foreach ($_PLUGINS as $pi_name) {
-            $status = LGLIB_invokeService($pi_name, 'profilefilter', $args,
-                        $pi_filter, $svc_msg);
+            $status = LGLIB_invokeService(
+                $pi_name,
+                'profilefilter',
+                $args,
+                $pi_filter, $svc_msg
+            );
             if ($status == PLG_RET_OK) {
                 if (!empty($pi_filter['filter'])) {
                     $this->pi_filter .= $pi_filter['filter'];

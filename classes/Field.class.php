@@ -20,26 +20,93 @@ namespace Profile;
 class Field
 {
     /** Options for this item.
-        Public, but should be accessed via getOption()
-        @var array */
-    public $options = array();
+     * Public, but should be accessed via getOption().
+     * @var array */
+    protected $options = array();
 
     /** CSS class to use on the entry form.
-        @var string */
+     * @var string */
     protected $_frmClass = '';
 
     /** Set to "DISABLED" if this item is read-only, to disable frm entry.
-        @var string */
+     * @var string */
     protected $_frmReadonly = '';
 
-    /** Properties array.
-     * Accessed via `__set()` and `__get()` functions.
-     * @var array */
-    private $properties = array();
-
     /** Easily indicate a hidden field.
-        @var boolean */
-    protected $hidden;
+     * @var boolean */
+    protected $hidden = 0;
+
+    /** Flag indicating the field is enabled for use.
+     * @var boolean */
+    protected $enabled = 1;
+
+    /** Flag indicating the field is shown in the user's profile.
+     * @var boolean */
+    protected $show_in_profile = 1;
+
+    /** Show the field on the registration form?
+     * @var boolean */
+    protected $user_reg = 0;
+
+    /** Is this a system (not modifiable) field?
+     * @var boolean */
+    protected $sys = 0;
+
+    /** Is this a read-only field?
+     * @var boolean */
+    protected $readonly = 0;
+
+    /** Is this a required field?
+     * @var boolean */
+    protected $required = 0;
+
+    /** Type of field (text, numeric, date, etc.)
+     * @var string */
+    protected $type = 'text';
+
+    /** Short name of the field.
+     * @var string */
+    protected $name = '';
+
+    /** Field prompt.
+     * @var string */
+    protected $prompt = '';
+
+    /** Submitted value for the field.
+     * @var string */
+    protected $value = '';
+
+    /** Field record ID.
+     * @var integer */
+    protected $id = 0;
+
+    /** User ID.
+     * @var integer */
+    protected $uid = 0;
+
+    /** Field display order.
+     * @var integer */
+    protected $orderby = 9999;
+
+    /** Group ID for permissions.
+     * @var integer */
+    protected $group_id = 2;
+
+    /** Owner (user) permission to edit their own values.
+     * @var integer */
+    protected $perm_owner = 3;
+
+    /** Permisson for the group to edit values.
+     * @var integer */
+    protected $perm_group = 3;
+
+    /** Permission for regular members to the value.
+     * @var integer */
+    protected $perm_members = 2;
+
+    /** Permission for anonymous users to the value.
+     * @var integer */
+    protected $perm_anon = 0;
 
 
     /**
@@ -53,9 +120,10 @@ class Field
     {
         global $_USER, $_TABLES, $_PRF_CONF;
 
-        if (empty($uid)) $uid = $_USER['uid'];
+        if (empty($uid)) {
+            $uid = $_USER['uid'];
+        }
         $this->uid = (int)$uid;
-
         $A = array();
 
         // If the item info is an array, then assume that it's been read from
@@ -72,19 +140,23 @@ class Field
         if (!empty($A)) {
             $this->setVars($A, true);
         } else {
-            $this->group_id = $_PRF_CONF['defgroup'];
-            $this->perm_owner = $_PRF_CONF['default_permissions'][0];
-            $this->perm_group = $_PRF_CONF['default_permissions'][1];
-            $this->perm_members = $_PRF_CONF['default_permissions'][2];
-            $this->perm_anon = $_PRF_CONF['default_permissions'][3];
+            $this->group_id = (int)$_PRF_CONF['defgroup'];
+            $this->perm_owner = (int)$_PRF_CONF['default_permissions'][0];
+            $this->perm_group = (int)$_PRF_CONF['default_permissions'][1];
+            $this->perm_members = (int)$_PRF_CONF['default_permissions'][2];
+            $this->perm_anon = (int)$_PRF_CONF['default_permissions'][3];
             $this->enabled = 1;
         }
 
         // Override the item's value if one is provided.
-        if (!empty($value)) $this->value = $value;
+        if (!empty($value)) {
+            $this->value = $value;
+        }
 
         // If the unserialization failed, provide an empty array
-        if (!$this->options) $this->options = array();
+        if (!$this->options) {
+            $this->options = array();
+        }
     }
 
 
@@ -101,7 +173,7 @@ class Field
         $this->id = PRF_getVar($A, 'id', 'integer', 0);
         $this->name = PRF_getVar($A, 'name');
         $this->value = PRF_getVar($A, 'value');
-        $this->orderby = PRF_getVar($A, 'orderby', 'integer', 999);
+        $this->orderby = PRF_getVar($A, 'orderby', 'integer', 9999);
         $this->type = PRF_getVar($A, 'type', 'string', 'text');
         $this->prompt = PRF_getVar($A, 'prompt');
         $this->group_id = PRF_getVar($A, 'group_id', 'integer', $_PRF_CONF['defgroup']);
@@ -120,68 +192,16 @@ class Field
             $this->options = @unserialize(PRF_getVar($A, 'options'));
         } else {
             if (isset($A['perm_owner'])) {
-                $perms = SEC_getPermissionValues($A['perm_owner'],
-                    $A['perm_group'], $A['perm_members'],
-                    $A['perm_anon']);
-                $this->perm_owner   = $perms[0];
-                $this->perm_group   = $perms[1];
-                $this->perm_members = $perms[2];
-                $this->perm_anon    = $perms[3];
+                $perms = SEC_getPermissionValues(
+                    $A['perm_owner'], $A['perm_group'],
+                    $A['perm_members'], $A['perm_anon']
+                );
+                $this->perm_owner   = (int)$perms[0];
+                $this->perm_group   = (int)$perms[1];
+                $this->perm_members = (int)$perms[2];
+                $this->perm_anon    = (int)$perms[3];
             }
             $this->options = array();
-        }
-    }
-
-
-    /**
-     * Set a property's value
-     *
-     * @param   string  $key    Name of property
-     * @param   mixed   $value  Value of property
-     */
-    public function __set($key, $value)
-    {
-        switch ($key) {
-        case 'enabled':
-        case 'show_in_profile':
-        case 'user_reg':
-        case 'sys':
-        case 'readonly':
-        case 'required':
-            $this->properties[$key] = $value == 0 ? 0 : 1;
-            break;
-        case 'type':
-        case 'name':
-        case 'prompt':
-        case 'value':
-            $this->properties[$key] = $value;
-            break;
-        case 'id':
-        case 'uid':
-        case 'orderby':
-        case 'group_id':
-        case 'perm_owner':
-        case 'perm_group':
-        case 'perm_members':
-        case 'perm_anon':
-            $this->properties[$key] = (int)$value;
-            break;
-        }
-    }
-
-
-    /**
-     * Get the value of a property, NULL if undefined
-     *
-     * @param   string  $key    Name of property
-     * @return  mixed           Value of property
-     */
-    public function __get($key)
-    {
-        if (array_key_exists($key, $this->properties)) {
-            return $this->properties[$key];
-        } else {
-            return NULL;
         }
     }
 
@@ -195,7 +215,9 @@ class Field
      */
     public function FormatValue($value = '')
     {
-        if ($value == '') $value = $this->value;
+        if ($value == '') {
+            $value = $this->value;
+        }
         return htmlspecialchars($value);
     }
 
@@ -236,10 +258,12 @@ class Field
         $this->_frmReadonly = '';
         //$this->readonly = false;
         $this->hidden = false;
-        if ($this->perm_owner < 3 &&
-                !SEC_hasRights('profile.admin, profile.manage', 'OR')) {
+        if (
+            $this->perm_owner < 3 &&
+            !SEC_hasRights('profile.admin, profile.manage', 'OR')
+        ) {
             $this->_frmReadonly = ' disabled="disabled" ';
-        //    $this->readonly = true;
+            //    $this->readonly = true;
             $this->hidden = $this->perm_owner < 2 ? true : false;
         }
     }
@@ -272,7 +296,7 @@ class Field
      *
      * @return  array   Field options
      */
-    public function Options()
+    public function XOptions()
     {
         return $this->options;
     }
@@ -801,7 +825,7 @@ class Field
      */
     public function setOptions($A)
     {
-        return $this->options;
+        return $this;
     }
 
 
@@ -857,6 +881,107 @@ class Field
         return '<i class="uk-icon uk-icon-remove uk-text-danger" ' .
             'data-uk-tooltip title="Remove Row" ' .
             'onclick="javascript:return removeRow(this);"></i>';
+    }
+
+
+    /**
+     * Get the field prompt to display.
+     *
+     * @return  string      Prompt string
+     */
+    public function getPrompt()
+    {
+        return $this->prompt;
+    }
+
+
+    /**
+     * Set the value into the Field object.
+     *
+     * @param   mixed   $val    Field value
+     * @return  object  $this
+     */
+    public function setValue($val)
+    {
+        $this->value = $val;
+        return $this;
+    }
+
+
+    /**
+     * See if this field is required.
+     *
+     * @return  boolean     True if required, False if not
+     */
+    public function isRequired()
+    {
+        return $this->required ? 1 : 0;
+    }
+
+
+    /**
+     * Get the type of field.
+     *
+     * @return  string      Field type
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+
+    /**
+     * Get the name of this field.
+     *
+     * @return  string      Field name
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+
+    /**
+     * Get the field value.
+     *
+     * @return  mixed       Field value
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+
+    /**
+     * Get one or all field permissions.
+     *
+     * @param   string  $type   Perm type (owner, group) or empty for all
+     * @return  integer|array   Single or all permissions
+     */
+    public function getPerm($type=NULL)
+    {
+        if ($type != NULL) {
+            $type = 'perm_' . $type;
+            return (int)$this->$type;
+        } else {
+            return array(
+                'owner' => $this->perm_owner,
+                'group' => $this->perm_group,
+                'members' => $this->perm_members,
+                'anon' => $this->perm_anon,
+            );
+        }
+    }
+
+
+    /**
+     * Get the at-registration setting for the field.
+     *
+     * @return  boolean     Status of user_reg flag
+     */
+    public function getUserReg()
+    {
+        return $this->user_reg ? 1 : 0;
     }
 
 }   // class Field

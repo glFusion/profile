@@ -20,17 +20,13 @@ namespace Profile;
  */
 class Profile
 {
-    /** Local properties accessed via `__set()` and `__get()`.
-     * @var array */
-    var $properties = array();
-
     /** Profile fields, an array of objects.
      * @var array */
-    var $fields = array();
+    private $fields = array();
 
     /** User ID.
      * @var integer */
-    var $uid;
+    private $uid = 0;
 
     /**
      * Constructor.
@@ -44,10 +40,13 @@ class Profile
     {
         global $_USER, $_PRF_CONF, $_TABLES;
 
-        if ($uid == 0) $uid = $_USER['uid'];
+        if ($uid == 0) {
+            $uid = $_USER['uid'];
+        }
         $this->uid = (int)$uid;
-        if ($this->uid == 0) $this->uid = 1;    // Anonymous
-
+        if ($this->uid == 0) {
+            $this->uid = 1;    // Anonymous
+        }
         $this->Read();
     }
 
@@ -63,7 +62,9 @@ class Profile
         global $_USER;
         static $_profiles = array();
 
-        if ($uid == 0) $uid = $_USER['uid'];
+        if ($uid == 0) {
+            $uid = $_USER['uid'];
+        }
         $uid = (int)$uid;
         if (!array_key_exists($uid, $_profiles)) {
             $_profiles[$uid] = new self($uid);
@@ -81,7 +82,7 @@ class Profile
         global $_TABLES;
 
         // Get the field definitions, reading from the DB if not already done
-        $key = 'defs_enabled';
+        $key = 'proflle_defs_enabled';
         $defs = Cache::get($key);
         if ($defs === NULL) {
             $defs = array();
@@ -90,28 +91,71 @@ class Profile
                     ORDER BY orderby ASC";
             $res = DB_query($sql);
             while ($A = DB_fetchArray($res, false)) {
-                $defs[$A['name']] = Field::getInstance($A);
+                $defs[$A['name']] = $A;
             }
             Cache::set($key, $defs, 'defs');
         }
-        $this->fields = $defs;
+        // Now instantiate the field objects to get the field classes loaded.
+        foreach ($defs as $name=>$data) {
+            $this->fields[$name] = Field::getInstance($data);
+        }
 
         // Now read the values for the current user
-        $key = 'user_' . $this->uid;
+        $key = 'profile_user_' . $this->uid;
         $A = Cache::get($key);
         if ($A === NULL) {
             $sql = "SELECT * FROM {$_TABLES['profile_data']}
-                    WHERE puid = '{$this->uid}'";
+                    WHERE puid = '{$this->uid}'
+                    LIMIT 1";
             $res = DB_query($sql);
             $A = DB_fetchArray($res, false);
         }
         if (!empty($A)) {
             foreach ($A as $name=>$value) {
                 if (isset($this->fields[$name])) {
-                    $this->fields[$name]->value = $value;
+                    $this->fields[$name]->setValue($value);
                 }
             }
             Cache::set($key, $A, array('defs', 'userdata'));
+        }
+    }
+
+
+    /**
+     * Get the field objects for the profile.
+     *
+     * @return  array       Array of Field objects
+     */
+    public function getFields()
+    {
+        return $this->fields;
+    }
+
+
+    /**
+     * Check if the profile contains a named field.
+     *
+     * @param   string  $name   Field name
+     * @return  boolean     True if the field exists, False if not
+     */
+    public function hasField($name)
+    {
+        return array_key_exists($name, $this->fields);
+    }
+
+
+    /**
+     * Get a single field from the profile.
+     *
+     * @param   string  $name   Field name
+     * @return  object      Field object
+     */
+    public function getField($name)
+    {
+        if ($this->hasField($name)) {
+            return $this->fields[$name];
+        } else {
+            return NULL;
         }
     }
 
@@ -164,9 +208,10 @@ class Profile
             // form, then skip it.  If it is a registration field, override
             // the owner permission to make sure the user can edit it.
             if ($type == 'registration') {
-                if (($Fld->user_reg == 0 && $Fld->required == 0))
+                if (!$Fld->getUserReg() && !$Fld->isRequired()) {
                     continue;
-                $Fld->perm_owner = 3;
+                }
+                $Fld->setPerm('owner', 3);
             } elseif ($type == 'edit') {
                 // In the account settings, the sys_directory checkbox
                 // appears in the privacy panel so exclude here
@@ -175,12 +220,7 @@ class Profile
 
             // If the field is required, set the fValidator class.
             // This doesn't work right for dates (yet).
-            $fValidator_opts = array();     // Start with a clean array
-            if ($Fld->required == 1) {
-                if ($Fld->type != 'checkbox' && $Fld->type != 'multicheck') {
-                    // current fValidator doesn't work with checkboxes
-                    $fValidator_opts[] = 'required';
-                }
+            if ($Fld->isRequired()) {
                 $T->set_var('is_required', 'true');
             } else {
                 $T->clear_var('is_required');
@@ -188,7 +228,7 @@ class Profile
 
             // Set a flag to indicate that this is a static field.  No status
             // indicators need to be shown.
-            if ($Fld->type == 'static' || $Fld->type == 'system') {
+            if ($Fld->getType() == 'static' || $Fld->getType() == 'system') {
                 $T->set_var('is_static', 'true');
             } else {
                 $T->clear_var('is_static');
@@ -196,21 +236,24 @@ class Profile
 
             // If POSTed form data, set the user variable to that.  Otherwise,
             // set it to the default or leave it alone.
-            if (isset($_POST[$Fld->name])) {
-                $Fld->value = $_POST[$Fld->name];
-            } elseif (is_null($Fld->value) && isset($Fld->options['default'])) {
-                $Fld->value = $Fld->options['default'];
+            if (isset($_POST[$Fld->getName()])) {
+                $Fld->setValue($_POST[$Fld->getName()]);
+            } elseif (
+                is_null($Fld->getValue()) &&
+                !is_null($Fld->getOption('default'))
+            ) {
+                $Fld->setValue($Fld->getOption('default'));
             }
 
             $T->set_var(array(
                 'is_visible'    => $Fld->isPublic() ? 'true' : '',
                 'spancols'      => $Fld->getOption('spancols'),
                 'help_text'     => htmlspecialchars($Fld->getOption('help_text')),
-                'prompt'        => PRF_noquotes($Fld->prompt),
+                'prompt'        => PRF_noquotes($Fld->getPrompt()),
                 'field'         => $Fld->FormField(),
-                'fld_class'     => isset($_POST['prf_errors'][$Fld->name]) ?
+                'fld_class'     => isset($_POST['prf_errors'][$Fld->getName()]) ?
                     'profile_error' : '',
-                'fld_name'      => $Fld->name,
+                'fld_name'      => $Fld->getName(),
             ) );
             $T->parse('qrow', 'QueueRow', true);
         }
@@ -269,10 +312,10 @@ class Profile
                 $newval = PRF_autogen($Fld, $this->uid);
             }
 
-            if ($Fld->perm_owner == 3 || $isAdmin) {
+            if ($Fld->getPerm('owner') == 3 || $isAdmin) {
                 // Perform field-specific sanitization and add to array of sql
                 $newval = $Fld->Sanitize($newval);
-                $fld_sql[] = $Fld->name . "='" . DB_escapeString($newval) . "'";
+                $fld_sql[] = $Fld->getName() . "='" . DB_escapeString($newval) . "'";
             }
         }
 
