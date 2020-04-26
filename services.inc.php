@@ -194,7 +194,7 @@ function service_getValues_profile($args, &$output, &$svc_msg)
 
     // Get all the profile items. We don't consider a failure here to be
     // an error, there will just be nothing returned.
-    $A = \Profile\Profile::getInstance($uid)->fields;
+    $A = \Profile\Profile::getInstance($uid)->getFields();
 
     if (isset($args['item'])) {
         $items = $args['item'];
@@ -290,7 +290,7 @@ function service_validate_profile($args, &$output, &$svc_msg)
     $uid = $args['uid'];
     $Prf = \Profile\Profile::getInstance($uid);
     $output = array();
-    foreach ($Prf->fields as $name=>$Fld) {
+    foreach ($Prf->getFields() as $name=>$Fld) {
         if (!$Fld->validData($vals)) {
             $output[] = $name;
         }

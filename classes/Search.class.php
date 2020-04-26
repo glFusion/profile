@@ -82,8 +82,8 @@ class Search
             $F = Field::getInstance($A);
             $T->set_block('searchform', 'FldRow', 'frow');
             $T->set_var(array(
-                'fld_prompt'    => $F->prompt,
-                'fld_name'      => $F->name,
+                'fld_prompt'    => $F->getPrompt(),
+                'fld_name'      => $F->getName(),
                 'fld_input'     => $F->searchFormOpts(),
                 'fld_empty'     => true,
             ) );
