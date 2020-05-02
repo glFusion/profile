@@ -60,22 +60,19 @@ class Profile
     public static function getInstance($uid=0)
     {
         global $_USER;
-        static $_profiles = array();
 
         if ($uid == 0) {
             $uid = $_USER['uid'];
         }
         $uid = (int)$uid;
-        if (!array_key_exists($uid, $_profiles)) {
-            $_profiles[$uid] = new self($uid);
-        }
-        return $_profiles[$uid];
+        return new self($uid);
     }
 
 
     /**
      * Read the profile field definitions and values.
-     * Stores definitions in a static array for re-use.
+     *
+     * @return  object  $this
      */
     private function Read()
     {
@@ -118,6 +115,7 @@ class Profile
             }
             Cache::set($key, $A, array('defs', 'userdata'));
         }
+        return $this;
     }
 
 
@@ -274,8 +272,9 @@ class Profile
     {
         global $_TABLES, $_USER, $LANG_PROFILE;
 
-        if (!is_array($vals)) return;
-        if ($this->uid == 1) return;    // never actually save anonymous
+        if (!is_array($vals) || $this->uid == 1) {
+            return;    // never actually save anonymous
+        }
 
         if ($type != 'registration') {
             $isAdmin = SEC_hasRights('profile.admin');
@@ -354,7 +353,7 @@ class Profile
                 COM_errorLog("Profile::Save() - error executing sql: $sql");
                 return false;
             } else {
-                Cache::delete('user_' . $this->uid);
+                Cache::delete('profile_user_' . $this->uid);
             }
         }
         return true;
