@@ -3,9 +3,9 @@
  * Web service functions for the Profile plugin.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2011 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2011-2020 Lee Garner <lee@leegarner.com>
  * @package     profile
- * @version     1.1.0
+ * @version     1.2.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -194,7 +194,7 @@ function service_getValues_profile($args, &$output, &$svc_msg)
 
     // Get all the profile items. We don't consider a failure here to be
     // an error, there will just be nothing returned.
-    $A = \Profile\Profile::getInstance($uid)->getFields();
+    $A = Profile\Profile::getInstance($uid)->getFields();
 
     if (isset($args['item'])) {
         $items = $args['item'];
@@ -242,7 +242,7 @@ function service_renderForm_profile($args, &$output, &$svc_msg)
     if (COM_isAnonUser()) return PLG_RET_ERROR;
     $uid = isset($args['uid']) ? $args['uid'] : $_USER['uid'];
     $form_id = isset($args['form_id']) ? $args['form_id'] : '';
-    $P = \Profile\Profile::getInstance($uid);
+    $P = Profile\Profile::getInstance($uid);
     $output = $P->Edit('inline', $form_id);
     return PLG_RET_OK;
 }
@@ -268,10 +268,9 @@ function service_saveData_profile($args, &$output, &$svc_msg)
         return PLG_RET_ERROR;
     }
 
-    $P = \Profile\Profile::getInstance($args['uid']);
-    $status = $P->Save($args['data']);;
-    if ($status) return PLG_RET_OK;
-    else return PLG_RET_ERROR;
+    $P = Profile\Profile::getInstance($args['uid']);
+    $status = $P->Save($args['data']);
+    return $status ? PLG_RET_OK : PLG_RET_ERROR;
 }
 
 
@@ -288,7 +287,7 @@ function service_saveData_profile($args, &$output, &$svc_msg)
 function service_validate_profile($args, &$output, &$svc_msg)
 {
     $uid = $args['uid'];
-    $Prf = \Profile\Profile::getInstance($uid);
+    $Prf = Profile\Profile::getInstance($uid);
     $output = array();
     foreach ($Prf->getFields() as $name=>$Fld) {
         if (!$Fld->validData($vals)) {
