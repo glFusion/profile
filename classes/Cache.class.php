@@ -37,7 +37,7 @@ class Cache
     public static function set($key, $data, $tag='', $cache_mins=0)
     {
         if (version_compare(GVERSION, self::MIN_GVERSION, '<')) {
-            return;     // caching requires glFusion 1.8.0 or higher
+            return NULL;
         }
 
         $cache_mins = (int)$cache_mins;
@@ -65,7 +65,7 @@ class Cache
     public static function delete($key)
     {
         if (version_compare(GVERSION, self::MIN_GVERSION, '<')) {
-            return;     // caching requires glFusion 1.8.0 or higher
+            return NULL;
         }
         $key = self::makeKey($key);
         return \glFusion\Cache\Cache::getInstance()->delete($key);
@@ -82,7 +82,7 @@ class Cache
     public static function clear($tag = array())
     {
         if (version_compare(GVERSION, self::MIN_GVERSION, '<')) {
-            return;     // caching requires glFusion 1.8.0 or higher
+            return NULL;
         }
         $tags = array(self::TAG);
         if (!empty($tag)) {
@@ -116,7 +116,7 @@ class Cache
     public static function get($key)
     {
         if (version_compare(GVERSION, self::MIN_GVERSION, '<')) {
-            return NULL;     // caching requires glFusion 1.8.0 or higher
+            return NULL;
         }
         $key = self::makeKey($key);
         if (\glFusion\Cache\Cache::getInstance()->has($key)) {
