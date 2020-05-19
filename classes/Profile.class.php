@@ -272,11 +272,13 @@ class Profile
     {
         global $_TABLES, $_USER, $LANG_PROFILE;
 
-        if (
-            !is_array($vals) ||
-            ($this->uid == 1 && $type != 'registration')
-        ) {
-            return false;    // never actually save anonymous
+        if (!is_array($vals)) {
+            // Return error if values aren't provided
+            return false;
+        }
+        if ($this->uid == 1) {
+            // Fake success for anonymous, don't actually save
+            return true;
         }
         if ($type != 'registration') {
             $isAdmin = SEC_hasRights('profile.admin');
