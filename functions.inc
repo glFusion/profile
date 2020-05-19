@@ -558,8 +558,8 @@ function plugin_itemPreSave_profile($type, $content)
         return '';
     }
 
-    $P = \Profile\Profile::getInstance($uid);
-    if (!$P->Save($_POST)) {
+    $P = Profile\Profile::getInstance($uid);
+    if (!$P->Save($_POST, $type)) {
         return 97;
     } else {
         return 0;
