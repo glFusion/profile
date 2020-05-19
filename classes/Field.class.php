@@ -984,6 +984,28 @@ class Field
         return $this->user_reg ? 1 : 0;
     }
 
+
+    /**
+     * Set a permission value for owner, group, members or anonymous.
+     *
+     * @param   string  $type   Type of permission, 'owner', 'group', etc.
+     * @param   integer $perm   Permission value to set
+     * @return  object  $this
+     */
+    public function setPerm($type, $perm)
+    {
+        switch ($type) {
+        case 'owner':
+        case 'group':
+        case 'members':
+        case 'anon':
+            $type = 'perm_' . $type;
+            $this->$type = (int)$perm;
+            break;
+        }
+        return $this;
+    }
+
 }   // class Field
 
 ?>

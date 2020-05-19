@@ -272,10 +272,12 @@ class Profile
     {
         global $_TABLES, $_USER, $LANG_PROFILE;
 
-        if (!is_array($vals) || $this->uid == 1) {
-            return;    // never actually save anonymous
+        if (
+            !is_array($vals) ||
+            ($this->uid == 1 && $type != 'registration')
+        ) {
+            return false;    // never actually save anonymous
         }
-
         if ($type != 'registration') {
             $isAdmin = SEC_hasRights('profile.admin');
             if ($this->uid != $_USER['uid'] && !$isAdmin) {
@@ -316,18 +318,18 @@ class Profile
                 $newval = $Fld->Sanitize($newval);
                 $fld_sql[] = $Fld->getName() . "='" . DB_escapeString($newval) . "'";
             }
-        }
+       }
 
         // If any validation errors found, return now for regular users
         // For managers, allow the data to be saved anyway but show the message.
         if ($validation_errs > 0) {
+            COM_errorLog("$validation_errs errors saving the profile for user {$this->uid}");
             if (PRF_isManager()) {
                 // Save but show message for managers
                 LGLIB_storeMessage('Validation Errors overriden by Manager', '', true);
                 $msg .= ' (Manager Override)';
             } else {
                 // Abort for regular users
-                COM_errorLog("$validation_errs errors saving the profile for user {$this->uid}");
                 return false;
             }
         }
@@ -347,7 +349,6 @@ class Profile
             $sql = "INSERT INTO {$_TABLES['profile_data']} SET
                         puid = '{$this->uid}', $new_sql
                     ON DUPLICATE KEY UPDATE $new_sql";
-            //echo $sql;die;
             DB_query($sql, 1);
             if (DB_error()) {
                 COM_errorLog("Profile::Save() - error executing sql: $sql");
