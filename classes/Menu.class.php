@@ -3,7 +3,7 @@
  * Class to provide admin and user-facing menus.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2019 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2019-2020 Lee Garner <lee@leegarner.com>
  * @package     profile
  * @version     v1.2.0
  * @since       v1.2.0
@@ -70,8 +70,66 @@ class Menu
         return $retval;
     }
 
+
+    /**
+     * Show the site header, with or without left blocks according to config.
+     *
+     * @since   1.0.2
+     * @see     COM_siteHeader()
+     * @param   string  $subject    Text for page title (ad title, etc)
+     * @param   string  $meta       Other meta info
+     * @return  string              HTML for site header
+     */
+    public static function siteHeader($subject='', $meta='')
+    {
+        global $_PRF_CONF, $LANG_PROFILE;
+
+        $retval = '';
+        if (!isset($_PRF_CONF['displayblocks'])) {
+            $_PRF_CONF['displayblocks'] = 0;
+        }
+        switch($_PRF_CONF['displayblocks']) {
+        case 2:     // right only
+        case 0:     // none
+            $retval .= COM_siteHeader('none', $subject, $meta);
+            break;
+        case 1:     // left only
+        case 3:     // both
+        default :
+            $retval .= COM_siteHeader('menu', $subject, $meta);
+            break;
+        }
+        return $retval;
+    }
+
+
+    /**
+     * Show the site footer, with or without right blocks according to config.
+     *
+     * @since   version 1.0.2
+     * @see     COM_siteFooter()
+     * @return  string              HTML for site header
+     */
+    public static function siteFooter()
+    {
+        global $_PRF_CONF;
+
+        $retval = '';
+
+        switch($_PRF_CONF['displayblocks']) {
+        case 2 : // right only
+        case 3 : // left and right
+            $retval .= COM_siteFooter(true);
+            break;
+        case 0: // none
+        case 1: // left only
+        default :
+            $retval .= COM_siteFooter();
+            break;
+        }
+        return $retval;
+    }
+
 }
 
 ?>
-
-

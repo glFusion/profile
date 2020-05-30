@@ -1,15 +1,15 @@
 <?php
 /**
-*   Display and export the custom member lists for the Custom Profile plugin.
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2010-2018 Lee Garner <lee@leegarner.com>
-*   @package    profile
-*   @version    1.2.0
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Display and export the custom member lists for the Custom Profile plugin.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2010-2018 Lee Garner <lee@leegarner.com>
+ * @package     profile
+ * @version     1.2.0
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 
 /** Import core glFusion libraries */
 require_once '../lib-common.php';
@@ -18,8 +18,6 @@ require_once '../lib-common.php';
 if (!in_array('profile', $_PLUGINS)) {
     COM_404();
 }
-
-USES_profile_functions();
 
 // Retrieve input variables.
 COM_setArgNames(array('listid', 'action'));
@@ -69,11 +67,10 @@ default:
     break;
 }
 
-$output = PRF_siteHeader();
+$output = Profile\Menu::siteHeader();
 $output .= $content;
-$output .= PRF_siteFooter();
+$output .= Profile\Menu::siteFooter();
 echo $output;
 exit;
-
 
 ?>

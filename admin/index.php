@@ -30,7 +30,6 @@ if (!SEC_hasRights('profile.admin')) {
 
 // Import administration functions
 USES_lib_admin();
-USES_profile_functions();
 
 $expected = array(
     'edit', 'savedef', 'deletedef', 'move', 'movelist', 'deletelist',
