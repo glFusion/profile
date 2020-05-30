@@ -92,28 +92,24 @@ class Profile
             }
             Cache::set($key, $defs, 'defs');
         }
+
         // Now instantiate the field objects to get the field classes loaded.
         foreach ($defs as $name=>$data) {
             $this->fields[$name] = Field::getInstance($data);
         }
 
         // Now read the values for the current user
-        $key = 'profile_user_' . $this->uid;
-        $A = Cache::get($key);
-        if ($A === NULL) {
-            $sql = "SELECT * FROM {$_TABLES['profile_data']}
-                    WHERE puid = '{$this->uid}'
-                    LIMIT 1";
-            $res = DB_query($sql);
-            $A = DB_fetchArray($res, false);
-        }
+        $sql = "SELECT * FROM {$_TABLES['profile_data']}
+            WHERE puid = '{$this->uid}'
+            LIMIT 1";
+        $res = DB_query($sql);
+        $A = DB_fetchArray($res, false);
         if (!empty($A)) {
             foreach ($A as $name=>$value) {
                 if (isset($this->fields[$name])) {
                     $this->fields[$name]->setValue($value);
                 }
             }
-            Cache::set($key, $A, array('defs', 'userdata'));
         }
         return $this;
     }
