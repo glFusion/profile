@@ -862,11 +862,7 @@ function plugin_user_changed_profile($uid)
  */
 function plugin_getconfigelementhelp_profile($option, $doclang='english')
 {
-    if (version_compare(GVERSION, '1.6.0', '<')) {
-        $file = 'config.legacy.html';
-    } else {
-        $file = 'config.html';
-    }
+    $file = 'config.html';
     $doc_url = PRF_getDocURL($file, $doclang);
     if (empty($doc_url))
         return false;
