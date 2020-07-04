@@ -290,7 +290,7 @@ function service_validate_profile($args, &$output, &$svc_msg)
     $Prf = Profile\Profile::getInstance($uid);
     $output = array();
     foreach ($Prf->getFields() as $name=>$Fld) {
-        if (!$Fld->validData($vals)) {
+        if (!$Fld->validData()) {
             $output[] = $name;
         }
     }
