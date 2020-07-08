@@ -319,15 +319,20 @@ class Field
 
 
     /**
-     * Check if this item should be publicly displayed in the user's
-     * profile.
+     * Check if this item should be publicly displayed in the user's profile.
      *
      * @return  boolean     True if publicly visible, False if not
      */
     public function isPublic()
     {
-        return $this->show_in_profile ? true : false;
-        return ($this->perm_members > 1 || $this->perm_anon > 1) ? TRUE : FALSE;
+        if (
+            $this->show_in_profile &&
+            ($this->perm_members > 1 || $this->perm_anon > 1)
+        ) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 
