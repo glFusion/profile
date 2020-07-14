@@ -385,8 +385,7 @@ class UserList
                 ON u.uid = p.puid
                 $addjoin
                 WHERE u.uid > $noshow_uid
-                $where_and
-                GROUP BY u.uid";
+                $where_and ";
         //echo $sql;die;
         return $sql;
     }
@@ -526,7 +525,8 @@ class UserList
         $query_arr = array('table' => 'profile_lists',
             'sql' => $query_sql,
             'query_fields' => $query_fields,
-            'default_filter' => ''
+            'default_filter' => '',
+            'group_by' => 'u.uid',
         );
 
         // Need this to get the listid into the column header sorting links
@@ -678,8 +678,11 @@ class UserList
             }
         }
 
-        // Get the user info.  If empty, return nothing
+        // Get the user info. If empty, return nothing
         $sql = $this->_getListSQL($filtersql);
+        // Group by is part of $query_arr in admin list, but that isn't
+        // available here.
+        $sql .= ' GROUP BY u.uid';
         //echo $sql;die;
         /*if (!empty($this->sortby)) {
             $sql .= " ORDER BY {$this->sortby} {$this->sortdir}";
