@@ -293,7 +293,7 @@ class Profile
             if (!$Fld->validData($vals)) {
                 // We could just return false here, but instead continue checking so
                 // we can show the user all the errors, not just the first.
-                $msg = sprintf($LANG_PROFILE['msg_fld_missing'], $Fld->prompt);
+                $msg = sprintf($LANG_PROFILE['msg_fld_missing'], $Fld->getPrompt());
                 LGLIB_storeMessage($msg, '', true);
                 // Add a value to $_POST so the field will be highlighted when it
                 // is redisplayed.
