@@ -27,31 +27,31 @@ class UserList
 {
     /** List identifier string.
      * @var string */
-    protected $listid;
+    protected $listid = '';
 
     /** Title string.
      * @var string */
-    protected $title;
+    protected $title = '';
 
     /** List order of apperarance.
      * @var integer */
-    protected $orderby;
+    protected $orderby = 0;
 
     /** Array of Fields included in this list.
      * @var array */
-    protected $fields;
+    protected $fields = array();
 
     /** Group with View access to this list.
      * @var integer */
-    protected $group_id;
+    protected $group_id = 0;
 
     /** User group included in this list.
      * @var integer */
-    private $incl_grp;
+    private $incl_grp = 0;
 
     /** User statuses included in list.
      * @var boolean */
-    private $incl_user_stat;
+    private $incl_user_stat = 0;
 
     /** Indicate whether this is a new list or an update.
      * @var boolean */
@@ -79,15 +79,20 @@ class UserList
 
     /** SQL clause to restrict access by group membership
      * @var string*/
-    private $access_sql;
+    private $access_sql = '';
 
     /** Field to order by.
      * @var string */
-    private $sortby;
+    private $sortby = '';
 
     /** Directory to order list (ASC or DESC).
      * @var string */
-    private $sortdir;
+    private $sortdir = 'ASC';
+
+    /** Group-by field.
+     * Not used in admin lists but needed for PDF lists.
+     * @var string */
+    protected $group_by = '';
 
     /** Account expiration statuses to include.
      * @var integer */
@@ -386,8 +391,20 @@ class UserList
                 $addjoin
                 WHERE u.uid > $noshow_uid
                 $where_and ";
+        if (!empty($this->group_by)) {
+            $sql .= " GROUP BY {$this->group_by}";
+        }
+                //GROUP BY u.uid";
         //echo $sql;die;
         return $sql;
+    }
+
+
+    protected function setGroupby($str)
+    {
+        if (!empty($str)) {
+            $this->group_by = $str;
+        }
     }
 
 
@@ -437,7 +454,6 @@ class UserList
                 $this->name_format = $fld['opt']['disp'];
             }*/
         }
-
         return $query_fields;
     }
 
@@ -452,7 +468,6 @@ class UserList
      * @uses    _getListSQL()
      * @uses    _getListMenu()
      * @uses    _setNameFormat()
-     * @uses    _getQueryFields()
      * @param   boolean $autotag    True if being displayed by an autotag
      * @return  string      HTML for the user list
      */
@@ -493,6 +508,7 @@ class UserList
 
         $header_arr = $this->fields;
         $query_fields = $this->_setQueryFields();
+
         $form_arr = array();
         $this->_setFullnameFormat();
 
@@ -516,11 +532,15 @@ class UserList
         $query_sql = $this->_getListSQL('', $extras);
 
         if (!empty($this->sortby)) {
-            $defsort_arr = array('field' => $this->sortby,
+            $defsort_arr = array(
+                'field' => $this->sortby,
                 'direction' => $this->sortdir == 'DESC' ? 'DESC' : 'ASC',
             );
         } else {
-            $defsort_arr = NULL;
+            $defsort_arr = array(
+                'field' => NULL,
+                'direction' => 'ASC',
+            );
         }
         $query_arr = array('table' => 'profile_lists',
             'sql' => $query_sql,
@@ -528,6 +548,7 @@ class UserList
             'default_filter' => '',
             'group_by' => 'u.uid',
         );
+        //echo $query_sql;die;
 
         // Need this to get the listid into the column header sorting links
         $text_arr = array(
@@ -561,12 +582,13 @@ class UserList
                     '<a href="' . $exportlink_all . '">' .
                     $LANG_PROFILE['all_fields'] . '</a>';
             // Add the export link if requested.
-            $pdflink = '/ <a href="' . PRF_PI_URL .
+            /*$pdflink = '/ <a href="' . PRF_PI_URL .
                 '/list.php?action=pdf&listid=' . $this->listid;
             if (!empty($this->pi_query)) {
                 $pdflink .= '&amp;' . $this->pi_query;
             }
-            $pdflink .= '" target="_new">PDF</a>';
+            $pdflink .= '" target="_new">PDF</a>';*/
+            $pdflink = '';
 
             $htmllink = '/ <a href="' . PRF_PI_URL .
                 '/list.php?action=html&listid=' . $this->listid;
@@ -629,7 +651,6 @@ class UserList
      * @since   version 1.1.1
      * @uses    _getListSQL()
      * @uses    showExport()
-     * @uses    _setNameFormat()
      * @uses    _getQueryFields()
      * @return  string      CSV output, or false for error/no access
      */
@@ -644,6 +665,7 @@ class UserList
         }
         $this->_setFullnameFormat();
         $query = $this->_getQuery();
+
         if (!empty($query)) {
             $query_fields = $this->_setQueryFields();
             $filters = array();
@@ -678,11 +700,8 @@ class UserList
             }
         }
 
-        // Get the user info. If empty, return nothing
+        // Get the user info.  If empty, return nothing
         $sql = $this->_getListSQL($filtersql);
-        // Group by is part of $query_arr in admin list, but that isn't
-        // available here.
-        $sql .= ' GROUP BY u.uid';
         //echo $sql;die;
         /*if (!empty($this->sortby)) {
             $sql .= " ORDER BY {$this->sortby} {$this->sortdir}";
@@ -1177,6 +1196,7 @@ class UserList
             'exp_stat' => $this->incl_exp_stat,
             'incl_user_stat' => $this->incl_user_stat,
         );
+//        var_dump($this->incl_exp_stat);die;
         foreach ($_PLUGINS as $pi_name) {
             $status = LGLIB_invokeService(
                 $pi_name,

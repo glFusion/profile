@@ -3,8 +3,16 @@
 As of {report_date}
 </div>
 <table border="0">
-<tr><th>Full Name</th><th>City</th><th>Phone</th></tr>
+<tr>
+<!-- BEGIN HeaderRow -->
+<th>{fld_hdr}</th>
+<!-- END HeaderRow -->
+</tr>
 <!-- BEGIN UserRow -->
-<tr><td>{fullname}</td><td>{prf_city}</td><td>{prf_phone}</td></tr>
+<tr>
+<!-- BEGIN Fields -->
+    <td>{fld_val}</td>
+<!-- END Fields -->
+</tr>
 <!-- END UserRow -->
 </table>

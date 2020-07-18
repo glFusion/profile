@@ -53,6 +53,7 @@ class htmlList extends UserList
         }
 
         if (!is_array($this->fields)) return '';
+        $this->setGroupby('u.uid');
         $sql = $this->_getListSQL();
         //echo $sql;die;
         $result = DB_query($sql, 1);
@@ -98,13 +99,38 @@ class htmlList extends UserList
         $T = new \Template(PRF_PI_PATH . 'templates/pdf');
         if (file_exists(PRF_PI_PATH . "templates/pdf/{$this->listid}.thtml")) {
             $T->set_file('list', $this->listid . '.thtml');
+            $def_tpl = false;
         } else {
-            $T->set_file('list', 'default.thtml');
+            $T->set_file('list', '_default.thtml');
+            $def_tpl = true;
         }
-        $T->set_block('list', 'UserRow', 'row');
+
+        $T->set_block('list', 'HeaderRow', 'hrow');
+        foreach ($this->fields as $field) {
+            if ($def_tpl) {
+                $fldname = $field['field'];
+                if (
+                    strpos($fldname, 'sys_') === 0 ||
+                    strpos($fldname, 'prf_') === 0
+                ) {
+                    $fldname = substr($fldname, 4);
+                }
+                if (isset($LANG_PROFILE[$fldname])) {
+                    $text = $LANG_PROFILE[$fldname];
+                } else {
+                    $text = ucfirst($fldname);
+                }
+                $T->set_var('fld_hdr', $text);
+            }
+            $T->parse('hrow', 'HeaderRow', true);
+        }
 
         // Create a row for each user record
+        $T->set_block('list', 'UserRow', 'row');
         while ($A = DB_fetchArray($result, false)) {
+            if ($def_tpl) {
+                $T->set_block('list', 'Fields', 'flds');
+            }
             foreach ($this->fields as $field) {
                 $fldname = $field['field'];
                 switch ($fldname) {
@@ -120,11 +146,15 @@ class htmlList extends UserList
                     }
                     break;
                 }
-                $T->set_var(array(
-                    $fldname    => $data,
-                ) );
+                if ($def_tpl) {
+                    $T->set_var('fld_val', $data);
+                    $T->parse('flds', 'Fields', true);
+                } else {
+                    $T->set_var($fldname, $data);
+                }
             }
             $T->parse('row', 'UserRow', true);
+            $T->clear_var('flds');
         }
 
         $dt = new \Date('now', $_CONF['timezone']);
