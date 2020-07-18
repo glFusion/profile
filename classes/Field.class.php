@@ -468,7 +468,11 @@ class Field
             $A = DB_fetchArray($res, false);
         }
         if (is_array($A)) {
-            $id = (int)$A['id'];
+            if (isset($A['id'])) {
+                $id = (int)$A['id'];
+            } else {
+                $id = 0;
+            }
             $type = $A['type'];
         } else {
             $id = 0;
