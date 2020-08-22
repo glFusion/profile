@@ -60,8 +60,7 @@ $(document).ready(function() {
       <span id="title" class="tooltip_cfg tooltipstered"></span>
     </label>
     <div class="uk-form-controls">
-      <input type="text" required class="required" size="80"
-        name="title" value="{title}" id="f_title" />
+      <input type="text" required class="required" size="32" name="title" value="{title}" id="f_title" />
       <i class="uk-icon uk-icon-warning uk-text-danger tooltip" title="{$LANG_PROFILE['required']}"></i>
     </div>
   </div>
