@@ -300,8 +300,10 @@ class UserList
         $args['incl_exp_stat'] = $this->incl_exp_stat;
 
         foreach ($_PLUGINS as $pi_name) {
-            $status = LGLIB_invokeService($pi_name, 'profilefields', $args,
-                        $pi_tmp, $svc_msg);
+            $status = LGLIB_invokeService(
+                $pi_name, 'profilefields', $args,
+                $pi_tmp, $svc_msg
+            );
             if ($status == PLG_RET_OK) {
                 $fieldnames[] = $pi_tmp['query'];
                 $pi_addjoin[] = $pi_tmp['join'];
@@ -395,7 +397,6 @@ class UserList
             $sql .= " GROUP BY {$this->group_by}";
         }
                 //GROUP BY u.uid";
-        //echo $sql;die;
         return $sql;
     }
 
@@ -546,13 +547,14 @@ class UserList
             'sql' => $query_sql,
             'query_fields' => $query_fields,
             'default_filter' => '',
-            'group_by' => 'u.uid',
+            //'group_by' => 'u.uid',
         );
-        //echo $query_sql;die;
 
         // Need this to get the listid into the column header sorting links
         $text_arr = array(
-            'form_url'   => PRF_PI_URL . '/list.php?listid='.$this->listid,
+            'form_url'  => PRF_PI_URL . '/list.php?listid='.$this->listid,
+            'has_limit' => true,
+            'has_search' => true,
         );
         if (!empty($this->pi_query)) {
             $text_arr['form_url'] .= '&amp;' . $this->pi_query;
@@ -1013,7 +1015,7 @@ class UserList
             incl_grp = '" . (int)$this->incl_grp . "',
             incl_user_stat = '" . DB_escapeString(@serialize($this->incl_user_stat)) . "',
             incl_exp_stat = '" . (int)$this->incl_exp_stat . "',
-            fields = '" . serialize($this->fields) . "'";
+            fields = '" . DB_escapeString(serialize($this->fields)) . "'";
         $sql = $sql_action . $sql_fields . $sql_where;
         //echo $sql;die;
         DB_query($sql);

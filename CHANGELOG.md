@@ -19,6 +19,7 @@ Release TBD
 - Fix user search for multi-option items.
 - Modernize using UIkit icons.
 - Add dvlpupdate.php development update utility.
+- SQL Strict Mode fixes.
 
 ## Version 1.1.3
 Released 2013-06-13
