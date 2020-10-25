@@ -1,26 +1,26 @@
 {# begin {templatelocation} #}
-<nav class="uk-navbar uk-margin-top">
-  <div class="uk-navbar-content">
-  {$LANG_PROFILE['block_title']}
-  </div>
-</nav>
-<table class="pluginProfileBlock uk-table uk-table-striped uk-table-condensed">
+<div class="block-box">
+    <h2>{$LANG_PROFILE['block_title']}</h2>
+    <table class="pluginProfileBlock uk-table uk-table-striped uk-table-condensed">
 <!-- BEGIN profile_row -->
-  <tr class="profile_{pubprv}"><td>
-    {!if descrip}
-      {descrip}:&nbsp;&nbsp;
-    {!endif}
-  </td>
-  <td>{value}&nbsp;&nbsp;
-  {!if showvisicons}
-  {!if is_visible}
-    <img tooltip src="{site_url}/profile/images/visible.png" width="16" height="16" class="tooltip" title="{$LANG_PROFILE['hlp_visible']}" />
-  {!else}
-    <img tooltip src="{site_url}/profile/images/invisible.png" width="16" height="16" class="tooltip" title="{$LANG_PROFILE['hlp_invisible']}" />
-  {!endif}
-  {!endif}
-  </td>
-  </tr>
+        <tr class="profile_{pubprv}">
+            <td>
+{!if descrip}
+                {descrip}:
+{!endif}
+            </td>
+            <td>
+                {value}
+{!if showvisicons}
+{!if is_visible}
+                <img tooltip src="{site_url}/profile/images/visible.png" width="16" height="16" class="tooltip" title="{$LANG_PROFILE['hlp_visible']}" />
+{!else}
+                <img tooltip src="{site_url}/profile/images/invisible.png" width="16" height="16" class="tooltip" title="{$LANG_PROFILE['hlp_invisible']}" />
+{!endif}
+{!endif}
+            </td>
+        </tr>
 <!-- END profile_row -->
-</table>
+    </table>
+</div>
 {# end {templatelocation} #}

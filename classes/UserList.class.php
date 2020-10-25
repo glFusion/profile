@@ -186,8 +186,11 @@ class UserList
             // for each user record.  Users with the "viewall" or "admin"
             // privilege can always see all profiles.
             if (!SEC_hasRights('profile.viewall, profile.admin', 'OR')) {
-                $dir_option = DB_getItem($_TABLES['profile_def'], 'enabled',
-                    "name='sys_directory'");
+                $dir_option = DB_getItem(
+                    $_TABLES['profile_def'],
+                    'enabled',
+                    "name='sys_directory'"
+                );
                 $this->dir_optional = $dir_option == '1' ? true : false;
             } else {
                 $this->dir_optional = false;
@@ -516,10 +519,15 @@ class UserList
         if ($this->isAdmin) {
             // Add the "Edit" link on the left
             $header_arr = array_merge(
-                    array(0 => array('text' => $LANG_ADMIN['edit'],
+                array(
+                    0 => array(
+                        'text' => $LANG_ADMIN['edit'],
                         'field' => 'edit',
-                        'sort' => false)),
-                    $header_arr);
+                        'sort' => false,
+                    )
+                ),
+                $header_arr
+            );
 
             // Add a footer explaining the highlighted entries
             $footer = $LANG_PROFILE['list_footer'];
@@ -567,9 +575,12 @@ class UserList
         $exportlink = '';
         if ($this->show_export) {
             $query = urlencode($this->_getQuery());
-            if (!empty($query)) $query = "&amp;q=$query";
-            if (!empty($this->pi_query))
+            if (!empty($query)) {
+                $query = "&amp;q=$query";
+            }
+            if (!empty($this->pi_query)) {
                 $query .= '&amp;' . $this->pi_query;
+            }
             $exportlink_disp = PRF_PI_URL . '/list.php?action=export' . $query .
                 '&amp;listid=' . $this->listid;
             if (isset($_GET['order'])) {
