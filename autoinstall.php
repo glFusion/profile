@@ -68,12 +68,20 @@ $INSTALL_plugin['profile'] = array(
             'desc' => 'Access to export user lists',
             'variable' => 'export_feature_id'),
 
-    array('type' => 'feature', 
-            'feature'   => 'profile.viewall',
-            'desc' => 'Access to view ALL user profiles, overriding user preferences.',
-            'variable' => 'viewall_feature_id'),
+    array(
+        'type' => 'feature',
+        'feature'   => 'profile.viewall',
+        'desc' => 'Access to view ALL user profiles, overriding user preferences.',
+        'variable' => 'viewall_feature_id',
+    ),
+    array(
+        'type' => 'feature',
+        'feature'   => 'profile.view',
+        'desc' => 'Access to view public profile fields for other members.',
+        'variable' => 'view_feature_id',
+    ),
 
-    array('type' => 'mapping', 
+    array('type' => 'mapping',
             'group' => 'admin_group_id', 
             'feature' => 'admin_feature_id',
             'log' => 'Adding Admin feature to the admin group'),
@@ -83,10 +91,18 @@ $INSTALL_plugin['profile'] = array(
             'feature' => 'export_feature_id',
             'log' => 'Adding Export feature to the admin group'),
 
-    array('type' => 'mapping', 
-            'group' => 'admin_group_id', 
-            'feature' => 'viewall_feature_id',
-            'log' => 'Adding View-All List feature to the admin group'),
+    array(
+        'type' => 'mapping',
+        'group' => 'admin_group_id',
+        'feature' => 'viewall_feature_id',
+        'log' => 'Adding View-All List feature to the admin group',
+    ),
+    array(
+        'type' => 'mapping',
+        'findgroup' => 'Logged-In Users',
+        'feature' => 'view_feature_id',
+        'log' => 'Adding View feature to the logged-in user group',
+    ),
 );
 
 /**

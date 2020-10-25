@@ -325,9 +325,15 @@ class Field
      */
     public function isPublic()
     {
+        static $has_right = NULL;
+
+        if ($has_right === NULL) {
+            $has_right = SEC_hasRights('profile.view');
+        }
         if (
-            $this->show_in_profile &&
-            ($this->perm_members > 1 || $this->perm_anon > 1)
+            $this->show_in_profile && (
+                $has_right || SEC_inGroup($this->group_id)
+            )
         ) {
             return true;
         } else {

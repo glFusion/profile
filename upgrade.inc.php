@@ -682,6 +682,26 @@ function profile_upgrade_1_2_0($dvlp=false)
             CHANGE `prompt` `prompt` text COLLATE utf8_unicode_ci DEFAULT ''",
     );
     if (!profile_do_upgrade_sql('1.2.0', $sql, $dvlp)) return false;
+
+    // Add the profile.view permission to be used in place of "members"
+    DB_query(
+        "INSERT INTO {$_TABLES['features']} (ft_name, ft_descr)
+        VALUES ('profile.view','Access to view public profile fields for other members.')"
+    );
+    if (!DB_error()) {
+        $feat_id = DB_insertId();
+        $grp_id = (int)DB_getItem(
+            $_TABLES['groups']
+            'grp_id',
+            "grp_name = 'Logged-In Users')"
+        );
+        if ($grp_id > 0) {
+            DB_query(
+                "INSERT INTO {$_TABLES['access']} (acc_ft_id, acc_grp_id)
+                VALUES ($feat_id, {$grp_id})"
+            );
+        }
+    }
     return profile_do_set_version('1.2.0');
 }
 
