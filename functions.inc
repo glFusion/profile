@@ -344,10 +344,9 @@ function plugin_profileedit_profile($uid, $panel, $fieldset)
  * Displays custom profile variables in the user profile screen.
  *
  * @param   integer  $uid       User ID whose profile is being displayed
- * @param   object   $template  Pointer to template object
  * @return  string          HTML to include in profile page
  */
-function plugin_profilevariablesdisplay_profile($uid, &$template)
+function plugin_profileblocksdisplay_profile($uid)
 {
     global $LANG_PROFILE, $_TABLES, $_CONF, $_PRF_CONF, $_USER;
 
@@ -355,7 +354,7 @@ function plugin_profilevariablesdisplay_profile($uid, &$template)
 
     // Make sure that a valid UID was passed in.
     if ($uid == '') {
-        return '';
+        return $retval;;
     }
 
     $T = new Template(PRF_PI_PATH . 'templates/');
@@ -364,7 +363,7 @@ function plugin_profilevariablesdisplay_profile($uid, &$template)
     ));
     $A = Profile\Profile::getInstance($uid)->getFields();
     if (empty($A)) {
-        return '';
+        return $retval;
     }
 
     $showvisicons = $uid == $_USER['uid'] ? true : false;
@@ -393,14 +392,9 @@ function plugin_profilevariablesdisplay_profile($uid, &$template)
     // Only return the block if it's not empty
     if ($items > 0) {
         $T->parse('output', 'block');
-        $existingFields = $template->get_var('plugin_fields');
-        $template->set_var(
-            'plugin_fields',
-            $existingFields . $T->finish($T->get_var('output'))
-        );
-    } else {
-        return '';
+        $retval = $T->finish($T->get_var('output'));
     }
+    return $retval;
 }
 
 
