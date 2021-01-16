@@ -3,7 +3,7 @@
  * Class to handle dropdown profile items.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2018 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2018-2020 Lee Garner <lee@leegarner.com>
  * @package     profile
  * @version     1.2.0
  * @since       1.2.0
@@ -100,9 +100,15 @@ class select extends \Profile\Field
     public function prepareToSave($vals)
     {
         $name = $this->name;
-        if (!isset($vals[$name]) && empty($this->value) &&
-                isset($data->options['values']['default'])) {
-            $vals[$name] = $data->options['values']['default'];
+        if (!isset($vals[$name])) {
+            if (
+                empty($this->value) &&
+                isset($data->options['values']['default'])
+            ) {
+                $vals[$name] = $data->options['values']['default'];
+            } else {
+                return NULL;
+            }
         }
         return $vals[$name];
     }
@@ -191,5 +197,3 @@ class select extends \Profile\Field
     }
 
 }
-
-?>

@@ -1,9 +1,9 @@
 <?php
 /**
- *   Class to handle date fields in profiles
+ * Class to handle date fields in profiles.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2018 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2018-2020 Lee Garner <lee@leegarner.com>
  * @package     profile
  * @version     1.2.0
  * @since       1.2.0
@@ -411,11 +411,16 @@ function {$this->name}_onUpdate(cal)
             $dt = $def_value;
             $tm = NULL;
         }
-        if (empty($tm)) $tm = '00:00:00';
+        if (empty($tm)) {
+            $tm = '00:00:00';
+        }
         $time = '';
         $date = '';
         if (isset($vals[$name . '_ampm'])) {
-            $vals[$name . '_hour'] = $this->hour12to24($vals[$name . '_hour'], $vals[$name . '_ampm']);
+            $vals[$name . '_hour'] = $this->hour12to24(
+                $vals[$name . '_hour'],
+                $vals[$name . '_ampm']
+            );
         }
         foreach (array('_hour', '_minute') as $fld) {
             // Absense of time value is actually ok, just set to midnight
@@ -425,13 +430,17 @@ function {$this->name}_onUpdate(cal)
             }
         }
         if (empty($time)) {
-            $time = sprintf('%02d:%02d:%02d',
-                    (int)$vals[$name . '_hour'],
-                    (int)$vals[$name . '_minute'] , '00');
+            $time = sprintf(
+                '%02d:%02d:%02d',
+                (int)$vals[$name . '_hour'],
+                (int)$vals[$name . '_minute'] ,
+                '00'
+            );
         }
         if (!isset($vals[$name.'_year']) ||
             !isset($vals[$name.'_year']) ||
-            !isset($vals[$name.'_year'])) {
+            !isset($vals[$name.'_year'])
+        ) {
             $date = $dt;
         } else {
             $year = (int)$vals[$name . '_year'];
@@ -531,5 +540,3 @@ function {$this->name}_onUpdate(cal)
     }
 
 }
-
-?>

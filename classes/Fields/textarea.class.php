@@ -3,7 +3,7 @@
  * Class to handle textarea profile items.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2018 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2018-2020 Lee Garner <lee@leegarner.com>
  * @package     profile
  * @version     1.2.0
  * @since       1.2.0
@@ -89,19 +89,6 @@ class textarea extends \Profile\Field
 
 
     /**
-     * Prepare to save a value to the DB.
-     * This type returns the submitted value without modification.
-     *
-     * @param   array   $vals   Array of all submitted values
-     * @return  string          Value to save
-     */
-    public function prepareToSave($vals)
-    {
-        return $vals[$this->name];
-    }
-
-
-    /**
      * Actually gets the options array specific to this field.
      *
      * @param   array   $A      Form values
@@ -116,5 +103,3 @@ class textarea extends \Profile\Field
     }
 
 }
-
-?>

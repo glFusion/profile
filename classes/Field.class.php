@@ -796,7 +796,7 @@ class Field
             $newval = $this->value;
         } else {
             // no value provided, get the default or blank
-            $newval = $this->getOption('default');
+            $newval = $this->getOption('default', NULL);
         }
         return $newval;
     }

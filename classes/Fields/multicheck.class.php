@@ -3,7 +3,7 @@
  * Class to handle multi-check profile items.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2018-2019 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2018-2020 Lee Garner <lee@leegarner.com>
  * @package     profile
  * @version     1.2.0
  * @since       1.2.0
@@ -154,7 +154,8 @@ class multicheck extends \Profile\Field
      */
     public function prepareToSave($vals)
     {
-        return @serialize($vals[$this->name]);
+        $v = isset($vals[$this->name]) ? $vals[$this->name] : array();
+        return @serialize($v);
     }
 
 
@@ -235,5 +236,3 @@ class multicheck extends \Profile\Field
     }
 
 }
-
-?>
