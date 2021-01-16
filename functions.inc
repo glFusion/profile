@@ -3,9 +3,9 @@
  * Functions for the Profile plugin for glFusion.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2009-2016 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2020 Lee Garner <lee@leegarner.com>
  * @package     profile
- * @version     v1.1.4
+ * @version     v1.2.0
  * @license    http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -821,8 +821,6 @@ function PRF_getGroups($grplist='', $NOT='')
  */
 function plugin_templatesetvars_profile($templatename, &$template)
 {
-    global $_PRF_CONF;
-
     if ($templatename == 'registration') {
         $existingPluginFields = $template->get_var('plugin_fields');
         $P = Profile\Profile::getInstance(1);
