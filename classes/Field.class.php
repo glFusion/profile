@@ -3,7 +3,7 @@
  * Class to handle individual profile items.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2020 Lee Garner <lee@leegarner.com>
  * @package     profile
  * @version     v1.2.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
@@ -11,6 +11,7 @@
  * @filesource
  */
 namespace Profile;
+
 
 /**
  * Base class for profile fields.
@@ -594,9 +595,15 @@ class Field
             'group_dropdown' => SEC_getGroupDropdown($this->group_id, 3),
             'permissions' => PRF_getPermissionsHTML(
                 $this->perm_owner, $this->perm_group,
-                $this->perm_members, $this->perm_anon),
-            'plugin_options' => COM_optionList($_TABLES['plugins'],
-                        'pi_name,pi_name', $this->plugin, 0, 'pi_enabled=1'),
+                $this->perm_members, $this->perm_anon
+            ),
+            /*'plugin_options' => COM_optionList(
+                $_TABLES['plugins'],
+                'pi_name,pi_name',
+                $this->plugin,
+                0,
+                'pi_enabled=1'
+            ),*/
             'help_text' => htmlspecialchars($this->getOption('help_text')),
             'dt_input_format' => Fields\date::DateFormatSelect($this->getOption('input_format', 0)),
             'orderby_selection' => $orderby_options,
