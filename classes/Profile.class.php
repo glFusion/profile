@@ -276,6 +276,7 @@ class Profile
             // Fake success for anonymous, don't actually save
             return true;
         }
+        $isAdmin = false;
         if ($type != 'registration') {
             $isAdmin = SEC_hasRights('profile.admin');
             if ($this->uid != $_USER['uid'] && !$isAdmin) {
@@ -306,8 +307,10 @@ class Profile
             if ($newval === NULL) continue;     // special value to avoid saving
 
             // Auto-Generate a value during registration, or if the value is empty
-            if ($Fld->getOption('autogen', 0) == 1 &&
-                    ($type == 'registration' || empty($newval))) {
+            if (
+                $Fld->getOption('autogen', 0) == 1 &&
+                ($type == 'registration' || empty($newval))
+            ) {
                 $newval = PRF_autogen($Fld, $this->uid);
             }
 
@@ -332,14 +335,41 @@ class Profile
             }
         }
 
-        // If the "fullname" value is included, break it into first and last names.
+        // If the fullname value is included but neither the
+        // first nor last name fields were used, parse the fullname into first
+        // and last.
         // Only update DB fields that are NOT included in the form, otherwise
         // there will be duplicate SQL fields during inserts.
-        if (isset($vals['fullname'])) {
+        if (
+            isset($vals['fullname']) &&
+            !empty($vals['fullname']) &&
+            (!isset($vals['sys_fname']) || empty($vas['sys_fname'])) &&
+            (!isset($vals['sys_lname']) || empty($vale['sys_lname']))
+        ) {
             $fname = DB_escapeString(\LGLib\NameParser::F($vals['fullname']));
             $lname = DB_escapeString(\LGLib\NameParser::L($vals['fullname']));
-            if (!isset($vals['sys_fname'])) $fld_sql[] = "sys_fname = '$fname'";
-            if (!isset($vals['sys_lname'])) $fld_sql[] = "sys_lname = '$lname'";
+            $fld_sql[] = "sys_fname = '$fname'";
+            $fld_sql[] = "sys_lname = '$lname'";
+        } elseif (
+            !isset($vals['fullname']) || empty($vals['fullname'])
+        ) {
+            // Otherwise, if the fullname was not solicited but the first
+            // and/or last names were, concatenate them into the fullname
+            // and update the main users table directly.
+            $fullname = '';
+            if (isset($vals['sys_fname']) && !empty($vals['sys_fname'])) {
+                $fullname .= $vals['sys_fname'];
+            }
+            if (isset($vals['sys_lname']) && !empty($vals['sys_lname'])) {
+                $fullname .= ' ' . $vals['sys_lname'];
+            }
+            $fullname = trim($fullname);
+            if (!empty($fullname)) {
+                $sql = "UPDATE {$_TABLES['users']}
+                    SET fullname = '" . DB_escapeString($fullname) . "'
+                    WHERE uid = {$this->uid}";
+                DB_query($sql);
+            }
         }
 
         if (!empty($fld_sql)) {
