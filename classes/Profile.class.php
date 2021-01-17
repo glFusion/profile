@@ -278,9 +278,8 @@ class Profile
         }
         $isAdmin = false;
         if ($type != 'registration') {
-            $isAdmin = SEC_hasRights('profile.admin');
-            if ($this->uid != $_USER['uid'] && !$isAdmin) {
-                // non-admin attempting to change another user's record
+            if ($this->uid != $_USER['uid'] && !PRF_isManager()) {
+                COM_errorLog("Non admin user attempting to change another's profile");
                 return false;
             }
         }
@@ -317,7 +316,7 @@ class Profile
             if ($Fld->getPerm('owner') == 3 || $isAdmin) {
                 // Perform field-specific sanitization and add to array of sql
                 $newval = $Fld->Sanitize($newval);
-                $fld_sql[] = $Fld->getName() . "='" . DB_escapeString($newval) . "'";
+                $fld_sql[$Fld->getName()] = $Fld->getName() . "='" . DB_escapeString($newval) . "'";
             }
        }
 
@@ -343,13 +342,13 @@ class Profile
         if (
             isset($vals['fullname']) &&
             !empty($vals['fullname']) &&
-            (!isset($vals['sys_fname']) || empty($vas['sys_fname'])) &&
-            (!isset($vals['sys_lname']) || empty($vale['sys_lname']))
+            (!isset($vals['sys_fname']) || empty($vals['sys_fname'])) &&
+            (!isset($vals['sys_lname']) || empty($vals['sys_lname']))
         ) {
             $fname = DB_escapeString(\LGLib\NameParser::F($vals['fullname']));
             $lname = DB_escapeString(\LGLib\NameParser::L($vals['fullname']));
-            $fld_sql[] = "sys_fname = '$fname'";
-            $fld_sql[] = "sys_lname = '$lname'";
+            $fld_sql['sys_fname'] = "sys_fname = '$fname'";
+            $fld_sql['sys_lname'] = "sys_lname = '$lname'";
         } elseif (
             !isset($vals['fullname']) || empty($vals['fullname'])
         ) {
@@ -389,5 +388,3 @@ class Profile
     }
 
 }
-
-?>
