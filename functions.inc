@@ -35,10 +35,10 @@ define('PRF_CHECKED', 'checked="checked"');
 define('PRF_SELECTED', 'selected="selected"');
 
 /** Determine the correct language file, falling back to English as default. */
-$langpath = PRF_PI_PATH . 'language';
+$langpath = __DIR__ . 'language';
 $langfile = $_CONF['language'] . '.php';
 if (!file_exists("$langpath/$langfile")) {
-    $langfile = 'english.php';
+    $langfile = 'english_utf-8.php';
 }
 
 /** Include plugin language file */
@@ -48,9 +48,9 @@ if (file_exists("$langpath/custom/$langfile")) {
     include_once "$langpath/custom/$langfile";
 }
 
-if (file_exists(PRF_PI_PATH . 'config.php')) {
+if (file_exists(__DIR__ . 'config.php')) {
 /** Include local config values and overrides */
-    include_once PRF_PI_PATH . 'config.php';
+    include_once __DIR__ . 'config.php';
 }
 
 spl_autoload_register(function ($class)
@@ -87,8 +87,6 @@ spl_autoload_register(function ($class)
 if (isset($_PLUGINS) && is_array($_PLUGINS) && in_array('profile', $_PLUGINS)) {
     PRF_setUserValues();
 }
-
-$_PRF_CONF['now'] = date('Y-m-d H:i:s');
 
 /** Include api functions for other plugins */
 require_once __DIR__ . '/services.inc.php';
