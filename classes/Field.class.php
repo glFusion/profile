@@ -326,6 +326,18 @@ class Field
      */
     public function isPublic()
     {
+        return $this->show_in_profile ? 1 : 0;
+    }
+
+
+    /**
+     * Check if the current user can view this field.
+     * The owner always has access, others can view if public.
+     *
+     * @return  boolean     True to allow viewing, False to block
+     */
+    public function canView()
+    {
         static $has_right = NULL;
 
         if ($has_right === NULL) {
@@ -344,7 +356,7 @@ class Field
 
 
     /**
-     * Prepare this item's values to be saved in the database
+     * Prepare this item's values to be saved in the database.
      *
      * @return  string      DB-safe version of the value(s)
      */
@@ -355,8 +367,8 @@ class Field
 
 
     /**
-     * Create the form elements for editing the value selections
-     * Returns the default value for single-value fields (text, textarea, etc)
+     * Create the form elements for editing the value selections.
+     * Returns the default value for single-value fields (text, textarea, etc).
      *
      * @return  array   Array of name=>value pairs for Template::set_var()
      */
