@@ -61,6 +61,7 @@ $LANG_PROFILE = array(
 'user_reg'  => 'Registration',
 'readonly'  => 'Read-Only',
 'invisible' => 'Invisible',
+'public'    => 'Public',
 'select'    => '--Select--',
 'usermenu'  => 'View Members',
 

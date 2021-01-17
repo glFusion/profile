@@ -45,6 +45,8 @@ $LANG_PROFILE = array(
 'hlp_fld_def_option'		=> 'Geben Sie den für die Standard-Einstellung zu verwendenden Optionsnamen ein',
 'hlp_fld_def_option_name'	=> 'Geben Sie den Standard-Optionsnamen ein',
 'hlp_fld_chkbox_default'	=> 'Geben Sie "1" für aktiviert oder "0" für deaktiviert ein.',
+'hlp_no_change_system' => 'Cannot change name or type for system fields.',
+'hlp_chk_if_default' => 'Check this box to have the value selected by default for new entries.',
 
 'orderby'					=> 'Sortierung',
 'name'						=> 'Name',
@@ -61,6 +63,7 @@ $LANG_PROFILE = array(
 'user_reg'					=> 'Registrierung',
 'readonly'					=> 'Nur-Lesen',
 'invisible'					=> 'Nicht Sichtbar',
+'public'    => 'Public',
 'select'					=> '-- Wähle --',
 'usermenu'					=> 'Benutzer anzeigen',
 

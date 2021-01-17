@@ -42,6 +42,8 @@ $LANG_PROFILE = array(
 'hlp_fld_def_option' => 'Enter the option name to be used for the default',
 'hlp_fld_def_option_name' => 'Enter the default option name',
 'hlp_fld_chkbox_default' => 'Enter "1" for checked, "0" for unchecked.',
+'hlp_no_change_system' => 'Cannot change name or type for system fields.',
+'hlp_chk_if_default' => 'Check this box to have the value selected by default for new entries.',
 
 'help'  => array(
     'list' => 'Maak en wijzig profielvelden',
@@ -66,6 +68,7 @@ $LANG_PROFILE = array(
 'user_reg'  => 'Registratie',
 'readonly'  => 'Alleen-Lezen',
 'invisible' => 'Invisible',
+'public'    => 'Public',
 'select'    => '--Selecteer--',
 'usermenu'  => 'Bekijk Leden',
 

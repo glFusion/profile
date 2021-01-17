@@ -404,6 +404,12 @@ function PRF_listFields()
             'align' => 'center',
         ),
         array(
+            'text' => $LANG_PROFILE['public'],
+            'field' => 'show_in_profile',
+            'sort' => true,
+            'align' => 'center',
+        ),
+        array(
             'text' => $LANG_PROFILE['required'],
             'field' => 'required',
             'sort' => true,
@@ -511,6 +517,7 @@ function PRF_getField_profile($fieldname, $fieldvalue, $A, $icon_arr, $extra)
     case 'enabled':
     case 'required':
     case 'user_reg':
+    case 'show_in_profile':
         if ($A[$fieldname] == 1) {
             $chk = PRF_CHECKED;
             $enabled = 1;

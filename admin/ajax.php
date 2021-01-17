@@ -33,6 +33,7 @@ case 'toggleEnabled':
     case 'required':
     case 'enabled':
     case 'user_reg':
+    case 'show_in_profile':
         // Toggle the is_origin flag between 0 and 1
         DB_query("UPDATE {$_TABLES['profile_def']}
                 SET $type = '$newval'
