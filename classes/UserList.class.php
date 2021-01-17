@@ -3,7 +3,7 @@
  * Class to handle profile lists
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2020 Lee Garner <lee@leegarner.com>
  * @package     profile
  * @version     1.2.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
@@ -14,10 +14,6 @@ namespace Profile;
 
 /** Import user library for USER_getPhoto() */
 USES_lib_user();
-
-define('PRF_EXP_ACTIVE',    1);
-define('PRF_EXP_ARREARS',   2);
-define('PRF_EXP_EXPIRED',   4);
 
 /**
  * Class for profile lists.
@@ -573,6 +569,8 @@ class UserList
         }
 
         $exportlink = '';
+        $pdflink = '';
+        $htmllink = '';
         if ($this->show_export) {
             $query = urlencode($this->_getQuery());
             if (!empty($query)) {
@@ -601,7 +599,6 @@ class UserList
                 $pdflink .= '&amp;' . $this->pi_query;
             }
             $pdflink .= '" target="_new">PDF</a>';*/
-            $pdflink = '';
 
             $htmllink = '/ <a href="' . PRF_PI_URL .
                 '/list.php?action=html&listid=' . $this->listid;
@@ -609,9 +606,6 @@ class UserList
                 $htmllink .= '&amp;' . $this->pi_query;
             }
             $htmllink .= '" target="_new">HTML</a>';
-        } elseif (!$_PRF_CONF['list_allow_pdf']) {
-            $pdflink = '';
-            $htmllink = '';
         }
 
         // Add the menu of available lists, if requested
