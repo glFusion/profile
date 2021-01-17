@@ -35,7 +35,7 @@ define('PRF_CHECKED', 'checked="checked"');
 define('PRF_SELECTED', 'selected="selected"');
 
 /** Determine the correct language file, falling back to English as default. */
-$langpath = __DIR__ . 'language';
+$langpath = __DIR__ . '/language';
 $langfile = $_CONF['language'] . '.php';
 if (!file_exists("$langpath/$langfile")) {
     $langfile = 'english_utf-8.php';
@@ -48,9 +48,9 @@ if (file_exists("$langpath/custom/$langfile")) {
     include_once "$langpath/custom/$langfile";
 }
 
-if (file_exists(__DIR__ . 'config.php')) {
+if (file_exists(__DIR__ . '/config.php')) {
 /** Include local config values and overrides */
-    include_once __DIR__ . 'config.php';
+    include_once __DIR__ . '/config.php';
 }
 
 spl_autoload_register(function ($class)
