@@ -454,11 +454,11 @@ function PRF_setUserValues($uid=0)
     global $_TABLES, $_USER;
 
     if ($uid == 0) {
-        $uid = $_USER['uid'];
+        $_uid = $_USER['uid'];
     }
-    $uid = (int)$uid;
+    $_uid = (int)$uid;
     $A = array();
-    foreach (Profile\Profile::getInstance($uid)->getFields() as $name => $data) {
+    foreach (Profile\Profile::getInstance($_uid)->getFields() as $name => $data) {
         $A[$name] = $data->FormatValue();
     }
     if ($uid == 0) {
@@ -521,9 +521,6 @@ function PRF_escape_string($val)
 
 /**
  * Verify that all required custom profile variables are set.
- * This is not truly necessary since fValidator won't allow incomplete
- * submissions, but serves as a fallback in case Javascript is disabled.
- * Read-only fields are excluded from the check when $type == 'registration'.
  *
  * @param   string  $type       Type of submission
  * @param   string  $content    Submission content
@@ -535,23 +532,24 @@ function plugin_itemPreSave_profile($type, $content)
 
     // Don't validate administrators, it doesn't work when creating
     // new users if any fields are required.
-    if (SEC_hasRights('user.admin,profile.admin', 'OR'))
+    if (SEC_hasRights('user.admin,profile.admin', 'OR')) {
         return '';
+    }
 
     // Only check content types that we care about.
     // Profile editing calls this starting with 1.3.0
-    if ($type == 'registration') {
-        $uid = 0;
-    } elseif ($type == 'useredit') {
-        $uid = $_USER['uid'];
+    if (
+        $type == 'registration' ||
+        $type == 'useredit'
+    ) {
+        $P = Profile\Profile::getInstance();
+        if (!empty($P->Validate($_POST))) {
+            return 97;
+        } else {
+            return 0;
+        }
     } else {
         return '';
-    }
-    $P = Profile\Profile::getInstance($uid);
-    if (!$P->Save($_POST, $type)) {
-        return 97;
-    } else {
-        return 0;
     }
 }
 

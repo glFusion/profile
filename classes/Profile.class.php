@@ -258,6 +258,34 @@ class Profile
 
 
     /**
+     * Validate a profile submission.
+     *
+     * @see     plugin_itemPreSave_profile()
+     * @see     self::Save()
+     * @param   array|NULL  $vals   Values from $_POST, null to use current
+     * @return  array   Array of error messages.
+     */
+    public function Validate($vals=NULL)
+    {
+        $errors = array();
+        foreach ($this->fields as $name=>$Fld) {
+            // Now make changes based on the type of data and applicable options.
+            // Managers can override normal validations.
+            if (!$Fld->validData($vals)) {
+                // We could just return false here, but instead continue checking so
+                // we can show the user all the errors, not just the first.
+                $errors[$name] = sprintf(
+                    $LANG_PROFILE['msg_fld_missing'],
+                    $Fld->getPrompt()
+                );
+                $validation_errs++;
+            }
+        }
+        return $errors;
+    }
+
+
+    /**
      * Saves the user data to the database.
      *
      * @param   array   $vals   Array of name=>value pairs, like $_POST.
@@ -287,19 +315,13 @@ class Profile
         $fld_sql = array();
         $validation_errs = 0;
         $_POST['prf_errors'] = array();
+        $errors = $this->Validate($vals);
+        $validation_errs = count($errors);
         foreach ($this->fields as $name=>$Fld) {
-            // Now make changes based on the type of data and applicable options.
-            // Managers can override normal validations.
-            if (!$Fld->validData($vals)) {
-                // We could just return false here, but instead continue checking so
-                // we can show the user all the errors, not just the first.
-                $msg = sprintf($LANG_PROFILE['msg_fld_missing'], $Fld->getPrompt());
-                LGLIB_storeMessage($msg, '', true);
-                // Add a value to $_POST so the field will be highlighted when it
-                // is redisplayed.
+            if (isset($errors[$name])) {
+                LGLIB_storeMessage($errors[$name], '', true);
                 $_POST['prf_errors'][$name] = 'true';
-                $validation_errs++;
-                continue;   // skip remainder of loop for invalid records
+                continue;
             }
 
             $newval = $Fld->prepareToSave($vals);
