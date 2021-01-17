@@ -372,7 +372,7 @@ function plugin_profileblocksdisplay_profile($uid)
     foreach ($A as $data) {
         // TODO: show variables to the user if owner perm set
         // Admin can see all fields, they'll be styled to indicate not public.
-        if (!$data->isPublic() && !$isAdmin) {
+        if (!$data->canView() && !$isAdmin) {
             continue;
         }
         $value = $data->FormatValue();
@@ -531,6 +531,8 @@ function PRF_escape_string($val)
  */
 function plugin_itemPreSave_profile($type, $content)
 {
+    global $_USER;
+
     // Don't validate administrators, it doesn't work when creating
     // new users if any fields are required.
     if (SEC_hasRights('user.admin,profile.admin', 'OR'))
@@ -541,11 +543,10 @@ function plugin_itemPreSave_profile($type, $content)
     if ($type == 'registration') {
         $uid = 0;
     } elseif ($type == 'useredit') {
-        $uid = $_POST['uid'];
+        $uid = $_USER['uid'];
     } else {
         return '';
     }
-
     $P = Profile\Profile::getInstance($uid);
     if (!$P->Save($_POST, $type)) {
         return 97;
@@ -1004,8 +1005,10 @@ function PRF_isManager()
 
     static $isManager = NULL;
     if ($isManager === NULL) {
-        if (PRF_isAdmin() ||
-                SEC_hasRights($_PRF_CONF['pi_name'] . '.manage')) {
+        if (
+            PRF_isAdmin() ||
+            SEC_hasRights($_PRF_CONF['pi_name'] . '.manage')
+        ) {
             $isManager = true;
         } else {
             $isManager = false;
