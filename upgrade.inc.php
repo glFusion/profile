@@ -95,6 +95,15 @@ function profile_do_upgrade($dvlp = false)
     require_once __DIR__ . '/install_defaults.php';
     _update_config('profile', $profileConfigData);
 
+    // Clear JS and CSS cache
+    Profile\Cache::clear();
+    if (function_exists('CACHE_clear')) {
+        CACHE_clear();
+    } else {
+        CTL_clearCache();
+        @unlink(COM_getStyleCacheLocation()[0]);
+        @unlink(COM_getJSCacheLocation()[0]);
+    }
     // Catch any final version update needed for code-only upgrades
     if (!COM_checkVersion($current_ver, $installed_ver)) {
         if (!profile_do_set_version($installed_ver)) return false;

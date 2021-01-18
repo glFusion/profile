@@ -20,9 +20,9 @@ global $_DB_dbms;
 global $PRF_sampledata;
 
 /** Include profile functions */
-require_once $_CONF['path'].'plugins/profile/functions.inc';
+require_once __DIR__ . '/functions.inc';
 /** Include database definitions */
-require_once $_CONF['path'].'plugins/profile/sql/'. $_DB_dbms. '_install.php';
+require_once __DIR__ . '/sql/'. $_DB_dbms. '_install.php';
 
 /** Plugin installation options
 *   @global array $INSTALL_plugin['profile']
@@ -169,8 +169,14 @@ function plugin_postinstall_profile()
     }
 
     Profile\Cache::clear();
-    CTL_clearCache();   // clear cache to ensure CSS and JS updates come through
-
+    if (function_exists('CACHE_clear')) {
+        CACHE_clear();
+    } else {
+        CTL_clearCache();
+        // These are removed in CACHE_clear() starting with glFusion 2.0.0
+        @unlink(COM_getStyleCacheLocation()[0]);
+        @unlink(COM_getJSCacheLocation()[0]);
+    }
 }
 
 
