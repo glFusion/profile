@@ -3,7 +3,7 @@
  * Functions for the Profile plugin for glFusion.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2009-2020 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2021 Lee Garner <lee@leegarner.com>
  * @package     profile
  * @version     v1.2.0
  * @license    http://opensource.org/licenses/gpl-2.0.php

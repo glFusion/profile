@@ -1,11 +1,11 @@
 <?php
 /**
- * Upgrade routines for the Custom Profile plugin
+ * Upgrade routines for the Custom Profile plugin.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2009-2019 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2021 Lee Garner <lee@leegarner.com>
  * @package     profile
- * @version     1.2.0
+ * @version     v1.2.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource

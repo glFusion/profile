@@ -1,14 +1,15 @@
 <?php
 /**
-*   Provides automatic installation of the Profile plugin
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2015 Lee Garner <lee@leegarner.com>
-*   @package    profile
-*   @version    1.1.4
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Provides automatic installation of the Profile plugin.
+ *
+ * @author     Lee Garner <lee@leegarner.com>
+ * @copyright  Copyright (c) 2009-2021 Lee Garner <lee@leegarner.com>
+ * @package    profile
+ * @version    v1.2.0
+ * @license    http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 
 if (!defined ('GVERSION')) {
     die ('This file can not be used on its own.');
@@ -28,46 +29,54 @@ require_once __DIR__ . '/sql/'. $_DB_dbms. '_install.php';
 *   @global array $INSTALL_plugin['profile']
 */
 $INSTALL_plugin['profile'] = array(
-    'installer' => array('type' => 'installer', 
-            'version' => '1', 
-            'mode' => 'install'),
-
-    'plugin' => array('type' => 'plugin', 
-            'name'      => $_PRF_CONF['pi_name'],
-            'ver'       => $_PRF_CONF['pi_version'], 
-            'gl_ver'    => $_PRF_CONF['gl_version'],
-            'url'       => $_PRF_CONF['pi_url'], 
-            'display'   => $_PRF_CONF['pi_display_name']),
-
-    array('type' => 'table', 
-            'table'     => $_TABLES['profile_def'], 
-            'sql'       => $_SQL['profile_def']),
-
-    array('type' => 'table', 
-            'table'     => $_TABLES['profile_data'], 
-            'sql'       => $_SQL['profile_data']),
-
-    array('type' => 'table', 
-            'table'     => $_TABLES['profile_lists'], 
-            'sql'       => $_SQL['profile_lists']),
-
-    array('type' => 'group', 
-            'group' => 'profile Admin', 
-            'desc' => 'Users in this group can administer the Custom Profile plugin',
-            'variable' => 'admin_group_id', 
-            'admin' => true,
-            'addroot' => true),
-
-    array('type' => 'feature', 
-            'feature' => 'profile.admin', 
-            'desc' => 'Profile Administration access',
-            'variable' => 'admin_feature_id'),
-
-    array('type' => 'feature', 
-            'feature' => 'profile.export', 
-            'desc' => 'Access to export user lists',
-            'variable' => 'export_feature_id'),
-
+    'installer' => array(
+        'type' => 'installer',
+        'version' => '1',
+        'mode' => 'install',
+    ),
+    'plugin' => array(
+        'type' => 'plugin',
+        'name'      => $_PRF_CONF['pi_name'],
+        'ver'       => $_PRF_CONF['pi_version'],
+        'gl_ver'    => $_PRF_CONF['gl_version'],
+        'url'       => $_PRF_CONF['pi_url'],
+        'display'   => $_PRF_CONF['pi_display_name'],
+    ),
+    array(
+        'type' => 'table',
+        'table'     => $_TABLES['profile_def'],
+        'sql'       => $_SQL['profile_def'],
+    ),
+    array(
+        'type' => 'table',
+        'table'     => $_TABLES['profile_data'],
+        'sql'       => $_SQL['profile_data'],
+    ),
+    array(
+        'type' => 'table',
+        'table'     => $_TABLES['profile_lists'],
+        'sql'       => $_SQL['profile_lists'],
+    ),
+    array(
+        'type' => 'group',
+        'group' => 'profile Admin',
+        'desc' => 'Users in this group can administer the Custom Profile plugin',
+        'variable' => 'admin_group_id',
+        'admin' => true,
+        'addroot' => true,
+    ),
+    array(
+        'type' => 'feature',
+        'feature' => 'profile.admin',
+        'desc' => 'Profile Administration access',
+        'variable' => 'admin_feature_id',
+    ),
+    array(
+        'type' => 'feature',
+        'feature' => 'profile.export',
+        'desc' => 'Access to export user lists',
+        'variable' => 'export_feature_id',
+    ),
     array(
         'type' => 'feature',
         'feature'   => 'profile.viewall',
@@ -80,17 +89,18 @@ $INSTALL_plugin['profile'] = array(
         'desc' => 'Access to view public profile fields for other members.',
         'variable' => 'view_feature_id',
     ),
-
-    array('type' => 'mapping',
-            'group' => 'admin_group_id', 
-            'feature' => 'admin_feature_id',
-            'log' => 'Adding Admin feature to the admin group'),
-
-    array('type' => 'mapping', 
-            'group' => 'admin_group_id', 
-            'feature' => 'export_feature_id',
-            'log' => 'Adding Export feature to the admin group'),
-
+    array(
+        'type' => 'mapping',
+        'group' => 'admin_group_id',
+        'feature' => 'admin_feature_id',
+        'log' => 'Adding Admin feature to the admin group',
+    ),
+    array(
+        'type' => 'mapping',
+        'group' => 'admin_group_id',
+        'feature' => 'export_feature_id',
+        'log' => 'Adding Export feature to the admin group',
+    ),
     array(
         'type' => 'mapping',
         'group' => 'admin_group_id',
@@ -120,7 +130,6 @@ function plugin_install_profile()
     if ($ret > 0) {
         return false;
     }
-
     return true;
 }
 
@@ -152,7 +161,7 @@ function plugin_postinstall_profile()
                 (puid, sys_fname, sys_lname)
             VALUES $values";
     DB_query($sql);
- 
+
     // Install sample data
     if (is_array($PRF_sampledata)) {
         foreach ($PRF_sampledata as $sql) {
@@ -160,20 +169,23 @@ function plugin_postinstall_profile()
         }
 
         // Set the correct default Group ID
-        $gid = (int)DB_getItem($_TABLES['groups'], 'grp_id', 
-                "grp_name='{$_PRF_CONF['pi_name']} Admin'");
+        $gid = (int)DB_getItem(
+            $_TABLES['groups'],
+            'grp_id',
+            "grp_name='{$_PRF_CONF['pi_name']} Admin'"
+        );
         if ($gid > 0) {
-            DB_query("UPDATE {$_TABLES['profile_def']}
-                SET group_id=$gid");
+            DB_query("UPDATE {$_TABLES['profile_def']} SET group_id=$gid");
         }
     }
 
     Profile\Cache::clear();
     if (function_exists('CACHE_clear')) {
+        // glFusion 2.00+
         CACHE_clear();
     } else {
-        CTL_clearCache();
         // These are removed in CACHE_clear() starting with glFusion 2.0.0
+        CTL_clearCache();
         @unlink(COM_getStyleCacheLocation()[0]);
         @unlink(COM_getJSCacheLocation()[0]);
     }
@@ -189,11 +201,13 @@ function plugin_load_configuration_profile()
 {
     global $_CONF, $_PRF_CONF, $_TABLES;
 
-    require_once PRF_PI_PATH . 'install_defaults.php';
+    require_once __DIR__ . '/install_defaults.php';
 
     // Get the admin group ID that was saved previously.
-    $group_id = (int)DB_getItem($_TABLES['groups'], 'grp_id', 
-            "grp_name='{$_PRF_CONF['pi_name']} Admin'");
-
+    $group_id = (int)DB_getItem(
+        $_TABLES['groups'],
+        'grp_id',
+        "grp_name='{$_PRF_CONF['pi_name']} Admin'"
+    );
     return plugin_initconfig_profile($group_id);
 }
