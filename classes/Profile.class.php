@@ -191,7 +191,7 @@ class Profile
         $T->set_var(array(
             'uid'       => $this->uid,
             'form_id'   => $form_id,
-            'old_fullname' => $_USER['fullname'],
+            'old_fullname' => $this->uid == 1 ? '' : $_USER['fullname'],
         ) );
 
         // Flag to make sure calendar javascript is added only once.  It's
