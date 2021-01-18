@@ -199,7 +199,7 @@ function plugin_user_login_profile($uid)
  */
 function plugin_upgrade_profile()
 {
-    require_once dirname(__FILE__) . '/upgrade.inc.php';
+    require_once __DIR__ . '/upgrade.inc.php';
     return profile_do_upgrade();
 }
 

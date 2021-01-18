@@ -139,7 +139,9 @@ function plugin_postinstall_profile()
     while ($A = DB_fetchArray($res, false)) {
         // use username if fullname is empty
         // fullname may be empty, but username can't be
-        if ($A['fullname'] == '') $A['fullname'] = $A['username'];
+        if ($A['fullname'] == '') {
+            $A['fullname'] = $A['username'];
+        }
         $fname = DB_escapeString(LGLib\NameParser::F($A['fullname']));
         $lname = DB_escapeString(LGLib\NameParser::L($A['fullname']));
         $uid = (int)$A['uid'];
@@ -166,8 +168,10 @@ function plugin_postinstall_profile()
         }
     }
 
-}
+    Profile\Cache::clear();
+    CTL_clearCache();   // clear cache to ensure CSS and JS updates come through
 
+}
 
 
 /**
@@ -187,6 +191,3 @@ function plugin_load_configuration_profile()
 
     return plugin_initconfig_profile($group_id);
 }
-
-
-?>

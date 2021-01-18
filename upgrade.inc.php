@@ -691,9 +691,9 @@ function profile_upgrade_1_2_0($dvlp=false)
     if (!DB_error()) {
         $feat_id = DB_insertId();
         $grp_id = (int)DB_getItem(
-            $_TABLES['groups']
+            $_TABLES['groups'],
             'grp_id',
-            "grp_name = 'Logged-In Users')"
+            "grp_name = 'Logged-In Users'"
         );
         if ($grp_id > 0) {
             DB_query(
