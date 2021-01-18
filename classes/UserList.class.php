@@ -90,10 +90,6 @@ class UserList
      * @var string */
     protected $group_by = '';
 
-    /** Account expiration statuses to include.
-     * @var integer */
-    private $incl_exp_stat = 0;
-
     /** Fname Lname, 1 = "Lname, Fname".
      * @var integer */
     private $name_format = 0;
@@ -216,18 +212,6 @@ class UserList
             $this->incl_user_stat = @unserialize($A['incl_user_stat']);
             if (!$this->incl_user_stat) $this->incl_user_stat = array();
         }
-        if (isset($A['incl_exp_stat'])) {
-            if (is_array($A['incl_exp_stat'])) {
-                $this->incl_exp_stat = 0;
-                foreach ($A['incl_exp_stat'] as $value) {
-                    $this->incl_exp_stat += (int)$value;
-                }
-            } else {
-                $this->incl_exp_stat = (int)$A['incl_exp_stat'];
-            }
-        } else {
-            $this->incl_exp_stat = 0;
-        }
 
         if ($fromDB) {
             $this->fields = @unserialize($A['fields']);
@@ -296,7 +280,6 @@ class UserList
         $fieldnames = array();
         $pi_where = array();    // additional "where" clauses
         $args = array('post' => $_POST, 'get' => $_GET);
-        $args['incl_exp_stat'] = $this->incl_exp_stat;
 
         foreach ($_PLUGINS as $pi_name) {
             $status = LGLIB_invokeService(
@@ -384,8 +367,7 @@ class UserList
         $sql = "SELECT u.uid, u.username, u.email, u.homepage, u.photo,
                 {$this->name_format} AS name_format,
                 p.*, $full_name
-                $field_select,
-                DATEDIFF(NOW(), p.sys_expires) as exp_diff
+                $field_select
                 FROM {$_TABLES['users']} u
                 LEFT JOIN {$_TABLES['profile_data']} p
                 ON u.uid = p.puid
@@ -843,12 +825,6 @@ class UserList
             'canDelete'     => $this->isNew ? false : true,
         ) );
 
-        foreach (array(1,2,4) as $stat) {
-            if ($this->incl_exp_stat & $stat) {
-                $T->set_var('exp_chk' . $stat, PRF_CHECKED);
-            }
-        }
-
         for ($i = 0; $i < 5; $i++) {
             if (in_array($i, $this->incl_user_stat)) {
                 $T->set_var('ustat_chk' . $i, PRF_CHECKED);
@@ -1019,7 +995,6 @@ class UserList
             group_id = '" . (int)$this->group_id . "',
             incl_grp = '" . (int)$this->incl_grp . "',
             incl_user_stat = '" . DB_escapeString(@serialize($this->incl_user_stat)) . "',
-            incl_exp_stat = '" . (int)$this->incl_exp_stat . "',
             fields = '" . DB_escapeString(serialize($this->fields)) . "'";
         $sql = $sql_action . $sql_fields . $sql_where;
         //echo $sql;die;
@@ -1200,10 +1175,8 @@ class UserList
         $args = array(
             'post' => $_POST,
             'get' => $_GET,
-            'exp_stat' => $this->incl_exp_stat,
             'incl_user_stat' => $this->incl_user_stat,
         );
-//        var_dump($this->incl_exp_stat);die;
         foreach ($_PLUGINS as $pi_name) {
             $status = LGLIB_invokeService(
                 $pi_name,
@@ -1398,28 +1371,8 @@ class UserList
             $retval = $fieldvalue == 1 ? $LANG_PROFILE['yes'] : $LANG_PROFILE['no'];
             break;
 
-        case 'sys_membertype':
         case 'email':
             $retval = $fieldvalue;
-            break;
-
-        case 'sys_expires':
-            if ($A['exp_diff'] == NULL) {
-                // Not a real expiration date entered, ignore
-                return '';
-            }
-
-            if ($A['exp_diff'] > $_PRF_CONF['grace_expired']) {
-                $status = 'expired';
-            } elseif ($A['exp_diff'] > 0) {
-                $status = 'arrears';
-            } else {
-                $status = 'current';
-            }
-
-            $F = new Fields\date($fieldname, $fieldvalue);
-            $fieldvalue = $F->FormatValue();
-            $retval = "<span class=\"profile_$status\">{$fieldvalue}</span>";
             break;
 
         case 'avatar':

@@ -56,7 +56,6 @@ $_SQL['profile_lists'] = "CREATE TABLE `{$_TABLES['profile_lists']}` (
   `group_id` int(11) unsigned DEFAULT '13',
   `incl_grp` int(11) unsigned DEFAULT '2',
   `incl_user_stat` varchar(64) NOT NULL DEFAULT 'a:4:{i:1;i:1;i:2;i:2;i:3;i:3;i:4;i:4;}',
-  `incl_exp_stat` tinyint(2) not null default 7,
   PRIMARY KEY (`listid`)
 ) ENGINE=MyISAM";
 

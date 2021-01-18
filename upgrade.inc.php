@@ -704,6 +704,7 @@ function profile_upgrade_1_2_0($dvlp=false)
         "UPDATE {$_TABLES['profile_def']} SET
             name='prf_parent', sys=0
             WHERE name = 'sys_parent'",
+        "ALTER TABLE {$_TABLES['profile_list']} DROP incl_exp_stat",
     );
     if (!profile_do_upgrade_sql('1.2.0', $sql, $dvlp)) return false;
 
