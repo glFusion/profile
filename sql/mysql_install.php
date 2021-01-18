@@ -3,10 +3,10 @@
 *   Table definitions for the Profile plugin
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2015 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2009-202021 Lee Garner <lee@leegarner.com>
 *   @package    profile
-*   @version    1.1.4
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @version    v1.2.0
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *   GNU Public License v2 or later
 *   @filesource
 */
@@ -66,35 +66,28 @@ $PRF_sampledata = array(
         (orderby, name, type, enabled, required, user_reg,
         prompt, options, sys, perm_owner)
      VALUES
-        (10, 'sys_membertype', 'text', 1, 0, 0,
-            '{$LANG_PROFILE['membertype']}', 
-            'a:4:{s:7:\"default\";s:0:\"\";s:4:\"size\";i:40;s:9:\"maxlength\";i:255;s:7:\"autogen\";i:0;}', 1, 1),
-        (20, 'sys_expires', 'date', 1, 0, 0, '{$LANG_PROFILE['expiration']}', 
-            'a:5:{s:7:\"default\";s:0:\"\";s:8:\"showtime\";i:0;s:10:\"timeformat\";s:2:\"12\";s:6:\"format\";N;s:12:\"input_format\";s:1:\"1\";}', 1, 1),
-        (30, 'sys_directory', 'checkbox', 1, 0, 1, 
-            '{$LANG_PROFILE['list_member_dir']}', 
+        (10, 'sys_directory', 'checkbox', 1, 0, 1,
+            '{$LANG_PROFILE['list_member_dir']}',
             'a:1:{s:7:\"default\";i:1;}', 1, 1),
-        (40, 'sys_parent', 'account', 0, 0, 0, '{$LANG_PROFILE['parent_uid']}', 
-            'a:1:{s:7:\"default\";s:1:\"0\";}', 1, 1),
-        (42, 'sys_fname', 'text', 1, 0, 0, '{$LANG_PROFILE['fname']}', 
+        (20, 'sys_fname', 'text', 1, 0, 0, '{$LANG_PROFILE['fname']}',
             'a:2:{s:4:\"size\";i:40;s:9:\"maxlength\";i:80;}', 1, 0),
-        (44, 'sys_lname', 'text', 1, 0, 0, '{$LANG_PROFILE['lname']}', 
+        (30, 'sys_lname', 'text', 1, 0, 0, '{$LANG_PROFILE['lname']}',
             'a:2:{s:4:\"size\";i:40;s:9:\"maxlength\";i:80;}', 1, 0),
-        (50, 'prf_address1', 'text', 1, 1, 1, 'Address Line 1', 
+        (40, 'prf_address1', 'text', 1, 1, 1, 'Address Line 1',
             'a:2:{s:4:\"size\";i:40;s:9:\"maxlength\";i:80;}', 0, 3),
-        (60, 'prf_address2', 'text', 1, 0, 1, 'Address Line 2', 
+        (50, 'prf_address2', 'text', 1, 0, 1, 'Address Line 2',
             'a:2:{s:4:\"size\";i:40;s:9:\"maxlength\";i:80;}', 0, 3),
-        (70, 'prf_city', 'text', 1, 1, 1, 'City', 
+        (60, 'prf_city', 'text', 1, 1, 1, 'City',
             'a:2:{s:4:\"size\";i:40;s:9:\"maxlength\";i:80;}', 0, 3),
-        (80, 'prf_state', 'text', 1, 1, 1, 'State', 
+        (70, 'prf_state', 'text', 1, 1, 1, 'State',
             'a:2:{s:4:\"size\";i:2;s:9:\"maxlength\";i:2;}', 0, 3),
-        (90, 'prf_zip', 'text', 1, 1, 1, 'Zip Code', 
+        (80, 'prf_zip', 'text', 1, 1, 1, 'Zip Code',
             'a:2:{s:4:\"size\";i:10;s:9:\"maxlength\";i:10;}', 0, 3),
-        (95, 'prf_phone', 'text', 1, 0, 0, 'Phone Number', 
+        (90, 'prf_phone', 'text', 1, 0, 0, 'Phone Number',
             'a:5:{s:7:\"default\";s:0:\"\";s:9:\"help_text\";s:23:\"Enter your phone number\";s:4:\"size\";i:40;s:9:\"maxlength\";i:255;s:7:\"autogen\";i:0;}', 0, 3),
-        (100, 'prf_favcolor', 'radio', 1, 1, 1, 'Favorite color', 
+        (100, 'prf_favcolor', 'radio', 1, 1, 1, 'Favorite color',
             'a:2:{s:6:\"values\";a:3:{i:1;s:3:\"Red\";i:2;s:4:\"Blue\";i:3;s:6:\"Yellow\";}s:7:\"default\";s:1:\"2\";}', 0, 3),
-        (110, 'prf_birthdate', 'date', 1, 1, 1, 'BirthDate', 
+        (110, 'prf_birthdate', 'date', 1, 1, 1, 'BirthDate',
             'a:3:{s:8:\"showtime\";i:0;s:10:\"timeformat\";s:1:\"0\";s:6:\"format\";s:8:\"%m/%d/%Y\";}', 0, 3)",
 "ALTER TABLE {$_TABLES['profile_data']}
     ADD `prf_address1` varchar(255) default NULL,

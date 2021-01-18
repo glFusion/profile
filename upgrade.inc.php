@@ -652,7 +652,7 @@ function profile_upgrade_1_1_4($dvlp=false)
     if (!profile_do_upgrade_sql('1.1.4', $sql, $dvlp)) return false;
 
     if ($add_name_parts) {
-        $sql = "SELECT uid, fullname FROM {$_TABLES['users']}";
+        $sql = "SELECT uid, username, fullname FROM {$_TABLES['users']}";
         $res = DB_query($sql);
         while ($A = DB_fetchArray($res, false)) {
             // use username if fullname is empty
@@ -689,6 +689,21 @@ function profile_upgrade_1_2_0($dvlp=false)
     $sql = array(
         "ALTER TABLE {$_TABLES['profile_def']}
             CHANGE `prompt` `prompt` text COLLATE utf8_unicode_ci DEFAULT ''",
+        "ALTER TABLE {$_TABLES['profile_data']}
+        CHANGE sys_membertype prf_membertype varchar(128)",
+        "UPDATE {$_TABLES['profile_def']} SET
+            name='prf_membertype', sys=0
+            WHERE name = 'sys_membertype'",
+        "ALTER TABLE {$_TABLES['profile_data']}
+            CHANGE sys_expires prf_expires date",
+        "UPDATE {$_TABLES['profile_def']} SET
+            name='prf_expires', sys=0
+            WHERE name = 'sys_expires'",
+        "ALTER TABLE {$_TABLES['profile_data']}
+            CHANGE sys_parent prf_parent mediumint(8) unsigned not null default 0",
+        "UPDATE {$_TABLES['profile_def']} SET
+            name='prf_parent', sys=0
+            WHERE name = 'sys_parent'",
     );
     if (!profile_do_upgrade_sql('1.2.0', $sql, $dvlp)) return false;
 
@@ -711,6 +726,7 @@ function profile_upgrade_1_2_0($dvlp=false)
             );
         }
     }
+
     return profile_do_set_version('1.2.0');
 }
 
