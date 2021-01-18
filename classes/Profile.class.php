@@ -191,7 +191,7 @@ class Profile
         $T->set_var(array(
             'uid'       => $this->uid,
             'form_id'   => $form_id,
-            'have_jquery' => isset($_SYSTEM['disable_jquery']) && $_SYSTEM['disable_jquery'] ? '' : 'true',
+            'old_fullname' => $_USER['fullname'],
         ) );
 
         // Flag to make sure calendar javascript is added only once.  It's
@@ -304,7 +304,7 @@ class Profile
             // Fake success for anonymous, don't actually save
             return true;
         }
-        $isAdmin = false;
+        $isAdmin = plugin_ismoderator_profile();
         if ($type != 'registration') {
             if ($this->uid != $_USER['uid'] && !PRF_isManager()) {
                 COM_errorLog("Non admin user attempting to change another's profile");
@@ -325,14 +325,17 @@ class Profile
             }
 
             $newval = $Fld->prepareToSave($vals);
-            if ($newval === NULL) continue;     // special value to avoid saving
+            if ($newval === NULL) {
+                // special value to avoid saving, e.g. static fields
+                continue;
+            }
 
             // Auto-Generate a value during registration, or if the value is empty
             if (
                 $Fld->getOption('autogen', 0) == 1 &&
                 ($type == 'registration' || empty($newval))
             ) {
-                $newval = PRF_autogen($Fld, $this->uid);
+                $newval = $Fld->autogen();
             }
 
             if ($Fld->getPerm('owner') == 3 || $isAdmin) {
@@ -361,36 +364,29 @@ class Profile
         // and last.
         // Only update DB fields that are NOT included in the form, otherwise
         // there will be duplicate SQL fields during inserts.
+        $fullname = PRF_getVar($vals, 'fullname');
+        $old_fullname = PRF_getVar($vals, 'prf_old_fullname');
+        $fname = PRF_getVar($vals, 'sys_fname');
+        $lname = PRF_getVar($vals, 'sys_lname');
         if (
-            isset($vals['fullname']) &&
-            !empty($vals['fullname']) &&
-            (!isset($vals['sys_fname']) || empty($vals['sys_fname'])) &&
-            (!isset($vals['sys_lname']) || empty($vals['sys_lname']))
+            !empty($fullname) && $fullname != $old_fullname
         ) {
+            // The fullname has been changed or provided for the first time.
             $fname = DB_escapeString(\LGLib\NameParser::F($vals['fullname']));
             $lname = DB_escapeString(\LGLib\NameParser::L($vals['fullname']));
             $fld_sql['sys_fname'] = "sys_fname = '$fname'";
             $fld_sql['sys_lname'] = "sys_lname = '$lname'";
         } elseif (
-            !isset($vals['fullname']) || empty($vals['fullname'])
+            $fname != $this->fields['sys_fname']->getValue() ||
+            $lname != $this->fields['sys_lname']->getValue()
         ) {
-            // Otherwise, if the fullname was not solicited but the first
-            // and/or last names were, concatenate them into the fullname
-            // and update the main users table directly.
-            $fullname = '';
-            if (isset($vals['sys_fname']) && !empty($vals['sys_fname'])) {
-                $fullname .= $vals['sys_fname'];
-            }
-            if (isset($vals['sys_lname']) && !empty($vals['sys_lname'])) {
-                $fullname .= ' ' . $vals['sys_lname'];
-            }
-            $fullname = trim($fullname);
-            if (!empty($fullname)) {
-                $sql = "UPDATE {$_TABLES['users']}
-                    SET fullname = '" . DB_escapeString($fullname) . "'
-                    WHERE uid = {$this->uid}";
-                DB_query($sql);
-            }
+            // The first or last name was changed by the submitter, so
+            // construct the fullname from them.
+            $fullname = trim($fname . ' ' . $lname);
+            $sql = "UPDATE {$_TABLES['users']}
+                SET fullname = '" . DB_escapeString($fullname) . "'
+                WHERE uid = {$this->uid}";
+            DB_query($sql);
         }
 
         if (!empty($fld_sql)) {

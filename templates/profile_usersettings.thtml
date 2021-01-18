@@ -1,4 +1,5 @@
 {# begin {templatelocation} #}
+<input type="hidden" name="prf_old_fullname" value="{old_fullname}" />
 <div id="pe_profileprefs" class="jsenabled_hide">
   <fieldset data-uk-margin>
     <legend>{$LANG_PROFILE['fieldset1']}</legend>

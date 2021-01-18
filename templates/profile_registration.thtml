@@ -1,4 +1,5 @@
 {# begin {templatelocation} #}
+<input type="hidden" name="prf_old_fullname" value="{old_fullname}" />
 <!-- BEGIN QueueRow -->
   <div class="uk-form-row">
 {!if spancols}

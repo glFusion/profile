@@ -553,6 +553,21 @@ function plugin_itemPreSave_profile($type, $content)
 
 
 /**
+ * Check if the current user is a plugin admin (moderator).
+ *
+ * @return  boolean     True if an admin, False if not
+ */
+function plugin_ismoderator_profile()
+{
+    static $ismod = NULL;
+    if ($ismod === NULL) {
+        $ismod = SEC_hasRights('profile.admin');
+    }
+    return $ismod;
+}
+
+
+/**
  * Return a single value from the values table corresponding to
  * a specific user ID and item name.
  * Not used by this plugin, but intended to provide a basic API to
@@ -566,14 +581,17 @@ function PRF_getValue($key, $uid=0)
 {
     global $_TABLES, $_USER;
 
-    if ($key == '')
+    if ($key == '') {
         return '';
+    }
+    if ($uid == 0) {
+        $uid = $_USER['uid'];
+    }
     $uid = (int)$uid;
-    if ($uid == 0) $uid = $_USER['uid'];
 
     $P = \Profile\Profile::getInstance($uid);
     if (isset($P->fields[$key])) {
-        return array($P->fields[$key]->value, $P->fields[$key]->FormatValue());
+        return array($P->fields[$key]->getValue(), $P->fields[$key]->FormatValue());
     } else {
         return '';
     }
@@ -834,7 +852,7 @@ function plugin_templatesetvars_profile($templatename, &$template)
  * @since   v1.0.0
  * @param   integer $uid    User ID being modified
  */
-function plugin_user_changed_profile($uid)
+function Xplugin_user_changed_profile($uid)
 {
     $P = \Profile\Profile::getInstance($uid);
     $P->Save($_POST);
