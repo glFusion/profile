@@ -20,6 +20,11 @@ Release TBD
 - Modernize using UIkit icons.
 - Add dvlpupdate.php development update utility.
 - SQL Strict Mode fixes.
+- Create first/last name from fullname (or vice-versa) at registration.
+- Deprecate non-UTF-8 language files.
+- Deprecate unused API functions.
+- Change unused system fields to regular fields.
+- Deprecate expiration status in lists, will be provided by Membership plugin.
 
 ## Version 1.1.3
 Released 2013-06-13
