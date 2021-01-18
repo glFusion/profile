@@ -1,37 +1,38 @@
 {# begin {templatelocation} #}
-<input type="hidden" name="prf_old_fullname" value="{old_fullname}" />
 <!-- BEGIN QueueRow -->
-  <div class="uk-form-row">
+<div class="uk-form-row">
 {!if spancols}
 {!else}
 {!if prompt}
     <label class="uk-form-label" for="{fld_name}">{prompt}:</label>
 {!endif}
 {!endif}
-  <div class="uk-form-controls">
-  <span class="pluginProfileField">
-    {field}
-    <span class="prfInfoIcons">
+    <div class="uk-form-controls">
+        <span class="pluginProfileField">
+            {field}
+            <span class="prfInfoIcons">
 {!if is_static}
 {!else}
-  {!if is_visible}
-      <i class="uk-icon uk-icon-user prf-icon-info tooltip" title="{$LANG_PROFILE['hlp_visible']}"></i>
-  {!else}
-      <i class="uk-icon uk-icon-user-secret prf-icon-disabled tooltip" title="{$LANG_PROFILE['hlp_invisible']}"></i>
-  {!endif}
-  {!if help_text}
-      <i class="uk-icon uk-icon-question-circle prf-icon-info tooltip" title="{help_text}"></i>
-  {!endif}
-  {!if is_required}
-      <i class="uk-icon uk-icon-warning prf-icon-danger tooltip" title="{$LANG_PROFILE['hlp_required']}"></i>
-  {!endif}
+{!if is_visible}
+                <i class="uk-icon uk-icon-user prf-icon-info tooltip" title="{$LANG_PROFILE['hlp_visible']}"></i>
+{!else}
+                <i class="uk-icon uk-icon-user-secret prf-icon-disabled tooltip" title="{$LANG_PROFILE['hlp_invisible']}"></i>
 {!endif}
-    </span>
+{!if help_text}
+                <i class="uk-icon uk-icon-question-circle prf-icon-info tooltip" title="{help_text}"></i>
+{!endif}
 {!if is_required}
-<br /><label for="{fld_name}" generated="true" class="error"></label>
+                <i class="uk-icon uk-icon-warning prf-icon-danger tooltip" title="{$LANG_PROFILE['hlp_required']}"></i>
 {!endif}
-  </span>
-  </div>
-  </div>
+{!endif}
+            </span>
+
+{!if is_required}
+            <br /><label for="{fld_name}" generated="true" class="error"></label>
+{!endif}
+        </span>
+    </div>
+</div>
 <!-- END QueueRow -->
+<input type="hidden" name="prf_old_fullname" value="{old_fullname}" />
 {# end {templatelocation} #}
