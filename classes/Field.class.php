@@ -681,6 +681,9 @@ class Field
         if (isset($A['help_text']) && $A['help_text'] != '') {
             $this->options['help_text'] = trim($A['help_text']);
         }
+        if (isset($A['autogen']) && $A['autogen'] == 1) {
+            $this->options['autogen'] = 1;
+        }
 
         // Now alter the data table.  We do this first in case there's any SQL
         // error so we don't end up with a mismatch between the definitions and
@@ -884,22 +887,26 @@ class Field
      * The second form takes precedence over the first.
      *
      * @since   version 0.0.3
-     * @param   array   $A      Field definition and values
-     * @param   integer $uid    Optional user ID.  Zero is acceptable here.
      * @return  string          Value to give the field
      */
-     public function AutoGen()
-     {
-        if (!is_object($A) || empty($A)) {
-            return COM_makeSID();
+    public function autogen()
+    {
+        if (!empty($this->value)) {
+            // shouldn't have been called
+            return $this->value;
         }
+
+        // See if there's a custom function for this field, or a generic
+        // custom function.
         $function = 'CUSTOM_profile_autogen_' . $this->name;
         if (function_exists($function)) {
             return $function($this, $this->uid);
         } elseif (function_exists('CUSTOM_profile_autogen')) {
             return CUSTOM_profile_autogen($this, $this->uid);
         } else {
-            return COM_makeSID();
+            // return a 12-character random string
+            $bytes = random_bytes(ceil(6));
+            return bin2hex($bytes);
         }
     }
 
