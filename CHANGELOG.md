@@ -1,7 +1,7 @@
 # Custom Profile Plugin - Change Log
 
 ## Version 1.2.0
-Release TBD
+Release 2021-01-18
 - Remove support for non-uikit themes
 - Enable web services to allow `PLG_invokeService()` to be used
 - Fix namespace usage
