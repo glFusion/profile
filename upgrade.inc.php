@@ -778,6 +778,7 @@ function PRF_remove_old_files()
             'classes/prfItem_static.class.php',
             'classes/prfItem_textarea.class.php',
             'classes/prfItem_text.class.php',
+            'classes/prfList.class.php',
         ),
         // public_html/profile
         $_CONF['path_html'] . 'profile' => array(
