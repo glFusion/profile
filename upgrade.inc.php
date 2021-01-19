@@ -89,6 +89,9 @@ function profile_do_upgrade($dvlp = false)
         if (!profile_upgrade_1_2_0($dvlp)) return false;
     }
 
+    // Remove deprecated files
+    PRF_remove_old_files();
+
     // Update the plugin configuration
     USES_lib_install();
     global $profileConfigData;
@@ -125,7 +128,7 @@ function profile_do_upgrade_sql($version, $sql='', $dvlp=false)
     global $_TABLES, $_PRF_CONF;
 
     // If no sql statements passed in, return success
-    if (!is_array($sql)) {
+    if (!is_array($sql) || empty($sql)) {
         return true;
     }
 
@@ -689,45 +692,57 @@ function profile_upgrade_1_2_0($dvlp=false)
     $sql = array(
         "ALTER TABLE {$_TABLES['profile_def']}
             CHANGE `prompt` `prompt` text COLLATE utf8_unicode_ci DEFAULT ''",
-        "ALTER TABLE {$_TABLES['profile_data']}
-        CHANGE sys_membertype prf_membertype varchar(128)",
         "UPDATE {$_TABLES['profile_def']} SET
             name='prf_membertype', sys=0
             WHERE name = 'sys_membertype'",
-        "ALTER TABLE {$_TABLES['profile_data']}
-            CHANGE sys_expires prf_expires date",
         "UPDATE {$_TABLES['profile_def']} SET
             name='prf_expires', sys=0
             WHERE name = 'sys_expires'",
-        "ALTER TABLE {$_TABLES['profile_data']}
-            CHANGE sys_parent prf_parent mediumint(8) unsigned not null default 0",
         "UPDATE {$_TABLES['profile_def']} SET
             name='prf_parent', sys=0
             WHERE name = 'sys_parent'",
-        "ALTER TABLE {$_TABLES['profile_list']} DROP incl_exp_stat",
     );
+    if (_PRFtableHasColumn('profile_data', 'sys_membertype')) {
+        $sql[] = "ALTER TABLE {$_TABLES['profile_data']}
+            CHANGE sys_membertype prf_membertype varchar(128)";
+    }
+    if (_PRFtableHasColumn('profile_data', 'sys_expires')) {
+        "ALTER TABLE {$_TABLES['profile_data']}
+            CHANGE sys_expires prf_expires date";
+    }
+    if (_PRFtableHasColumn('profile_data', 'sys_parent')) {
+        "ALTER TABLE {$_TABLES['profile_data']}
+            CHANGE sys_parent prf_parent mediumint(8) unsigned not null default 0";
+    }
+    if (_PRFtableHasColumn('profile_lists', 'incl_exp_stat')) {
+        "ALTER TABLE {$_TABLES['profile_lists']} DROP incl_exp_stat";
+    }
+
     if (!profile_do_upgrade_sql('1.2.0', $sql, $dvlp)) return false;
 
     // Add the profile.view permission to be used in place of "members"
-    DB_query(
-        "INSERT INTO {$_TABLES['features']} (ft_name, ft_descr)
-        VALUES ('profile.view','Access to view public profile fields for other members.')"
-    );
-    if (!DB_error()) {
-        $feat_id = DB_insertId();
-        $grp_id = (int)DB_getItem(
-            $_TABLES['groups'],
-            'grp_id',
-            "grp_name = 'Logged-In Users'"
+    $ft_descr = DB_getItem($_TABLES['features'], 'ft_name', "ft_name='profile.view'");
+    if (!$ft_descr) {
+        DB_query(
+            "INSERT IGNORE INTO {$_TABLES['features']} (ft_name, ft_descr)
+            VALUES ('profile.view','Access to view public profile fields for other members.')",
+            1
         );
-        if ($grp_id > 0) {
-            DB_query(
-                "INSERT INTO {$_TABLES['access']} (acc_ft_id, acc_grp_id)
-                VALUES ($feat_id, {$grp_id})"
+        if (!DB_error()) {
+            $feat_id = DB_insertId();
+            $grp_id = (int)DB_getItem(
+                $_TABLES['groups'],
+                'grp_id',
+                "grp_name = 'Logged-In Users'"
             );
+            if ($grp_id > 0) {
+                DB_query(
+                    "INSERT INTO {$_TABLES['access']} (acc_ft_id, acc_grp_id)
+                    VALUES ($feat_id, {$grp_id})"
+                );
+            }
         }
     }
-
     return profile_do_set_version('1.2.0');
 }
 
