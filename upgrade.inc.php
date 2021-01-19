@@ -794,6 +794,9 @@ function PRF_remove_old_files()
             'classes/prfItem_textarea.class.php',
             'classes/prfItem_text.class.php',
             'classes/prfList.class.php',
+            // 1.2.1 - Remove old .uikit.thtml files
+            'templates/profile_registration.uikit.thtml',
+            'templates/profile_usersettings.uikit.thtml',
         ),
         // public_html/profile
         $_CONF['path_html'] . 'profile' => array(
