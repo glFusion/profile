@@ -643,12 +643,10 @@ function PRF_permReset()
     global $_TABLES, $_PRF_CONF;
 
     $sql = "UPDATE {$_TABLES['profile_def']} SET
-                perm_owner = {$_PRF_CONF['default_permissions'][0]},
-                perm_group = {$_PRF_CONF['default_permissions'][1]},
-                perm_members = {$_PRF_CONF['default_permissions'][2]},
-                perm_anon = {$_PRF_CONF['default_permissions'][3]}";
-    //echo $sql;die;
+        group_id = " . (int)$_PRF_CONF['defgroup'] . ",
+        perm_owner = " . (int)$_PRF_CONF['default_permissions'][0] . ",
+        perm_group = " . (int)$_PRF_CONF['default_permissions'][1] . ",
+        perm_members = " . (int)$_PRF_CONF['default_permissions'][2] . ",
+        perm_anon = " . (int)$_PRF_CONF['default_permissions'][3];
     DB_query($sql);
 }
-
-?>
