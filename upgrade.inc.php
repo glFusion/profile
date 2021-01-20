@@ -26,7 +26,7 @@ global $_CONF, $_PRF_CONF;
  */
 function profile_do_upgrade($dvlp = false)
 {
-    global $_PRF_CONF, $_PLUGIN_INFO;
+    global $_PRF_CONF, $_PLUGIN_INFO, $_TABLES;
 
     if (isset($_PLUGIN_INFO[$_PRF_CONF['pi_name']])) {
         if (is_array($_PLUGIN_INFO[$_PRF_CONF['pi_name']])) {
@@ -88,6 +88,30 @@ function profile_do_upgrade($dvlp = false)
         COM_errorLog("Updating Profile Plugin to $current_ver");
         if (!profile_upgrade_1_2_0($dvlp)) return false;
     }
+    if (!COM_checkVersion($current_ver, '1.2.1')) {
+        $current_ver = '1.2.1';
+        $sql = array(
+            "DELETE FROM {$_TABLES['profile_data']} WHERE puid = 1",
+        );
+        if (_PRFtableHasColumn('profile_data', 'sys_membertype')) {
+            $sql[] = "ALTER TABLE {$_TABLES['profile_data']}
+                CHANGE sys_membertype prf_membertype varchar(128)";
+        }
+        if (_PRFtableHasColumn('profile_data', 'sys_expires')) {
+            $sql[] = "ALTER TABLE {$_TABLES['profile_data']}
+                CHANGE sys_expires prf_expires date";
+        }
+        if (_PRFtableHasColumn('profile_data', 'sys_parent')) {
+            $sql[] = "ALTER TABLE {$_TABLES['profile_data']}
+                CHANGE sys_parent prf_parent mediumint(8) unsigned not null default 0";
+        }
+        if (_PRFtableHasColumn('profile_lists', 'incl_exp_stat')) {
+            $sql[] = "ALTER TABLE {$_TABLES['profile_lists']} DROP incl_exp_stat";
+        }
+        if (!profile_do_upgrade_sql('1.2.1', $sql, $dvlp)) return false;
+        if (!profile_do_set_version('1.2.1')) return false;
+    }
+
 
     // Remove deprecated files
     PRF_remove_old_files();
@@ -701,21 +725,22 @@ function profile_upgrade_1_2_0($dvlp=false)
         "UPDATE {$_TABLES['profile_def']} SET
             name='prf_parent', sys=0
             WHERE name = 'sys_parent'",
+        "DELETE FROM {$_TABLES['profile_def']} WHERE puid = 1",
     );
     if (_PRFtableHasColumn('profile_data', 'sys_membertype')) {
         $sql[] = "ALTER TABLE {$_TABLES['profile_data']}
             CHANGE sys_membertype prf_membertype varchar(128)";
     }
     if (_PRFtableHasColumn('profile_data', 'sys_expires')) {
-        "ALTER TABLE {$_TABLES['profile_data']}
+        $sql[] = "ALTER TABLE {$_TABLES['profile_data']}
             CHANGE sys_expires prf_expires date";
     }
     if (_PRFtableHasColumn('profile_data', 'sys_parent')) {
-        "ALTER TABLE {$_TABLES['profile_data']}
+        $sql[] = "ALTER TABLE {$_TABLES['profile_data']}
             CHANGE sys_parent prf_parent mediumint(8) unsigned not null default 0";
     }
     if (_PRFtableHasColumn('profile_lists', 'incl_exp_stat')) {
-        "ALTER TABLE {$_TABLES['profile_lists']} DROP incl_exp_stat";
+        $sql[] = "ALTER TABLE {$_TABLES['profile_lists']} DROP incl_exp_stat";
     }
 
     if (!profile_do_upgrade_sql('1.2.0', $sql, $dvlp)) return false;

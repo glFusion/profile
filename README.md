@@ -2,16 +2,16 @@ profile
 =======
 
 Custom Profile plugin for glFusion
-Release 1.1.4
+Release 1.2.0
 
 The Custom Profile plugin for glFusion allows the administrator to create 
-custom profile elements for user acccounts. Prevously, this required 
-significant cusom programming and template modification.
+custom profile elements for user accounts without cusom programming and
+template modifications.
 
 This plugin requires the LGLib plugin for message handling and other
 functions. To enable messages to the user, add
     {lglib_messages}
-shortly after the <body> tag in {layout_dir}/header.thtml. This is where
+shortly after the `<body>` tag in `{layout_dir}/header.thtml`. This is where
 alerts about missing or invalid field data will be displayed.
 
 Known Issues
@@ -24,7 +24,7 @@ information within the page unless authorized. Copyrights information in
 acceptable form is allowed.
 
    
-Copyright (C) 2009-2016 by Lee Garner <lee@leegarner.com>
+Copyright (C) 2009-2021 by Lee Garner <lee@leegarner.com>
 
 LICENSE:
 
