@@ -98,16 +98,19 @@ class Profile
             $this->fields[$name] = Field::getInstance($data);
         }
 
-        // Now read the values for the current user
-        $sql = "SELECT * FROM {$_TABLES['profile_data']}
-            WHERE puid = '{$this->uid}'
-            LIMIT 1";
-        $res = DB_query($sql);
-        $A = DB_fetchArray($res, false);
-        if (!empty($A)) {
-            foreach ($A as $name=>$value) {
-                if (isset($this->fields[$name])) {
-                    $this->fields[$name]->setValue($value);
+        // Now read the values for the current user.
+        // Don't bother reading anonymous, just in case a record gets in there.
+        if ($this->uid > 1) {
+            $sql = "SELECT * FROM {$_TABLES['profile_data']}
+                WHERE puid = '{$this->uid}'
+                LIMIT 1";
+            $res = DB_query($sql);
+            $A = DB_fetchArray($res, false);
+            if (!empty($A)) {
+                foreach ($A as $name=>$value) {
+                    if (isset($this->fields[$name])) {
+                        $this->fields[$name]->setValue($value);
+                    }
                 }
             }
         }
@@ -338,7 +341,13 @@ class Profile
                 $newval = $Fld->autogen();
             }
 
-            if ($Fld->getPerm('owner') == 3 || $isAdmin) {
+            // Require valid access, unless this is a registration submission
+            // in which case fields need to be filled in regardless of access.
+            if (
+                $isAdmin ||
+                $type == 'registration' ||
+                $Fld->getPerm('owner') == 3
+            ) {
                 // Perform field-specific sanitization and add to array of sql
                 $newval = $Fld->Sanitize($newval);
                 $fld_sql[$Fld->getName()] = $Fld->getName() . "='" . DB_escapeString($newval) . "'";
