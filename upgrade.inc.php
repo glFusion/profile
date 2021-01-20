@@ -86,8 +86,10 @@ function profile_do_upgrade($dvlp = false)
     if (!COM_checkVersion($current_ver, '1.2.0')) {
         $current_ver = '1.2.0';
         COM_errorLog("Updating Profile Plugin to $current_ver");
+        if (!profile_upgrade_1_1_4(true)) return false;
         if (!profile_upgrade_1_2_0($dvlp)) return false;
     }
+
     if (!COM_checkVersion($current_ver, '1.2.1')) {
         $current_ver = '1.2.1';
         $sql = array(
@@ -108,6 +110,8 @@ function profile_do_upgrade($dvlp = false)
         if (_PRFtableHasColumn('profile_lists', 'incl_exp_stat')) {
             $sql[] = "ALTER TABLE {$_TABLES['profile_lists']} DROP incl_exp_stat";
         }
+        // Catch up on creating sys_fname and sys_lname fields
+        if (!profile_upgrade_1_1_4(true)) return false;
         if (!profile_do_upgrade_sql('1.2.1', $sql, $dvlp)) return false;
         if (!profile_do_set_version('1.2.1')) return false;
     }
@@ -635,10 +639,12 @@ function profile_upgrade_1_1_4($dvlp=false)
 
     $sql = array();
     $add_name_parts = false;
-    if (!_PRFtableHasColumn('profile_def', 'sys_fname')) {
+    if (!_PRFtableHasColumn('profile_data', 'sys_fname')) {
         $add_name_parts = true;
         $sql[] = "ALTER TABLE {$_TABLES['profile_data']}
-            ADD sys_fname varchar(40) AFTER sys_parent";
+            ADD sys_fname varchar(40) AFTER puid";
+    }
+    if (DB_count($_TABLES['profile_def'], 'name', 'sys_fname') < 1) {
         $sql[] = "INSERT INTO {$_TABLES['profile_def']}
                 (orderby, name, type, enabled, required, user_reg,
                 prompt, options, sys, perm_owner)
@@ -646,10 +652,12 @@ function profile_upgrade_1_1_4($dvlp=false)
                 (41, 'sys_fname', 'fname', 0, 0, 0, '{$LANG_PROFILE['fname']}',
                     'a:2:{s:4:\"size\";i:40;s:9:\"maxlength\";i:80;}', 1, 2)";
     }
-    if (!_PRFtableHasColumn('profile_def', 'sys_lname')) {
+    if (!_PRFtableHasColumn('profile_data', 'sys_lname')) {
         $add_name_parts = true;
         $sql[] = "ALTER TABLE {$_TABLES['profile_data']}
             ADD sys_lname varchar(40) AFTER sys_fname";
+    }
+    if (DB_count($_TABLES['profile_def'], 'name', 'sys_lname') < 1) {
         $sql[] = "INSERT INTO {$_TABLES['profile_def']}
                 (orderby, name, type, enabled, required, user_reg,
                 prompt, options, sys, perm_owner)
