@@ -1,5 +1,9 @@
 # Custom Profile Plugin - Change Log
 
+## Version 1.2.1
+Release 2021-01-20
+- Fix saving first and last names during registration.
+
 ## Version 1.2.0
 Release 2021-01-18
 - Remove support for non-uikit themes
