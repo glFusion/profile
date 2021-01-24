@@ -386,8 +386,15 @@ class Profile
             $fld_sql['sys_fname'] = "sys_fname = '$fname'";
             $fld_sql['sys_lname'] = "sys_lname = '$lname'";
         } elseif (
-            $fname != $this->fields['sys_fname']->getValue() ||
-            $lname != $this->fields['sys_lname']->getValue()
+            (
+                isset($this->fields['sys_fname']) &&
+                $fname != $this->fields['sys_fname']->getValue()
+            )
+            ||
+            (
+                isset($this->fields['sys_lname']) &&
+                $lname != $this->fields['sys_lname']->getValue()
+            )
         ) {
             // The first or last name was changed by the submitter, so
             // construct the fullname from them.

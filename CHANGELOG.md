@@ -1,5 +1,9 @@
 # Custom Profile Plugin - Change Log
 
+## Version 1.2.2
+Release 2021-01-24
+- Check if first/last name fields are enabled before creating fullname from them.
+
 ## Version 1.2.1
 Release 2021-01-20
 - Fix saving first and last names during registration.
