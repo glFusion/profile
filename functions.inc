@@ -430,8 +430,9 @@ function plugin_user_create_profile($uid = 0)
     global $_TABLES;
 
     // $uid must already be set to the new user's ID
-    if ($uid == 0)
+    if ($uid == 0) {
         return;
+    }
 
     $P = Profile\Profile::getInstance($uid);
     $P->Save($_POST, 'registration');
@@ -608,19 +609,32 @@ function PRF_getValue($key, $uid=0)
  */
 function plugin_autotags_profile($op, $content = '', $autotag = '')
 {
-    global $_USER;
+    global $_USER, $LANG_PROFILE;
 
     $HTML = '';
     $retval = $content;
 
-    if ($op == 'tagname' ) {
+    switch ($op) {
+    case 'tagname':
         return array('profile', 'profile_list');
-    } else if ($op == 'parse') {
+        break;
+    case 'tagusage':
+        return array(array('namespace' => 'profile', 'usage' => 'description'));
+        break;
+    case 'desc':
+        if (isset($LANG_PROFILE['at_dscp_' . $content])) {
+            return $LANG_PROFILE['at_dscp_' . $content];
+        } else {
+            return '';
+        }
+        break;
+    case 'parse':
         $item_id = COM_applyFilter($autotag['parm1']);
         $options = explode(' ', COM_applyFilter($autotag['parm2']));
+        $opts = array();
         foreach ($options as $tmp) {
             $opt = explode(':', $tmp);
-            // This is to allow for tags like 'case', which have no options
+            // This is to allow for tags like 'value', which have no options
             // and would throw a PHP error
             if (isset($opt[1])) {
                 $opts[$opt[0]] = $opt[1];
@@ -634,17 +648,24 @@ function plugin_autotags_profile($op, $content = '', $autotag = '')
             // We always use a userID, so if one wasn't supplied then
             // use the current user. Anonymous users have no profile data
             // so just breat with $HTML empty.
-            if (isset($opts['uid']))
+            if (isset($opts['uid'])) {
                 $uid = (int)$opts['uid'];
-            else
+            } else {
                 $uid = $_USER['uid'];
+            }
             if ($uid < 2) break;    // Have to have a valid user ID
-
+            $fld_id = $autotag['parm1'];
+            if (empty($fld_id)) {
+                break;
+            }
             // Now get the specific profile value for the user
-            list($value, $text) = PRF_getValue($item_id, $uid);
-
-            // Set the $HTML variable to the value or formatted text
-            $HTML = isset($opts['value']) ? $value : $text;
+            $P = Profile\Profile::getInstance($uid);
+            if (isset($P->getFields()[$fld_id])) {
+                $F = $P->getFields()[$fld_id];
+                $HTML = isset($opts['value']) ? $F->getValue() : $F->FormatValue();
+            } else {
+                $HTML = '';
+            }
 
             // Switch the text case, if requested
             if (isset($opts['case'])) {
@@ -663,8 +684,8 @@ function plugin_autotags_profile($op, $content = '', $autotag = '')
             break;
 
         case 'profile_list':
-            $item_id = COM_applyFilter($autotag['parm1']);
-            $PL = new Profile\UserList($item_id);
+            $list_id = COM_applyFilter($autotag['parm1']);
+            $PL = new Profile\UserList($list_id);
             if (isset($opts['menu'])) $PL->showMenu();
             if (isset($opts['export'])) $PL->showExport();
             if (isset($opts['extras'])) $PL->hasExtras();
@@ -674,8 +695,8 @@ function plugin_autotags_profile($op, $content = '', $autotag = '')
 
         // Perform the text substitution with the final version of $HTML
         $retval = str_replace($autotag['tagstr'], $HTML, $content);
+        break;
     }
-
     return $retval;
 }
 
@@ -894,11 +915,11 @@ function plugin_getconfigelementhelp_profile($option, $doclang='english')
 function plugin_privacy_export_profile($uid,$email='',$username='',$ip='')
 {
     $retval = "<profile>\n";
-    $tmp = \Profile\Profile::getInstance($uid)->fields;
+    $tmp = \Profile\Profile::getInstance($uid)->getFields();
     foreach ($tmp as $name => $data) {
         $d = addSlashes(htmlentities($data->FormatValue()));
         if (!empty($d)) {
-            $p = str_replace(' ', '_', $data->prompt);
+            $p = str_replace(' ', '_', $data->getPrompt());
             $p = preg_replace("/[^A-Za-z0-9_]/", '', $p);
             $retval .= '<'.$p.'>'.$d.'</'.$p.">\n";
         }
