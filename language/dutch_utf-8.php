@@ -136,6 +136,8 @@ $LANG_PROFILE = array(
 'move_up'   => 'Move Up',
 'move_dn'   => 'Move Down',
 'click_to_change' => 'Click to change',
+'at_dscp_profile' => 'Include a profile field in the content',
+'at_dscp_profile_list' => 'Embed a profile list in the content',
 
 // begin membership fields
 'del_selected' => 'Delete Selected',
