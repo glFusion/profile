@@ -270,6 +270,8 @@ class Profile
      */
     public function Validate($vals=NULL)
     {
+        global $LANG_PROFILE;
+
         $errors = array();
         foreach ($this->fields as $name=>$Fld) {
             // Now make changes based on the type of data and applicable options.
@@ -281,7 +283,6 @@ class Profile
                     $LANG_PROFILE['msg_fld_missing'],
                     $Fld->getPrompt()
                 );
-                $validation_errs++;
             }
         }
         return $errors;

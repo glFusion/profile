@@ -542,14 +542,12 @@ function plugin_itemPreSave_profile($type, $content)
         $type == 'useredit'
     ) {
         $P = Profile\Profile::getInstance();
-        if (!empty($P->Validate($_POST))) {
-            return 97;
-        } else {
-            return 0;
+        $msgs = $P->Validate($_POST);
+        if (!empty($msgs)) {
+            return '<ul><li>' . implode('</li><li>', $msgs) . '</li></ul>';
         }
-    } else {
-        return '';
     }
+    return '';
 }
 
 
