@@ -1,5 +1,9 @@
 # Custom Profile Plugin - Change Log
 
+## Version 1.2.3
+Release 2021-04-06
+- Return text error message from plugin_itemPreSave_profile() instead of string code.
+
 ## Version 1.2.2
 Release 2021-01-24
 - Check if first/last name fields are enabled before creating fullname from them.
