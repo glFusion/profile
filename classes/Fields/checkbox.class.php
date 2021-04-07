@@ -68,7 +68,6 @@ class checkbox extends \Profile\Field
             $chk = '';
         }
 
-        // _frmClass is ignored since fValidator doesn't work for checkboxes
         $fld = "<input {$this->_frmClass} name=\"{$this->name}\"
                     id=\"{$this->name}\"
                     type=\"checkbox\" value=\"1\" $chk
@@ -92,8 +91,6 @@ class checkbox extends \Profile\Field
 
     /**
      * Special handling for "required" setting for checkboxes.
-     * FValidator doesn't work right, so don't use it and allow
-     * the submission handling to deal with empty checkboxes.
      */
     protected function _FormFieldInit()
     {
@@ -119,12 +116,18 @@ class checkbox extends \Profile\Field
     /**
      * Check if a field has valid data.  Used in conjuction with the "required" flag.
      *
-     * @param   integer $value  Optional value override
+     * @param   array   $vals   Values submitted from form
      * @return  booldan         True if data is valid, False if not
      */
-    public function validData($value = NULL)
+    public function validData($vals = NULL)
     {
-        $val = $value !== NULL ? $value : $this->value;
+        if ($vals === NULL) {   // check current value
+            $val = $this->value;
+        } elseif (is_array($vals) && isset($vals[$this->name])) {
+            $val = $vals[$this->name] !== NULL ? (int)$vals[$this->name] : $this->value;
+        } else {
+            $val = '';
+        }
         if ($this->required && $val != 1) {
            return false;
         } else {

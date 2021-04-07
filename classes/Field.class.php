@@ -408,7 +408,7 @@ class Field
     {
         if ($vals === NULL) {   // check current value
             $val = $this->value;
-        } elseif (isset($vals[$this->name])) {
+        } elseif (is_array($vals) && isset($vals[$this->name])) {
             $val = $vals[$this->name] !== NULL ? $vals[$this->name] : $this->value;
         } else {
             $val = '';
