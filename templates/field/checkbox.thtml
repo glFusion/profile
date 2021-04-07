@@ -1,0 +1,3 @@
+{# begin {templatelocation} #}
+<input class="uk-checkbox {classes}" name="{name}" id="{name}" type="checkbox" value="1" {!if checked}checked="checked"{!endif} {!if readonly}disabled="disabled"{!endif} />
+{# end {templatelocation} #}

@@ -1,0 +1,3 @@
+{# begin {templatelocation} #}
+<input {classes} name="{name}" id="{name}" {maxlen} size="{size}" type="text" value="{value}" {!if readonly}disabled="disabled"{!endif} />
+{# end {templatelocation} #}

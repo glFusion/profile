@@ -1,0 +1,5 @@
+{# begin {templatelocation} #}
+<!-- BEGIN optionRow -->
+<input class="uk-radio {classes}" type="radio" name="{name}" id="{name}_{value}" value="{value}" {!if selected}checked="checked"{!endif} {!if readonly}disabled="disabled"{!endif} />&nbsp;{value}&nbsp;
+<!-- END optionRow -->
+{# end {templatelocation} #}

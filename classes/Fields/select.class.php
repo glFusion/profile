@@ -49,16 +49,23 @@ class select extends \Profile\Field
         global $LANG_PROFILE;
 
         $this->_FormFieldInit();
-
-        $fld = "<select $this->_frmClass name=\"{$this->name}\"
-                    id=\"{$this->name}\" $this->_frmReadonly>\n";
-        $fld .= "<option value=\"\">--{$LANG_PROFILE['select']}--</option>\n";
+        $T = $this->_getTemplate('field', 'select');
+        $T->set_var(array(
+            'classes' => $this->_frmClass,
+            'name' => $this->name,
+            'readonly' => $this->readonly,
+        ) );
+        $T->set_block('template', 'optionRow', 'opt');
         foreach ($this->options['values'] as $id=>$value) {
-            $sel = $this->value == $value ? PRF_SELECTED : '';
-            $fld .= "<option value=\"$value\" $sel>$value</option>\n";
+            $T->set_var(array(
+                'opt_value' => $value,
+                'opt_name' => $value,
+                'opt_sel' => $value == $this->value,
+            ) );
+            $T->parse('opt', 'optionRow', true);
         }
-        $fld .= "</select>\n";
-        return $fld;
+        $T->parse('output', 'template');
+        return $T->finish($T->get_var('output'));
     }
 
 
@@ -69,24 +76,19 @@ class select extends \Profile\Field
      */
     public function editValues()
     {
-        $listinput = '';
-        if (!empty($this->options['values'])) {
-            $i = 0;
-            foreach ($this->options['values'] as $valname) {
-                $listinput .= '<tr><td><input type="text" value="' . $valname . '" name="select_values[]" /></td>';
-                $sel = $this->getOption('default') == $valname ? PRF_CHECKED : '';
-                $listinput .= '<td><input type="radio" name="sel_default" value="' . $i . '" ' . $sel . '/></td>';
-                $listinput .= '<td>' . $this->getRemoveRowIcon() . '</td>';
-                $listinput .= "</tr>\n";
-                $i++;
-            }
-        } else {
-            $this->options['values'] = array();
-            $listinput .= '<tr><td><input type="text" value="" name="select_values[]" /></td>' . "\n";
-                $listinput .= '<td><input type="radio" name="sel_default" value="0" ' . $sel . '/></td>';
-            $listinput .= '<td>' . $this->getRemoveRowIcon() . '</td>';
-            $listinput .= "</tr>\n";
+        $T = new \Template(PRF_PI_PATH . '/templates/admin/fields');
+        $T->set_file('template', 'select_values.thtml');
+        $def_val = $this->getOption('default');
+        $T->set_block('template', 'optionRow', 'opt');
+        foreach ($this->options['values'] as $valname) {
+            $T->set_var(array(
+                'value' => $valname,
+                'opt_sel' => $def_val == $valname,
+            ) );
+            $T->parse('opt', 'optionRow', true);
         }
+        $T->parse('output', 'template');
+        $listinput = $T->finish($T->get_var('output'));
         return array('list_input'=>$listinput);
     }
 
@@ -121,26 +123,19 @@ class select extends \Profile\Field
      */
     public function searchFormOpts()
     {
-        global $LANG_PROFILE;
-        $fld = '';
         $opts = $this->getOption('values', array());
+        $T = $this->_getTemplate('search', 'radio');
+        $T->set_block('template', 'optionRow', 'opt');
         foreach ($opts as $valname) {
-            $fld .= '<input type="checkbox" name="'.$this->name .
-                '[]" value="' . htmlentities($valname, ENT_QUOTES) .
-                '" />'.$valname.'&nbsp;';
+            $T->set_var(array(
+                'fld_name' => $this->name,
+                'opt_value' => htmlentities($valname, ENT_QUOTES),
+                'opt_name' => $valname,
+            ) );
+            $T->parse('opt', 'optionRow', true);
         }
-        return $fld;
-
-        /*$fld = '';
-        $opts = $this->getOption('values', array());
-        foreach ($opts as $valname) {
-            $fld .= '<input type="radio" name="'.$this->name .
-                    '" value="'.htmlentities($valname, ENT_QUOTES) .
-                    '" />'.$valname.'&nbsp;';
-        }
-        $fld .= '<input type="radio" name="'.$this->name .
-                '" value="-1" ' . PRF_CHECKED . '/>' . $LANG_PROFILE['any'];
-        return $fld;*/
+        $T->parse('output', 'template');
+        return $T->finish($T->get_var('output'));
     }
 
 

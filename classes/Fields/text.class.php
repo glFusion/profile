@@ -1,11 +1,11 @@
 <?php
 /**
- * Class to handle text fields in profiles
+ * Class to handle text fields in profiles.
  *
  * @author      Lee Garner <lee@leegarner.com>
  * @copyright   Copyright (c) 2018 Lee Garner <lee@leegarner.com>
  * @package     profile
- * @version     1.2.0
+ * @version     1.2.3
  * @since       1.2.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
@@ -31,12 +31,18 @@ class text extends \Profile\Field
         $size = $this->getOption('size');
         $maxlength = $this->getOption('maxlength');
         $maxlength = (int)$maxlength > 0 ? "maxlength=\"$maxlength\"" : '';
-        $fld = "<input $this->_frmClass name=\"{$this->name}\"
-                    id=\"{$this->name}\" $maxlength
-                    size=\"$size\"
-                    type=\"text\" value=\"{$this->value}\" $this->_frmReadonly>\n";
-
-        return $fld;
+        $T = $this->_getTemplate();
+        $T->set_var(array(
+            'classes' => $this->_frmClass,
+            'name' => $this->name,
+            'maxlen' => $maxlength,
+            'size' => $size,
+            'type' => 'text',
+            'value' => $this->value,
+            'readonly' => $this->readonly,
+        ) );
+        $T->parse('output', 'template');
+        return $T->finish($T->get_var('output'));
     }
 
 
@@ -65,5 +71,3 @@ class text extends \Profile\Field
     }
 
 }
-
-?>

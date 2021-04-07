@@ -3,9 +3,10 @@
  * Class to handle individual profile items.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2009-2020 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2021 Lee Garner <lee@leegarner.com>
  * @package     profile
- * @version     v1.2.0
+ * @version     v1.2.3
+ * @since       v1.1.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -244,7 +245,7 @@ class Field
         if ($this->required == 1 && !PRF_isManager()) {
             $classes[] = 'required error';
         }
-        $this->_frmClass = 'class="' . implode(' ', $classes) . '"';
+        $this->_frmClass = implode(' ', $classes);
 
         // If POSTed form data, set the user variable to that.  Otherwise,
         // set it to the default or leave it alone.
@@ -256,15 +257,15 @@ class Field
 
         // Check for read-only status on the field.  Admins can always
         // edit user values.
-        $this->_frmReadonly = '';
-        //$this->readonly = false;
+        $this->_frmReadonly = false;
+        $this->readonly = false;
         $this->hidden = false;
         if (
             $this->perm_owner < 3 &&
             !SEC_hasRights('profile.admin, profile.manage', 'OR')
         ) {
             $this->_frmReadonly = ' disabled="disabled" ';
-            //    $this->readonly = true;
+            $this->readonly = true;
             $this->hidden = $this->perm_owner < 2 ? true : false;
         }
     }
@@ -278,17 +279,25 @@ class Field
      */
     public function FormField()
     {
+        static $T = NULL;
+
         $this->_FormFieldInit();
 
         $size = $this->getOption('size', 40);
         $maxlength = $this->getOption('maxlength', 40);
         $maxlength = (int)$maxlength > 0 ? "maxlength=\"$maxlength\"" : '';
-        $fld = "<input $this->_frmClass name=\"{$this->name}\"
-                    id=\"{$this->name}\" $maxlength
-                    size=\"$size\"
-                    type=\"text\" value=\"{$this->value}\" $this->_frmReadonly>\n";
-
-        return $fld;
+        $T = $this->_getTemplate();
+        $T->set_var(array(
+            'classes' => $this->_frmClass,
+            'name' => $this->name,
+            'maxlen' => $maxlength,
+            'size' => $size,
+            'type' => 'text',
+            'value' => $this->value,
+            'readonly' => $this->readonly,
+        ) );
+        $T->parse('output', $this->type);
+        return $T->finish($T->get_var('output'));
     }
 
 
@@ -299,6 +308,7 @@ class Field
      */
     public function XOptions()
     {
+        return "DEPRECATED";
         return $this->options;
     }
 
@@ -739,8 +749,8 @@ class Field
             return '103';
         }
         // Values array may be affected by changes to definition, so clear both
-        Cache::clear();
         self::reOrder();
+        Cache::clear();
         return '';
     }
 
@@ -774,6 +784,7 @@ class Field
     {
         global $_TABLES;
 
+        $updated = false;
         $sql = "SELECT id, orderby
                 FROM {$_TABLES['profile_def']}
                 ORDER BY orderby ASC;";
@@ -789,8 +800,12 @@ class Field
                         SET orderby = '$order'
                         WHERE id = '" . (int)$A['id'] . "'";
                 DB_query($sql, 1);
+                $updated = true;
             }
             $order += $stepNumber;
+        }
+        if ($updated) {
+            Cache::clear();
         }
     }
 
@@ -824,7 +839,10 @@ class Field
      */
     public function searchFormOpts()
     {
-        return '<input type="text" size="50" name="'.$this->name.'" value="" />';
+        $T = $this->getTemplate('search');
+        $T->set_var('fld_name', $this->name);
+        $T->parse('output', 'template');
+        return $T->finish($T->get_var('output'));
     }
 
 
@@ -1047,6 +1065,28 @@ class Field
         return $this;
     }
 
-}   // class Field
 
-?>
+    /**
+     * Get the template to use for this field type.
+     * Templates are cached in an array, so it's important that the field's
+     * FormField() function sets or clears every variable.
+     *
+     * @param   string  $type   Type of template, either field or search
+     * @param   string  $vartype    Type of field, default = current type
+     * @return  object      Template object specific to the field type.
+     */
+    protected function _getTemplate($type='field', $vartype=NULL)
+    {
+        static $T = array();
+
+        if ($vartype === NULL) {
+            $vartype = $this->type;
+        }
+        if (!isset($T[$vartype])) {
+            $T[$vartype] = new \Template(PRF_PI_PATH . '/templates/' . $type);
+            $T[$vartype]->set_file('template', $vartype . '.thtml');
+        }
+        return $T[$vartype];
+    }
+
+}

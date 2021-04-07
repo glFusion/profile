@@ -63,15 +63,21 @@ class multicheck extends \Profile\Field
         $fld = '';
         if (!is_array($this->value)) $this->value = @unserialize($this->value);
         if (!is_array($this->value)) $this->value = array();
+        $T = $this->_getTemplate();
+        $T->set_block('template', 'optionRow', 'opt');
         foreach ($this->options['values'] as $id=>$value) {
-            $sel = in_array($value, $this->value) ? PRF_CHECKED : '';
-            $fld .= '<span style="white-space:nowrap">' .
-                    "<input {$this->_frmClass} type=\"checkbox\" " .
-                    "name=\"{$this->name}[$id]\" id=\"{$this->name}_$id\" " .
-                    "value=\"$value\" $sel {$this->_frmReadonly} />&nbsp;" .
-                    $value . '</span>' . LB;
+            $T->set_var(array(
+                'classes' => $this->_frmClass,
+                'name' => $this->name,
+                'id' => $id,
+                'value' => $value,
+                'opt_sel' => in_array($value, $this->value),
+                'readonly' => $this->readonly,
+            ) );
+            $T->parse('opt', 'optionRow', true);
         }
-        return $fld;
+        $T->parse('output', 'template');
+        return $T->finish($T->get_var('output'));
     }
 
 
@@ -118,30 +124,28 @@ class multicheck extends \Profile\Field
 
     /**
      * Create the form elements for editing the value selections.
+     * Usage: Administrator editing the field.
      *
      * @return  array   Array of name=>value pairs for Template::set_var()
      */
     public function editValues()
     {
+        $T = new \Template(PRF_PI_PATH . '/templates/admin/fields');
+        $T->set_file('template', 'multicheck_values.thtml');
+
         $multichk_input = '';
-        if (!empty($this->options['values'])) {
-            $defaults = $this->getOption('default', array());
-            if (!is_array($defaults)) $defaults = array();
-            foreach ($this->options['values'] as $key=>$valdata) {
-                $multichk_input .= '<tr><td><input type="text" value="' .
-                    $valdata. '" name="multichk_values[]" /></td>';
-                $sel = in_array($valdata, $defaults) ? PRF_CHECKED : '';
-                $multichk_input .= '<td><input type="checkbox" name="multichk_default[]" value="' .
-                    $valdata . '" ' . $sel  . '/></td>';
-                $multichk_input .= '<td>' . $this->getRemoveRowIcon() . '</td>';
-                $multichk_input .= "</tr>\n";
-            }
-        } else {
-            $multichk_input .= '<tr><td><input type="text" value="" name="multichk_values[]" /></td>';
-            $multichk_input .= '<td><input type="checkbox" name="multichk_default[]" value="" /></td>';
-            $multichk_input .= '<td>' . $this->getRemoveRowIcon() . '</td>';
-            $multichk_input .= "</tr>\n";
+        $defaults = $this->getOption('default', array());
+        if (!is_array($defaults)) $defaults = array();
+        $T->set_block('template', 'optionRow', 'opt');
+        foreach ($this->options['values'] as $key=>$valdata) {
+            $T->set_var(array(
+                'opt_sel' => in_array($valdata, $defaults),
+                'value' => $valdata,
+            ) );
+            $T->parse('opt', 'optionRow', true);
         }
+        $T->parse('output', 'template');
+        $multichk_input = $T->finish($T->get_var('output'));
         return array('multichk_input'=>$multichk_input);
     }
 
@@ -168,14 +172,20 @@ class multicheck extends \Profile\Field
     {
         global $LANG_PROFILE;
 
-        $fld = '';
         $opts = $this->getOption('values', array());
+        // Search options have multiple checkboxes for this field type
+        $T = $this->_getTemplate('search', 'multicheck');
+        $T->set_block('template', 'optionRow', 'opt');
         foreach ($opts as $valname) {
-            $fld .= '<input type="checkbox" name="'.$this->name .
-                '[]" value="' . htmlentities($valname, ENT_QUOTES) .
-                '" />'.$valname.'&nbsp;';
+            $T->set_var(array(
+                'fld_name' => $this->name,
+                'opt_value' => htmlentities($valname, ENT_QUOTES),
+                'opt_name' => $valname,
+            ) );
+            $T->parse('opt', 'optionRow', true);
         }
-        return $fld;
+        $T->parse('output', 'template');
+        return $T->finish($T->get_var('output'));
     }
 
 

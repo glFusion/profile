@@ -61,18 +61,20 @@ class checkbox extends \Profile\Field
         $this->_FormFieldInit();
 
         if (is_null($this->value)) {
-            $chk = $this->getOption('default', 0) == 1 ? PRF_CHECKED : '';
-        } elseif ($this->value == 1) {
-            $chk = PRF_CHECKED;
+            $chk = ($this->getOption('default', 0) == 1);
         } else {
-            $chk = '';
+            $chk = $this->value == 1;
         }
-
-        $fld = "<input {$this->_frmClass} name=\"{$this->name}\"
-                    id=\"{$this->name}\"
-                    type=\"checkbox\" value=\"1\" $chk
-                    {$this->_frmReadonly}>\n";
-        return $fld;
+        $T = $this->_getTemplate();
+        $T->set_var(array(
+            'classes' => $this->_frmClass,
+            'name' => $this->name,
+            'id' => $this->name,
+            'checked' => $chk,
+            'readonly' => $this->_frmReadonly,
+        ) );
+        $T->parse('output', 'template');
+        return $T->finish($T->get_var('output'));
     }
 
 
@@ -92,15 +94,16 @@ class checkbox extends \Profile\Field
     /**
      * Special handling for "required" setting for checkboxes.
      */
-    protected function _FormFieldInit()
+    protected function X_FormFieldInit()
     {
+        return "DEPRECATED";
         parent::_FormFieldInit();
         $this->_frmClass = '';
     }
 
 
     /**
-     * Create the form elements for editing the value selections
+     * Create the form elements for editing the value selections.
      *
      * @return  array   Array of name=>value pairs for Template::set_var()
      */
@@ -157,10 +160,18 @@ class checkbox extends \Profile\Field
     {
         global $LANG_PROFILE;
 
-        return '<input type="radio" name="'. $this->name.'" value="1">' .
-                $LANG_PROFILE['checked'] . '&nbsp;' .
-                '<input type="radio" name="'. $this->name.'" value="0" />' .
-                $LANG_PROFILE['unchecked'];
+        $T = $this->_getTemplate('search', 'radio');
+        $T->set_block('template', 'optionRow', 'opt');
+        foreach (array($LANG_PROFILE['unchecked'], $LANG_PROFILE['checked']) as $val=>$dscp) {
+            $T->set_var(array(
+                'fld_name' => $this->name,
+                'opt_value' => $val,
+                'opt_name' => $dscp,
+            ) );
+            $T->parse('opt', 'optionRow', true);
+        }
+        $T->parse('output', 'template');
+        return $T->finish($T->get_var('output'));
     }
 
 

@@ -23,25 +23,42 @@ class account extends \Profile\Field
     /**
      * Create the data entry field
      *
-     * @uses    AccountSelection();
      * @return  string  HTML for selection dropdown.  Includes <select> tags.
      */
     public function FormField()
     {
-        global $LANG_PROFILE;
+        global $LANG_PROFILE, $_TABLES;
 
         $this->_FormFieldInit();
+        // Borrow the "select" field type template
+        $T = $this->_getTemplate('field', 'select');
+        $T->set_var(array(
+            'classes' => $this->_frmClass,
+            'name' => $this->name,
+            'readonly' => $this->readonly,
+        ) );
+        $T->set_block('template', 'optionRow', 'opt');
+        $T->set_var(array(
+            'opt_value' => 0,
+            'opt_name' => '-- ' . $LANG_PROFILE['none'] . ' --',
+            'opt_sel' => 0 == $this->value,
+        ) );
+        $T->parse('opt', 'optionRow', true);
 
-        $fld = "<select $this->_frmClass name=\"{$this->name}\"
-                    id=\"{$this->name}\" $this->_frmReadonly>\n";
-        $fld .= $this->AccountSelection($this->value);
-        //$fld .= "<option value=\"0\">--{$LANG_PROFILE['select']}--</option>\n";
-        /*foreach ($this->options['values'] as $id=>$value) {
-            $sel = $this->value == $value ? 'selected="selected"' : '';
-            $fld .= "<option value=\"$value\" $sel>$value</option>\n";
-        }*/
-        $fld .= "</select>\n";
-        return $fld;
+        $sql = "SELECT uid, username, fullname
+                FROM {$_TABLES['users']}
+                ORDER BY username ASC";
+        $res = DB_query($sql);
+        while ($A = DB_fetchArray($res, false)) {
+            $T->set_var(array(
+                'opt_value' => $A['uid'],
+                'opt_name' => $A['username'] . ' - ' . $A['fullname'],
+                'opt_sel' => $A['uid'] == $this->value,
+            ) );
+            $T->parse('opt', 'optionRow', true);
+        }
+        $T->parse('output', 'template');
+        return $T->finish($T->get_var('output'));
     }
 
 
@@ -51,9 +68,10 @@ class account extends \Profile\Field
      * @param   integer $selected   Currently-selected value
      * @return  string              HTML for selection options
      */
-    public function AccountSelection($selected = 0)
+    public function XAccountSelection($selected = 0)
     {
         global $_TABLES;
+        return "DEPRECATED";
 
         $sel = 0 == $selected ? PRF_SELECTED : '';
         $retval = '<option value="0" ' . $sel . '>--None--</option>' . LB;

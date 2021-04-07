@@ -1,0 +1,5 @@
+{# begin {templatelocation} #}
+<textarea style="width:90%;" class="uk-textarea {classes}" name="{name}"
+	rows="{rows}" cols="{cols}"
+	id="{name}"	{!if readonly}disabled="disabled"{!endif}>{value}</textarea>
+{# end {templatelocation} #}

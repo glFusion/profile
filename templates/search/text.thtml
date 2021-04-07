@@ -1,0 +1,5 @@
+{# begin {templatelocation} #}
+<!-- BEGIN optionRow -->
+<input type="text" size="50" name="{fld_name}" value="" />
+<!-- END optionRow -->
+{# end {templatelocation} #}

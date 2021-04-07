@@ -1,0 +1,5 @@
+{# begin {templatelocation} #}
+<!-- BEGIN optionRow -->
+<span style="white-space:nowrap"><input class="uk-checkbox {classes}" type="checkbox" name="{name}[{id}]" id="{name}_{id}" value="{value}" {!if opt_sel}selected="selected"{!endif} {!if readonly}disabled="disabled"{!endif} />&nbsp;{value}</span>
+<!-- END optionRow -->
+{# end {templatelocation} #}

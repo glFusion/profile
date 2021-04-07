@@ -1,0 +1,36 @@
+{# begin {templatelocation} #}
+{!if fmt_dmy}
+<select id="{name}_day" name="{name}_day" {!if readonly}disabled="disabled"{!endif}>
+	<option value="0">--{$LANG_PROFILE['day']}--</option>
+	{day_options}
+</select>
+<select id="{name}_month" name="{name}_month" {!if readonly}disabled="disabled"{!endif}>
+    <option value="0">--{$LANG_PROFILE['month']}--</option>
+	{month_options}
+</select>
+{!else}
+<select id="{name}_month" name="{name}_month" {!if readonly}disabled="disabled"{!endif}>
+    <option value="0">--{$LANG_PROFILE['month']}--</option>
+	{month_options}
+</select>
+<select id="{name}_day" name="{name}_day" {!if readonly}disabled="disabled"{!endif}>
+	<option value="0">--{$LANG_PROFILE['day']}--</option>
+	{day_options}
+</select>
+{!endif}
+{$LANG_PROFILE['year']}: <input type="text" id="{name}_year" name="{name}_year" size="5" value="{year_value}" {!if readonly}disabled="disabled"{!endif} />
+{!if have_time}
+&nbsp;&nbsp;<select id="{name}_hour" name="{name}_hour" {!if readonly}disabled="disabled"{!endif}>
+	{hour_options}
+</select>
+<select id="{name}_minute" name="{name}_minute {!if readonly}disabled="disabled}{!endif}>
+	{minute_options}
+</select>
+{!if ampm}
+&nbsp;&nbsp;<select id="{name}" name="{name}">
+	<option value="0" {ampm_sel_0}>am</option>
+	<option value="1" {ampm_sel_1}>pm</option>
+</select>
+{!endif}
+{!endif}
+{# end {templatelocation} #}

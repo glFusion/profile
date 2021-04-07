@@ -93,18 +93,18 @@ class date extends \Profile\Field
         global $LANG_PROFILE, $_CONF, $_PRF_CONF;
 
         $this->_FormFieldInit();
+        $T = $this->_getTemplate();
 
         $timeformat = $this->getOption('timeformat');
+        if (strpos($this->value, ' ')) {
+            list($date, $time) = explode(' ', $this->value);
+        } else {
+            $date = $this->value;
+            $time = NULL;
+        }
         if ($timeformat && $incl_time) {
-            $iFormat = '%Y-%m-%d %H:%M';
-            if (strpos($this->value, ' ')) {
-                list($date, $time) = explode(' ', $this->value);
-            } else {
-                $date = $this->value;
-                $time = NULL;
-            }
+            //$iFormat = '%Y-%m-%d %H:%M';
             if ($time == NULL) $time = '00:00:00';
-            $dt = explode('-', $date);
             $tm = explode(':', $time);
             if (isset($_POST)) {
                 if (isset($_POST[$this->name . '_hour']))
@@ -115,32 +115,27 @@ class date extends \Profile\Field
 
             if ($this->options['timeformat'] == '12') {
                 list($hour, $ampm_sel) = $this->hour24to12($tm[0]);
-                $ampm_fld = '&nbsp;&nbsp;' .
-                    self::ampmSelection($this->name . '_ampm', $ampm_sel);
+                $T->set_var(array(
+                    'ampm' => true,
+                    'ampm_sel_0' => $ampm_sel == 'am',
+                    'ampm_sel_1' => $ampm_sel == 'pm',
+                ) );
+                //$ampm_fld = self::ampmSelection($this->name . '_ampm', $ampm_sel);
             } else {
-                $ampm_fld = '';
+                $T->set_var('ampm', false);
+                //$ampm_fld = '';
                 $hour = $tm[0];
             }
-
-            $hr_fld = '<select id="' . $this->name . '_hour" ' .
-                    'name="' . $this->name . '_hour" ' .
-                    $this->_frmReadOnly . '>' . LB .
-                COM_getHourFormOptions($hour, $this->options['timeformat']) .
-                '</select>' . LB;
-            $min_fld = '<select id="' . $this->name . '_minute" ' .
-                    'name="' . $this->name . '_minute" ' .
-                    $this->_frmReadOnly . '>' . LB .
-                COM_getMinuteFormOptions($tm[1]) .
-                '</select>' . LB;
+            $T->set_var(array(
+                'have_time' => true,
+                'hour_options' => COM_getHourFormOptions($hour, $this->options['timeformat']),
+                'minute_options' => COM_getMinuteFormOptions($tm[1]),
+            ) );
         } else {
-            $iFormat = '%Y-%m-%d';
-            $dt = explode('-', $this->value);
-            $tm = NULL;
-            $hr_fld = '';
-            $min_fld = '';
-            $ampm_fld = '';
+            $T->set_var('have_time', false);
         }
 
+        $dt = explode('-', $date);
         if (isset($_POST)) {
             // Get the values from $_POST, if set.
             if (isset($_POST[$this->name . '_month']))
@@ -151,63 +146,19 @@ class date extends \Profile\Field
                 $dt[0] = $_POST[$this->name . '_year'];
         }
 
-        $m_fld = "<select id=\"{$this->name}_month\" name=\"{$this->name}_month\" {$this->_frmReadonly}>\n";
-        $m_fld .= "<option value=\"0\">--{$LANG_PROFILE['month']}--</option>\n";
-        $sel = isset($dt[1]) ? (int)$dt[1] : '';
-        $m_fld .= COM_getMonthFormOptions($sel) . "</select>\n";
-
-        $d_fld = "<select id=\"{$this->name}_day\" name=\"{$this->name}_day\" {$this->_frmReadonly}>\n";
-        $d_fld .= "<option value=\"0\">--{$LANG_PROFILE['day']}--</option>\n";
-        $sel = isset($dt[2]) ? (int)$dt[2] : '';
-        $d_fld .= COM_getDayFormOptions($sel) . "</select>\n";
-
-        $y_fld = $LANG_PROFILE['year'] .
-            ': <input type="text" id="' . $this->name . '_year" name="' .
-            $this->name . '_year" size="5" value="' . $dt[0] . '" ' .
-            $this->_frmReadonly . '/>' . LB;
-
-        // Hidden field to hold the date in its native format
-        // Required for the date picker
-        $datepick = '<input type="hidden" name="f_' . $this->name .
-                '" id="f_' . $this->name . '" value="' . $this->value .
-                '"/>' . LB;
-
-        if (!$this->readonly) {
-            // If not a readonly field, add the date picker image & js
-            $datepick .= '<i class="uk-icon uk-icon--calendar tooltip" title="' .
-                    $LANG_PROFILE['select_date'] . '" id="' .
-                    $this->name . '_trigger"></i>';
-            $timeformat = $this->getOption('timeformat', 0);
-            if ($timeformat && $incl_time) {
-                $showtime = 'true';
-            } else {
-                $showtime = 'false';
-                $timeformat = 0;
-            }
-            $datepick .= LB . "<script type=\"text/javascript\">
-Calendar.setup({
-inputField :   \"f_{$this->name}\",
-ifFormat   :   \"$iFormat\",
-showsTime  :    $showtime,
-timeFormat :    \"{$timeformat}\",
-button     :   \"{$this->name}_trigger\",
-onUpdate   :   {$this->name}_onUpdate
-});
-function {$this->name}_onUpdate(cal)
-{
-    var d = cal.date;
-
-    if (cal.dateClicked && d) {
-        PRF_updateDate(d, \"{$this->name}\", \"$timeformat\");
-    }
-    return true;
-}
-</script>" . LB;
-
-        }
+        $m_sel = isset($dt[1]) ? (int)$dt[1] : '';
+        $d_sel = isset($dt[2]) ? (int)$dt[2] : '';
+        $T->set_var(array(
+            'name' => $this->name,
+            'readonly' => $this->readonly,
+            'month_options' => COM_getMonthFormOptions($m_sel),
+            'day_options' => COM_getDayFormOptions($d_sel),
+            'year_value' => $dt[0],
+            'fmt_dmy' => $this->options['input_format'] == 2,
+        ) );
 
         // Place the date components according to m/d/y or d/m/y format
-        if (!isset($this->options['input_format'])) {
+        /*if (!isset($this->options['input_format'])) {
             $this->options['input_format'] = 0;
         }
         switch ($this->options['input_format']) {
@@ -222,7 +173,10 @@ function {$this->name}_onUpdate(cal)
 
         if ($timeformat && $incl_time) {
             $fld .= '&nbsp;&nbsp;' . $hr_fld . ':' . $min_fld . $ampm_fld;
-        }
+        }*/
+        $T->parse('output', 'template');
+        $fld = $T->finish($T->get_var('output'));
+        return $fld;
 
         $fld .= $datepick;
         return $fld;
@@ -310,8 +264,9 @@ function {$this->name}_onUpdate(cal)
      * @param   string  $selected   Which option is selected, am or pm?
      * @return  string      HTML for selection
      */
-    private function ampmSelection($name, $selected)
+    private function XampmSelection($name, $selected)
     {
+        return "DEPRECATED";
         global $_CONF;
 
         if (isset($_CONF['hour_mode'] ) && ( $_CONF['hour_mode'] == 24 )) {
@@ -460,15 +415,11 @@ function {$this->name}_onUpdate(cal)
      */
     public function searchFormOpts()
     {
-        $fld = '';
-        $fld .= '<input type="radio" name="'.$this->name.'_mod" value="=">=&nbsp;&nbsp;';
-        $fld .= '<input type="radio" name="'.$this->name.'_mod" value="<"><&nbsp;&nbsp;';
-        $fld .= '<input type="radio" name="'.$this->name.'_mod" value="<="><=&nbsp;&nbsp;';
-        $fld .= '<input type="radio" name="'.$this->name.'_mod" value=">">>&nbsp;&nbsp;';
-        $fld .= '<input type="radio" name="'.$this->name.'_mod" value=">=">>=&nbsp;&nbsp;';
-        $fld .= '<input type="radio" name="'.$this->name.'_mod" value="<>"><>&nbsp;';
-        $fld .= $this->FormField(false);
-        return $fld;
+        $T = $this->_getTemplate('search');
+        $T->set_var('fld_name', $this->name);
+        $T->set_var('formfield', $this->FormField(false));
+        $T->parse('output', 'template');
+        return $T->finish($T->get_var('output'));
     }
 
 

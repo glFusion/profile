@@ -1,0 +1,13 @@
+{# begin {templatelocation} #}
+<!-- BEGIN optionRow -->
+<tr>
+	<td><input type="text" value="{value}" name="multichk_values[]" /></td>
+    <td><input type="checkbox" name="multichk_default[]" value="{value}" {!if opt_sel}checked="checked" {!endif}/></td>
+	<td>
+		<i class="uk-icon uk-icon-remove uk-text-danger" data-uk-tooltip title="Remove Row"
+        onclick="javascript:return removeRow(this);"></i>
+	</td>
+</td>
+</tr>
+<!-- END optionRow -->
+{# end {templatelocation} #}
