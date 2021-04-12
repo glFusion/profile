@@ -417,7 +417,7 @@ class date extends \Profile\Field
     {
         $T = $this->_getTemplate('search');
         $T->set_var('fld_name', $this->name);
-        $T->set_var('formfield', $this->FormField(false));
+        $T->set_var('form_field', $this->FormField(false));
         $T->parse('output', 'template');
         return $T->finish($T->get_var('output'));
     }

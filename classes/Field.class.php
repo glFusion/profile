@@ -834,15 +834,13 @@ class Field
 
     /**
      * Get field-specific options for the user search form.
+     * Each field must specify its own form fields, if used.
      *
      * @return  string      HTML input options
      */
     public function searchFormOpts()
     {
-        $T = $this->getTemplate('search');
-        $T->set_var('fld_name', $this->name);
-        $T->parse('output', 'template');
-        return $T->finish($T->get_var('output'));
+        return '';
     }
 
 
@@ -1068,8 +1066,8 @@ class Field
 
     /**
      * Get the template to use for this field type.
-     * Templates are cached in an array, so it's important that the field's
-     * FormField() function sets or clears every variable.
+     * Looks in either `field` or `search` directory and sets the
+     * file as `template`.
      *
      * @param   string  $type   Type of template, either field or search
      * @param   string  $vartype    Type of field, default = current type
@@ -1077,16 +1075,12 @@ class Field
      */
     protected function _getTemplate($type='field', $vartype=NULL)
     {
-        static $T = array();
-
         if ($vartype === NULL) {
             $vartype = $this->type;
         }
-        if (!isset($T[$vartype])) {
-            $T[$vartype] = new \Template(PRF_PI_PATH . '/templates/' . $type);
-            $T[$vartype]->set_file('template', $vartype . '.thtml');
-        }
-        return $T[$vartype];
+        $T = new \Template(PRF_PI_PATH . '/templates/' . $type);
+        $T->set_file('template', $vartype . '.thtml');
+        return $T;
     }
 
 }
