@@ -3,9 +3,9 @@
  * Class to handle dropdown profile items.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2018-2020 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2018-2021 Lee Garner <lee@leegarner.com>
  * @package     profile
- * @version     1.2.0
+ * @version     1.2.3
  * @since       1.2.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
@@ -124,7 +124,7 @@ class select extends \Profile\Field
     public function searchFormOpts()
     {
         $opts = $this->getOption('values', array());
-        $T = $this->_getTemplate('search', 'radio');
+        $T = $this->_getTemplate('search', 'checkbox');
         $T->set_block('template', 'optionRow', 'opt');
         foreach ($opts as $valname) {
             $T->set_var(array(

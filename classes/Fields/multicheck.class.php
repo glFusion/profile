@@ -174,7 +174,7 @@ class multicheck extends \Profile\Field
 
         $opts = $this->getOption('values', array());
         // Search options have multiple checkboxes for this field type
-        $T = $this->_getTemplate('search', 'multicheck');
+        $T = $this->_getTemplate('search', 'checkbox');
         $T->set_block('template', 'optionRow', 'opt');
         foreach ($opts as $valname) {
             $T->set_var(array(
