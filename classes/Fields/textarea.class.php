@@ -106,4 +106,18 @@ class textarea extends \Profile\Field
         return $this;
     }
 
+
+    /**
+     * Get field-specific options for the user search form.
+     *
+     * @return  string      HTML input options
+     */
+    public function searchFormOpts()
+    {
+        $T = $this->_getTemplate('search', 'text');
+        $T->set_var('fld_name', $this->name);
+        $T->parse('output', 'template');
+        return $T->finish($T->get_var('output'));
+    }
+
 }
