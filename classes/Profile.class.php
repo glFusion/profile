@@ -79,7 +79,7 @@ class Profile
         global $_TABLES;
 
         // Get the field definitions, reading from the DB if not already done
-        $key = 'proflle_defs_enabled';
+        $key = 'profile_defs_enabled';
         $defs = Cache::get($key);
         if ($defs === NULL) {
             $defs = array();
@@ -323,7 +323,6 @@ class Profile
         $validation_errs = count($errors);
         foreach ($this->fields as $name=>$Fld) {
             if (isset($errors[$name])) {
-                LGLIB_storeMessage($errors[$name], '', true);
                 $_POST['prf_errors'][$name] = 'true';
                 continue;
             }
@@ -361,9 +360,9 @@ class Profile
             COM_errorLog("$validation_errs errors saving the profile for user {$this->uid}");
             if (PRF_isManager()) {
                 // Save but show message for managers
-                LGLIB_storeMessage('Validation Errors overriden by Manager', '', true);
-                $msg .= ' (Manager Override)';
+                COM_setMsg('Validation Errors overriden by Manager');
             } else {
+                COM_setMsg('<ul><li>' . implode('</li><li>', $errors) . '</li></ul>');
                 // Abort for regular users
                 return false;
             }
