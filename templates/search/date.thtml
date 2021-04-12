@@ -1,9 +1,9 @@
 {# begin {templatelocation} #}
-<input type="radio" name="{fld_name}_mod" value="=">=&nbsp;&nbsp;';
-<input type="radio" name="{fld_name}_mod" value="<"><&nbsp;&nbsp;';
-<input type="radio" name="{fld_name}_mod" value="<="><=&nbsp;&nbsp;';
-<input type="radio" name="{fld_name}_mod" value=">">>&nbsp;&nbsp;';
-<input type="radio" name="{fld_name}_mod" value=">=">>=&nbsp;&nbsp;';
-<input type="radio" name="{fld_name}_mod" value="<>"><>&nbsp;';
+<input type="radio" name="{fld_name}_mod" value="=">=&nbsp;&nbsp;
+<input type="radio" name="{fld_name}_mod" value="<"><&nbsp;&nbsp;
+<input type="radio" name="{fld_name}_mod" value="<="><=&nbsp;&nbsp;
+<input type="radio" name="{fld_name}_mod" value=">">>&nbsp;&nbsp;
+<input type="radio" name="{fld_name}_mod" value=">=">>=&nbsp;&nbsp;
+<input type="radio" name="{fld_name}_mod" value="<>"><>&nbsp;
 {form_field}
 {# end {templatelocation} #}
