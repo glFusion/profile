@@ -833,22 +833,29 @@ class UserList
 
         // Add fields from the main users table
         $avail_fields = array(
-            'username'  => array('title' => $LANG_PROFILE['username'],
-                        'field' => 'username',
-                        'dbfield' => $_TABLES['users'] . '.username',
-                            'perm' => 2),
-            'fullname'  => array('title' => $LANG_PROFILE['fullname'],
-                        'field' => 'fullname',
-                        'dbfield' => $_TABLES['users'] . '.fullname',
-                            'perm' => 2),
-            'email'     => array('title' => $LANG_PROFILE['email_addr'],
-                        'field' => 'email',
-                        'dbfield' => $_TABLES['users'] . '.email',
-                            'perm' => 2),
+            'username'  => array(
+                'title' => $LANG_PROFILE['username'],
+                'field' => 'username',
+                'dbfield' => $_TABLES['users'] . '.username',
+                'perm' => 2,
+            ),
+            'fullname'  => array(
+                'title' => $LANG_PROFILE['fullname'],
+                'field' => 'fullname',
+                'dbfield' => $_TABLES['users'] . '.fullname',
+                'perm' => 2,
+            ),
+            'email'     => array(
+                'title' => $LANG_PROFILE['email_addr'],
+                'field' => 'email',
+                'dbfield' => $_TABLES['users'] . '.email',
+                'perm' => 2,
+            ),
             'avatar'    => array('title' => $LANG_PROFILE['avatar'],
-                        'dbfield' => $_TABLES['users'] . '.photo',
-                        'field' => 'avatar',
-                        'perm' => 2),
+                'dbfield' => $_TABLES['users'] . '.photo',
+                'field' => 'avatar',
+                'perm' => 2,
+            ),
         );
 
         $sql = "SELECT name, prompt, perm_members+perm_anon as perm
@@ -868,8 +875,13 @@ class UserList
         $pi_tmp = array();      // output from LGLIB_invokeService()
         $svc_msg = '';          // service message from LGLIB_invokeService()
          foreach ($_PLUGINS as $pi_name) {
-            $status = LGLIB_invokeService($pi_name, 'profilefields', $args,
-                        $pi_tmp, $svc_msg);
+            $status = LGLIB_invokeService(
+                 $pi_name,
+                 'profilefields',
+                 $args,
+                 $pi_tmp,
+                 $svc_msg
+            );
             if ($status == PLG_RET_OK &&
                     isset($pi_tmp['names']) &&
                     is_array($pi_tmp['names'])) {
@@ -888,7 +900,6 @@ class UserList
         $T->set_block('editform', 'FieldRow', 'fRow');
         $i = 0;
         if (is_array($this->fields)) {
-
             // Show the currently-selected fields at the top of the list
             foreach ($this->fields as $key=>$field) {
                 if ($field['field'] == 'fullname') {
@@ -902,6 +913,9 @@ class UserList
                             $LANG_PROFILE['name_format' . $i] . '</option>' . LB;
                     }
                     $fld_opt .= '</select>' . LB;
+                } elseif (!array_key_exists($field['field'], $avail_fields)) {
+                    // Avoid errors if a plugin that's part of this list was removed.
+                    continue;
                 } else {
                     $fld_opt = '';
                 }
@@ -1129,9 +1143,12 @@ class UserList
         while (count($to_check) > 0) {
             $thisgroup = array_pop($to_check);
             if ($thisgroup > 0) {
-                $result = DB_query("SELECT ug_grp_id
-                        FROM {$_TABLES['group_assignments']}
-                        WHERE ug_main_grp_id = $thisgroup", 1);
+                $result = DB_query(
+                    "SELECT ug_grp_id
+                    FROM {$_TABLES['group_assignments']}
+                    WHERE ug_main_grp_id = $thisgroup",
+                    1
+                );
                 while ($A = DB_fetchArray($result, false)) {
                     // Don't include the Root group unless it was requested
                     if ($A['ug_grp_id'] == 1 && $group_id > 1) continue;
