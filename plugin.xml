@@ -2,7 +2,7 @@
     <id>profile</id>
     <name>Extended Profiles</name>
     <description>Provides the ability to add and modify extended profile fields from within glFusion</description>
-    <version>1.2.3.1</version>
+    <version>1.2.4</version>
     <glfusionversion>1.7.8</glfusionversion>
     <phpversion>7.2.0</phpversion>
     <url>http://www.leegarner.com</url>
