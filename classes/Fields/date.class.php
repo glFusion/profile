@@ -64,20 +64,19 @@ class date extends \Profile\Field
             break;
         }
 
-        $format = $this->getOption('timeformat', '24') == '12' ? '%I:%M %p' : '%H:%M';
-        $formatted .= ' ' . strftime($format, mktime($hour, $minute, $second));
-        /*if ($this->options['showtime'] == 1) {
-            if ($_CONF['hour_mode'] == 12) {
-                //$format = ' %I:%M:%S %p';
-                $format = ' %I:%M %p';
-            } else {
-                //$format = ' %H:%M:%S';
-                $format = ' %H:%S';
+        $t_format = $this->getOption('timeformat', '24');
+        if (!empty($t_format)) {
+            switch ($t_format) {
+            case '12':
+                $timeformat = '%I:%M %p';
+                break;
+            case '24':
+            default:
+                $timeformat = '%H:%M';
+                break;
             }
-            $ts = mktime($hour, $minute, $second);
-            $formatted .= strftime($format, $ts);
-        }*/
-
+            $formatted .= ' ' . strftime($timeformat, mktime($hour, $minute, $second));
+        }
         return $formatted;
     }
 
@@ -401,7 +400,7 @@ class date extends \Profile\Field
             $year = (int)$vals[$name . '_year'];
             $month = (int)$vals[$name . '_month'];
             $day = (int)$vals[$name . '_day'];
-            $date = sprintf('%04d-%02d-%02d ', $year, $month, $day);
+            $date = sprintf('%04d-%02d-%02d', $year, $month, $day);
         }
         $newval = $date . ' ' . $time;
         return $newval;
