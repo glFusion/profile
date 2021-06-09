@@ -1,0 +1,8 @@
+<h1>{title}</h1>
+<table style="border:0;">
+<!-- BEGIN Fields -->
+	<tr>
+		<td>{fld_name}</td><td>{fld_val}</td>
+	</tr>
+<!-- END Fields -->
+</table>

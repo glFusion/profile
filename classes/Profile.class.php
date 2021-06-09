@@ -5,7 +5,7 @@
  * @author      Lee Garner <lee@leegarner.com>
  * @copyright   Copyright (c) 2018-2021 Lee Garner <lee@leegarner.com>
  * @package     profile
- * @version     v1.2.2
+ * @version     v1.2.5
  * @since       v1.2.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
@@ -22,11 +22,16 @@ class Profile
 {
     /** Profile fields, an array of objects.
      * @var array */
-    private $fields = array();
+    private $Fields = array();
 
     /** User ID.
      * @var integer */
     private $uid = 0;
+
+    /** Flag to indicate this user has an existing profile.
+     * @var boolean */
+    private $_exists = false;
+
 
     /**
      * Constructor.
@@ -95,7 +100,7 @@ class Profile
 
         // Now instantiate the field objects to get the field classes loaded.
         foreach ($defs as $name=>$data) {
-            $this->fields[$name] = Field::getInstance($data);
+            $this->Fields[$name] = Field::getInstance($data);
         }
 
         // Now read the values for the current user.
@@ -107,9 +112,10 @@ class Profile
             $res = DB_query($sql);
             $A = DB_fetchArray($res, false);
             if (!empty($A)) {
+                $this->_exists = true;
                 foreach ($A as $name=>$value) {
-                    if (isset($this->fields[$name])) {
-                        $this->fields[$name]->setValue($value);
+                    if (isset($this->Fields[$name])) {
+                        $this->Fields[$name]->setValue($value);
                     }
                 }
             }
@@ -125,7 +131,7 @@ class Profile
      */
     public function getFields()
     {
-        return $this->fields;
+        return $this->Fields;
     }
 
 
@@ -137,7 +143,7 @@ class Profile
      */
     public function hasField($name)
     {
-        return array_key_exists($name, $this->fields);
+        return array_key_exists($name, $this->Fields);
     }
 
 
@@ -150,7 +156,7 @@ class Profile
     public function getField($name)
     {
         if ($this->hasField($name)) {
-            return $this->fields[$name];
+            return $this->Fields[$name];
         } else {
             return NULL;
         }
@@ -200,7 +206,7 @@ class Profile
         // Flag to make sure calendar javascript is added only once.  It's
         // only added if there's at least one calendar field.
         $T->set_block('editform', 'QueueRow', 'qrow');
-        foreach ($this->fields as $fldname=>$Fld) {
+        foreach ($this->Fields as $fldname=>$Fld) {
             // If the field is not required and is not to appear on the signup
             // form, then skip it.  If it is a registration field, override
             // the owner permission to make sure the user can edit it.
@@ -273,7 +279,7 @@ class Profile
         global $LANG_PROFILE;
 
         $errors = array();
-        foreach ($this->fields as $name=>$Fld) {
+        foreach ($this->Fields as $name=>$Fld) {
             // Now make changes based on the type of data and applicable options.
             // Managers can override normal validations.
             if (!$Fld->validData($vals)) {
@@ -298,7 +304,12 @@ class Profile
      */
     public function Save($vals, $type = 'edit')
     {
-        global $_TABLES, $_USER, $LANG_PROFILE;
+        global $_TABLES, $_USER, $LANG_PROFILE, $_PRF_CONF;
+
+        $changed = false;           // assume no changes
+        $notify_changes = true;     // assume notification is to be sent
+        // Save the current profile to determine if changes were made.
+        $OldProfile = new self($this->uid);
 
         if (!is_array($vals)) {
             // Return error if values aren't provided
@@ -310,10 +321,17 @@ class Profile
         }
         $isAdmin = plugin_ismoderator_profile();
         if ($type != 'registration') {
-            if ($this->uid != $_USER['uid'] && !PRF_isManager()) {
-                COM_errorLog("Non admin user attempting to change another's profile");
-                return false;
+            if ($this->uid != $_USER['uid']) {
+               if (!PRF_isManager()) {
+                    COM_errorLog($LANG_PROFILE['non_admin_msg']);
+                    return false;
+                } else {
+                    $notify_changes = false;    // don't notify on admin action
+                }
             }
+        } elseif (!(1 & $_PRF_CONF['notify_change'])) {
+            // Do not notify for initial registration
+            $notify_changes = false;
         }
 
         $fld_sql = array();
@@ -321,7 +339,7 @@ class Profile
         $_POST['prf_errors'] = array();
         $errors = $this->Validate($vals);
         $validation_errs = count($errors);
-        foreach ($this->fields as $name=>$Fld) {
+        foreach ($this->Fields as $name=>$Fld) {
             if (isset($errors[$name])) {
                 $_POST['prf_errors'][$name] = 'true';
                 continue;
@@ -350,9 +368,13 @@ class Profile
             ) {
                 // Perform field-specific sanitization and add to array of sql
                 $newval = $Fld->Sanitize($newval);
+                if ($newval != $Fld->getValue()) {
+                    // Note that at least one value changed.
+                    $changed = true;
+                }
                 $fld_sql[$Fld->getName()] = $Fld->getName() . "='" . DB_escapeString($newval) . "'";
             }
-       }
+        }
 
         // If any validation errors found, return now for regular users
         // For managers, allow the data to be saved anyway but show the message.
@@ -387,13 +409,13 @@ class Profile
             $fld_sql['sys_lname'] = "sys_lname = '$lname'";
         } elseif (
             (
-                isset($this->fields['sys_fname']) &&
-                $fname != $this->fields['sys_fname']->getValue()
+                isset($this->Fields['sys_fname']) &&
+                $fname != $this->Fields['sys_fname']->getValue()
             )
             ||
             (
-                isset($this->fields['sys_lname']) &&
-                $lname != $this->fields['sys_lname']->getValue()
+                isset($this->Fields['sys_lname']) &&
+                $lname != $this->Fields['sys_lname']->getValue()
             )
         ) {
             // The first or last name was changed by the submitter, so
@@ -415,7 +437,19 @@ class Profile
                 COM_errorLog("Profile::Save() - error executing sql: $sql");
                 return false;
             } else {
+                COM_errorLog("notify_changes: " . $notify_changes);
                 Cache::delete('profile_user_' . $this->uid);
+                if (
+                    $changed &&
+                    $notify_changes &&
+                    (
+                        ($this->_exists && (2 & $_PRF_CONF['notify_change'])) ||
+                        (!$this->_exists && (1 & $_PRF_CONF['notify_change']))
+                    )
+                ) {
+                    $N = new Notifier($this->uid);
+                    $N->send();
+                }
             }
         }
         return true;

@@ -1,6 +1,12 @@
 # Custom Profile Plugin - Change Log
 
-## Version 1.2.3.1
+## Version 1.2.5
+Release TBD
+- Move field rendering to templates
+- Enable user confirmation emails when profile is changed
+- Hide time display if timeformat is "none"
+
+## Version 1.2.4
 Release 2021-04-07
 - Fix checkbox field validation.
 

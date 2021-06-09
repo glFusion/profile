@@ -143,6 +143,7 @@ $LANG_PROFILE = array(
 'click_to_change' => 'Click to change',
 'at_dscp_profile' => 'Include a profile field in the content',
 'at_dscp_profile_list' => 'Embed a profile list in the content',
+'non_admin_msg' => 'Non admin user attempting to change another user profile',
 
 // begin membership fields
 'del_selected' => 'Delete Selected',
@@ -221,6 +222,7 @@ $LANG_confignames['profile'] = array(
     'grace_expired' => 'Expiration Grace Period (days)',
     'date_format'   => 'Date format',
     'list_incl_admin' => 'Include admin account in lists?',
+    'notify_change' => 'When to notify users of changes',
 );
 
 // Note: entries 0, 1, and 12 are the same as in $LANG_configselects['Core']
@@ -234,6 +236,13 @@ $LANG_configselects['profile'] = array(
     10 => array('Never' => 0, 'Always' => 1, 'Accepted' => 2, 'Rejected' => 3),
     12 => array('No access' => 0, 'Read-Only' => 2, 'Read-Write' => 3),
     13 => array('Month Day Year' => 1, 'Day Month Year' => 2),
+    // notify_change settings
+    14 => array(
+        'Never' => 0,
+        'Registration' => 1,
+        'When Updated' => 2,
+        'Both' => 3,
+    ),
 );
 
 

@@ -74,6 +74,17 @@ $profileConfigData = array(
         'set' => true,
         'group' => 'profile',
     ),
+    array(
+        'name' => 'notify_change',
+        'default_value' => 0,
+        'type' => 'select',
+        'subgroup' => 0,
+        'fieldset' => 0,
+        'selection_array' => 14,
+        'sort' => 40,
+        'set' => true,
+        'group' => 'profile',
+    ),
 
     array(
         'name' => 'fs_lists',
