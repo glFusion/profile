@@ -119,7 +119,7 @@ $profileConfigData = array(
         'set' => true,
         'group' => 'profile',
     ),
-    array(
+    /*array(
         'name' => 'list_allow_pdf',
         'default_value' => 1,
         'type' => 'select',
@@ -129,8 +129,7 @@ $profileConfigData = array(
         'sort' => 20,
         'set' => true,
         'group' => 'profile',
-    ),
-
+    ),*/
 
     array(
         'name' => 'fs_permissions',
