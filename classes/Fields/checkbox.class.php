@@ -42,11 +42,10 @@ class checkbox extends \Profile\Field
     {
         global $LANG_PROFILE;
 
-        if (empty($value))
+        if (empty($value)) {
             $value = $this->value;
-
+        }
         $formatted = $value == 1 ? $LANG_PROFILE['yes'] : $LANG_PROFILE['no'];
-
         return $formatted;
     }
 
