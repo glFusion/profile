@@ -151,4 +151,17 @@ class account extends \Profile\Field
         return 'MEDIUMINT(8) DEFAULT 0';
     }
 
+
+    /**
+     * Sanitize the value.
+     * This field type just returns an integer.
+     *
+     * @param   mixed   $val    Current field value
+     * @return  integer     Sanitized value.
+     */
+    public function Sanitize($val)
+    {
+        return (int)$val;
+    }
+
 }
