@@ -871,10 +871,13 @@ class UserList
         // Now get any fields that are provided by plugins.  These won't
         // have text strings associated with them.
         $tmp = array();         // storage for plugin info in our format
-        $args = array('post' => $_POST, 'get' => $_GET);
+        $args = array(
+            'post' => $_POST,
+            'get' => $_GET,
+        );
         $pi_tmp = array();      // output from LGLIB_invokeService()
         $svc_msg = '';          // service message from LGLIB_invokeService()
-         foreach ($_PLUGINS as $pi_name) {
+        foreach ($_PLUGINS as $pi_name) {
             $status = LGLIB_invokeService(
                  $pi_name,
                  'profilefields',
@@ -1193,6 +1196,8 @@ class UserList
             'post' => $_POST,
             'get' => $_GET,
             'incl_user_stat' => $this->incl_user_stat,
+            'incl_grp' => $this->incl_grp,
+            'grp_access' => $this->group_id,
         );
         foreach ($_PLUGINS as $pi_name) {
             $status = LGLIB_invokeService(
