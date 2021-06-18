@@ -1,10 +1,11 @@
 # Custom Profile Plugin - Change Log
 
 ## Version 1.2.5
-Release TBD
+Release 2021-06-18
 - Move field rendering to templates
 - Enable user confirmation emails when profile is changed
 - Hide time display if timeformat is "none"
+- Pass group IDs to plugins from profile lists
 
 ## Version 1.2.4
 Release 2021-04-07
