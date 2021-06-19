@@ -61,8 +61,16 @@ class multicheck extends \Profile\Field
         }
 
         $fld = '';
-        if (!is_array($this->value)) $this->value = @unserialize($this->value);
-        if (!is_array($this->value)) $this->value = array();
+
+        // Extract the field values. If not successfull, make sure the values
+        // are an array.
+        if (!is_array($this->value)) {
+            $this->value = @unserialize($this->value);
+        }
+        if (!is_array($this->value)) {
+            $this->value = array();
+        }
+
         $T = $this->_getTemplate();
         $T->set_block('template', 'optionRow', 'opt');
         foreach ($this->options['values'] as $id=>$value) {
@@ -137,12 +145,14 @@ class multicheck extends \Profile\Field
         $defaults = $this->getOption('default', array());
         if (!is_array($defaults)) $defaults = array();
         $T->set_block('template', 'optionRow', 'opt');
-        foreach ($this->options['values'] as $key=>$valdata) {
-            $T->set_var(array(
-                'opt_sel' => in_array($valdata, $defaults),
-                'value' => $valdata,
-            ) );
-            $T->parse('opt', 'optionRow', true);
+        if (isset($this->options['values'])) {
+            foreach ($this->options['values'] as $key=>$valdata) {
+                $T->set_var(array(
+                    'opt_sel' => in_array($valdata, $defaults),
+                    'value' => $valdata,
+                ) );
+                $T->parse('opt', 'optionRow', true);
+            }
         }
         $T->parse('output', 'template');
         $multichk_input = $T->finish($T->get_var('output'));
