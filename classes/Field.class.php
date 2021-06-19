@@ -5,7 +5,7 @@
  * @author      Lee Garner <lee@leegarner.com>
  * @copyright   Copyright (c) 2009-2021 Lee Garner <lee@leegarner.com>
  * @package     profile
- * @version     v1.2.3
+ * @version     v1.2.6
  * @since       v1.1.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
@@ -486,7 +486,6 @@ class Field
     public static function getInstance($A, $value='', $uid=0)
     {
         global $_TABLES;
-        static $defs = array();
 
         if (!is_array($A)) {
             // Need to retrieve the field to find the type
@@ -508,6 +507,9 @@ class Field
             $type = 'text';
         }
         $classname = __NAMESPACE__ . '\\Fields\\' . $type;
+        if (!class_exists($classname)) {
+            $classname = __NAMESPACE__ . '\\Fields\\text';
+        }
 
         // For a new field being created, don't cache anything.
         // Just construct the appropriate class and return it.
@@ -515,26 +517,17 @@ class Field
             return new $classname();
         }
 
-        if (!isset($defs[$id])) {
-            if (is_array($A)) {     // should be array at this point
-                $classname = __NAMESPACE__ . '\\Fields\\' . $type;
-                if (class_exists($classname)) {
-                    $cls = new $classname($A, '', $uid);
-                } else {
-                    // so there's a default if the type isn't defined
-                    $cls = new Fields\text($A, '', $uid);
-                }
-            } else {
-                // Failsafe if no field is found, e.g. when creating a new one
-                $cls = new Fields\text('', '', $uid);
-            }
-            $defs[$id] = $cls;  // save for subsequent requests, if not new
+        if (is_array($A)) {     // should be array at this point
+            $cls = new $classname($A, '', $uid);
+        } else {
+            // Failsafe if no field is found, e.g. when creating a new one
+            $cls = new Fields\text('', '', $uid);
         }
         // Always set the value if defined, allows for repeated calls
         // for different users, e.g. in a profile list.
-        $defs[$id]->value = $value;
-        $defs[$id]->uid = $uid;
-        return $defs[$id];
+        $cls->value = $value;
+        $cls->uid = $uid;
+        return $cls;
     }
 
 
