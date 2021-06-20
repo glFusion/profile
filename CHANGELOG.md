@@ -1,5 +1,10 @@
 # Custom Profile Plugin - Change Log
 
+## Version 1.2.6
+Release 2021-06-20
+- Use correct tag to mark multicheck boxes as checked
+- Remove field caching, interferes with changing field type
+
 ## Version 1.2.5
 Release 2021-06-18
 - Move field rendering to templates
