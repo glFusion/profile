@@ -359,7 +359,7 @@ function profile_upgrade_1_1_0()
             $sql_type = 'TINYINT(1) UNSIGNED NOT NULL ' . $default_val;
             break;
         case 'static':
-            continue;
+            continue 2;
             break;
         case 'select':
         case 'radio':
