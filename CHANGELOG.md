@@ -1,5 +1,9 @@
 # Custom Profile Plugin - Change Log
 
+## Version 1.2.7
+Release 2021-06-29
+- Fix bug calling undefined function during user profile update
+
 ## Version 1.2.6
 Release 2021-06-20
 - Use correct tag to mark multicheck boxes as checked

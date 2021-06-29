@@ -415,9 +415,9 @@ function plugin_profilesave_profile($uid=0)
     }
 
     $P = Profile\Profile::getInstance($uid);
-    if ($uid != $_USER['uid']) {    // admin saving another user
+    /*if ($uid != $_USER['uid']) {    // admin saving another user
         $P->withAdmin(true);
-    }
+    }*/
     $P->Save($_POST);
 }
 
