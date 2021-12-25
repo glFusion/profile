@@ -14,6 +14,7 @@
 /** @global array $_TABLES */
 global $_TABLES;
 
+$_SQL = array();
 $_SQL['profile_def'] = "CREATE TABLE {$_TABLES['profile_def']} (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `orderby` int(11) unsigned DEFAULT NULL,
