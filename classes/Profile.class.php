@@ -3,9 +3,9 @@
  * Class to handle a user profile
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2018-2021 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2018-2022 Lee Garner <lee@leegarner.com>
  * @package     profile
- * @version     v1.2.5
+ * @version     v1.2.8
  * @since       v1.2.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
@@ -383,6 +383,9 @@ class Profile
             if (PRF_isManager()) {
                 // Save but show message for managers
                 COM_setMsg('Validation Errors overriden by Manager');
+                foreach ($errors as $errmsg) {
+                    COM_errorLog("Profile error overriden: $errmsg");
+                }
             } else {
                 COM_setMsg('<ul><li>' . implode('</li><li>', $errors) . '</li></ul>');
                 // Abort for regular users
@@ -437,7 +440,6 @@ class Profile
                 COM_errorLog("Profile::Save() - error executing sql: $sql");
                 return false;
             } else {
-                COM_errorLog("notify_changes: " . $notify_changes);
                 Cache::delete('profile_user_' . $this->uid);
                 if (
                     $changed &&

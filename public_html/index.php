@@ -3,9 +3,9 @@
  * Home page for the Custom Profile plugin.
  *
  * @author     Lee Garner <lee@leegarner.com>
- * @copyright  Copyright (c) 2009-2019 Lee Garner <lee@leegarner.com>
+ * @copyright  Copyright (c) 2009-2022 Lee Garner <lee@leegarner.com>
  * @package    profile
- * @version    1.2.0
+ * @version    1.2.8
  * @license    http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -21,7 +21,7 @@ USES_lib_user();
 
 // some vars that will be moved to user-selectable values:
 // Default to Logged-in Users
-$group = (int)PRF_getParam('group', $_PRF_CONF['default_grp']);
+$group = (int)PRF_getParam('group', 13);
 $srchval = PRF_getParam('srchval');
 $conf_grplist = isset($_PRF_CONF['groups']) ? $_PRF_CONF['groups'] : '';
 
@@ -67,7 +67,7 @@ $sel_list = COM_optionList(
     'grp_id, grp_name',
     $group,
     1,
-    "grp_id $NOT IN ($grplist)"
+    "grp_id $exclude IN ($grplist)"
 );
 $T->set_var('grp_select', $sel_list);
 
@@ -101,7 +101,7 @@ if ($srchval != '' && !empty($_PRF_CONF['search_fields'])) {
     $search_phrase = join(' OR ', $phrases);
     $sql .= " AND ($search_phrase)";
 }
-//echo $sql;
+echo $sql;
 
 $result = DB_query($sql);
 
@@ -226,4 +226,3 @@ function PRF_getParam($name, $defvalue = '')
         return $defvalue;
 }
 
-?>

@@ -1,5 +1,10 @@
 # Custom Profile Plugin - Change Log
 
+## Version 1.2.8
+Release 2022-02-16
+- Fix #11, no default allowed for text columns in recent MySQL versions
+- Log profile errors when overriden by admin saving user
+
 ## Version 1.2.7
 Release 2021-06-29
 - Fix bug calling undefined function during user profile update

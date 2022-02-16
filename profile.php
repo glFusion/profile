@@ -5,7 +5,7 @@
  * @author      Lee Garner <lee@leegarner.com>
  * @copyright   Copyright (c) 2009-2021 Lee Garner <lee@leegarner.com>
  * @package     profile
- * @version     v1.2.7
+ * @version     v1.2.8
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -36,7 +36,7 @@ $_TABLES['profile_values']  = $_DB_table_prefix . 'profile_values';
  */
 global $_PRF_CONF;
 $_PRF_CONF['pi_name']           = 'profile';
-$_PRF_CONF['pi_version']        = '1.2.7';
+$_PRF_CONF['pi_version']        = '1.2.8';
 $_PRF_CONF['gl_version']        = '1.7.8';
 $_PRF_CONF['pi_url']            = 'http://www.leegarner.com';
 $_PRF_CONF['pi_display_name']   = 'Custom Profile';
