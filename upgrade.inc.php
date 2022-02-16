@@ -723,7 +723,7 @@ function profile_upgrade_1_2_0($dvlp=false)
 
     $sql = array(
         "ALTER TABLE {$_TABLES['profile_def']}
-            CHANGE `prompt` `prompt` text COLLATE utf8_unicode_ci DEFAULT ''",
+            CHANGE `prompt` `prompt` text COLLATE utf8_unicode_ci",
         "UPDATE {$_TABLES['profile_def']} SET
             name='prf_membertype', sys=0
             WHERE name = 'sys_membertype'",
