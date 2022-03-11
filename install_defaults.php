@@ -98,17 +98,6 @@ $profileConfigData = array(
         'group' => 'profile',
     ),
     array(
-        'name' => 'date_format',
-        'default_value' => 1,
-        'type' => 'select',
-        'subgroup' => 0,
-        'fieldset' => 0,
-        'selection_array' => 13,
-        'sort' => 30,
-        'set' => true,
-        'group' => 'profile',
-    ),
-    array(
         'name' => 'list_incl_admin',
         'default_value' => 0,
         'type' => 'select',

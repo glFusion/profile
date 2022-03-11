@@ -3,9 +3,9 @@
  * Upgrade routines for the Custom Profile plugin.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2009-2021 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2022 Lee Garner <lee@leegarner.com>
  * @package     profile
- * @version     v1.2.0
+ * @version     v1.2.8
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -28,13 +28,15 @@ function profile_do_upgrade($dvlp = false)
 {
     global $_PRF_CONF, $_PLUGIN_INFO, $_TABLES;
 
+    $pi_name = $_PRF_CONF['pi_name'];   // used all over
+
     if (isset($_PLUGIN_INFO[$_PRF_CONF['pi_name']])) {
-        if (is_array($_PLUGIN_INFO[$_PRF_CONF['pi_name']])) {
+        if (is_array($_PLUGIN_INFO[$pi_name])) {
             // glFusion > 1.6.5
-            $current_ver = $_PLUGIN_INFO[$_PRF_CONF['pi_name']]['pi_version'];
+            $current_ver = $_PLUGIN_INFO[$pi_name]['pi_version'];
         } else {
             // legacy
-            $current_ver = $_PLUGIN_INFO[$_PRF_CONF['pi_name']];
+            $current_ver = $_PLUGIN_INFO[$pi_name];
         }
     } else {
         return false;
@@ -116,6 +118,25 @@ function profile_do_upgrade($dvlp = false)
         if (!profile_do_set_version('1.2.1')) return false;
     }
 
+    if (!COM_checkVersion($current_ver, '1.2.8')) {
+        $current_ver = '1.2.8';
+
+        // Multiple date_format items got into the config table
+        $count = DB_count(
+            $_TABLES['conf_values'],
+            array('name', 'group_name'),
+            array('date_format', $pi_name)
+        );
+        if ($count > 1) {
+            $count--;
+            $sql = "DELETE FROM {$_TABLES['conf_values']}
+                WHERE name = 'date_format' AND group_name = '$pi_name'
+                LIMIT $count";
+            DB_query($sql, 1);
+        }
+        //if (!profile_do_upgrade_sql($current_ver, $sql, $dvlp)) return false;
+        if (!profile_do_set_version($current_ver)) return false;
+    }
 
     // Remove deprecated files
     PRF_remove_old_files();
@@ -863,4 +884,3 @@ function _PRFtableHasColumn($table, $col_name)
     return DB_numRows($res) == 0 ? false : true;
 }
 
-?>
