@@ -164,6 +164,17 @@ class Profile
 
 
     /**
+     * Return the flag to see if a valid record exists.
+     *
+     * @return  boolean     True if a profile record exists
+     */
+    public function Exists() : bool
+    {
+        return $this->_exists;
+    }
+
+
+    /**
      * Displays a form for editing profile data.
      *
      * @param   string  $type       'edit' or 'registration'
