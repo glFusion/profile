@@ -1200,4 +1200,52 @@ function PRF_GroupDropdown($group_id, $access)
     return $groupdd;
 }
 
-?>
+
+/**
+ * Return one or more value from the data table corresponding to
+ * a specific user ID and item name(s).
+ *
+ * @param   array   $args       array('uid' => userID)
+ * @return  array   All profile field values
+ */
+function plugin_getValues_profile($args) : ?array
+{
+    global $_TABLES, $_USER;
+
+    $output = array();
+
+    $uid = isset($args['uid']) ? (int)$args['uid'] : (int)$_USER['uid'];
+    if ($uid < 2) {
+        return NULL;
+    }
+
+    // Get all the profile items. We don't consider a failure here to be
+    // an error, there will just be nothing returned.
+    $A = Profile\Profile::getInstance($uid)->getFields();
+
+    if (isset($args['item'])) {
+        $items = $args['item'];
+        if ($items == '*') {
+            // Getting the formatted value for all items
+            foreach ($A as $key=>$item) {
+                $output[$key] = $A[$item]->FormatValue();
+            }
+        } else {
+            // Getting the formatted value for one or more specific items
+            if (!is_array($items)) {
+                $items = array($items);
+            }
+            foreach ($items as $item) {
+                if (isset($A[$item])) {
+                    $output[$item] = $A[$item]->FormatValue();
+                }
+            }
+        }
+    } else {
+        // Just getting the item objects for all items
+        foreach ($A as $key=>$item) {
+            $output[$key] = $item;
+        }
+    }
+    return $output;
+}
