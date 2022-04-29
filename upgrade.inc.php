@@ -186,7 +186,6 @@ function profile_do_upgrade_sql($version, $sql='', $dvlp=false)
     $errmsg = 'SQL Error during Profile plugin update';
     if ($dvlp) $errmsg .= ' (ignored)';
     foreach ($sql as $query) {
-        //COM_errorLOG("Profile Plugin $version update: Executing SQL => $query");
         DB_query($query, 1);
         if (DB_error()) {
             COM_errorLog("$errmsg: $query",1);
@@ -851,6 +850,12 @@ function PRF_remove_old_files()
             // 1.2.1 - Remove old .uikit.thtml files
             'templates/profile_registration.uikit.thtml',
             'templates/profile_usersettings.uikit.thtml',
+            // 1.2.8 - Some old files not removed previously
+            'profile_functions.inc.php',
+            'templates/admin/list.uikit.thtml',
+            'templates/admin/profile.uikit.thtml',
+            'templates/pdf/default.thtml',
+            'css/calendar-blue.css',
         ),
         // public_html/profile
         $_CONF['path_html'] . 'profile' => array(
@@ -859,6 +864,11 @@ function PRF_remove_old_files()
         $_CONF['path_html'] . 'admin/plugins/profile' => array(
         ),
     );
+    if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+        // Files that were renamed, changing case only.
+        // Only delete these on non-windows systems.
+        $paths[__DIR__][] = 'classes/pdflist.class.php';
+    }
 
     foreach ($paths as $path=>$files) {
         foreach ($files as $file) {
