@@ -5,12 +5,14 @@
  * @author      Lee Garner <lee@leegarner.com>
  * @copyright   Copyright (c) 2009-2020 Lee Garner <lee@leegarner.com>
  * @package     profile
- * @version     1.2.0
+ * @version     1.3.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
  */
 namespace Profile;
+use glFusion\Database\Database;
+use glFusion\Log\Log;
 
 /** Import user library for USER_getPhoto() */
 USES_lib_user();
@@ -334,10 +336,9 @@ class UserList
 
         // Only show users in the list's inclusion group, unless the group
         // is "All Users"
-        if ($this->incl_grp != 2) {
+        if ($this->incl_grp != 2 && $this->incl_grp != 13) {
             $limit_group = $this->_usersInGroup($this->incl_grp);
-            if (!empty($limit_group))
-                $where_and .= ' AND u.uid IN (' . $limit_group . ') ';
+            $where_and .= ' AND u.uid IN (' . $limit_group . ') ';
         } else {
             $limit_group = '';
         }
@@ -1131,13 +1132,35 @@ class UserList
      * @param   integer $group_id   Requested group ID
      * @return  string      Comma-separated list of user IDs
      */
-    private function _usersInGroup($group_id)
+    private function _usersInGroup(int $group_id) : string
     {
         global $_TABLES;
 
-        $users = array();
+        $users = array(0);
 
-        // First, get this group and all the groups that belong to it
+        $db = Database::getInstance();
+
+        // Quick check, if $group_id is "All Users" or "Logged-In Users" then
+        // return all users except Anonymous. glFusion 2.0+ doesn't create
+        // group records for logged-in users any more.
+        if ($group_id == 13 || $group_id == 2) {
+            try {
+                $data = $db->conn->executeQuery(
+                    "SELECT uid FROM {$_TABLES['users']} WHERE uid > 1"
+                )->fetchAllAssociative();
+            } catch (\Exception $e) {
+                Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+                $data = false;
+            }
+            if (is_array($data)) {
+                foreach ($data as $user) {
+                    $users[] = $user['uid'];
+                }
+            }
+            return implode(',', $users);
+        }
+
+        // First, get this group and all the groups that belong to it.
         // Root always belongs to all groups, so it's excluded unless it was
         // specifically requested.
         $to_check = array ();
@@ -1146,37 +1169,51 @@ class UserList
         while (count($to_check) > 0) {
             $thisgroup = array_pop($to_check);
             if ($thisgroup > 0) {
-                $result = DB_query(
-                    "SELECT ug_grp_id
-                    FROM {$_TABLES['group_assignments']}
-                    WHERE ug_main_grp_id = $thisgroup",
-                    1
-                );
-                while ($A = DB_fetchArray($result, false)) {
-                    // Don't include the Root group unless it was requested
-                    if ($A['ug_grp_id'] == 1 && $group_id > 1) continue;
-                    if (!in_array($A['ug_grp_id'], $groups)) {
-                        if (!in_array($A['ug_grp_id'], $to_check)) {
-                            array_push($to_check, $A['ug_grp_id']);
+                try {
+                    $data = $db->conn->executeQuery(
+                        "SELECT ug_grp_id FROM {$_TABLES['group_assignments']}
+                        WHERE ug_main_grp_id = ?",
+                        array($thisgroup),
+                        array(Database::INTEGER)
+                    )->fetchAllAssociative();
+                } catch (\Exception $e) {
+                    Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+                    $data = false;
+                }
+                if (is_array($data)) {
+                    foreach ($data as $A) {
+                        // Don't include the Root group unless it was requested
+                        if ($A['ug_grp_id'] == 1 && $group_id > 1) continue;
+                        if (!in_array($A['ug_grp_id'], $groups)) {
+                            if (!in_array($A['ug_grp_id'], $to_check)) {
+                                array_push($to_check, $A['ug_grp_id']);
+                            }
                         }
                     }
+                    $groups[] = $thisgroup;
                 }
-                $groups[] = $thisgroup;
             }
         }
 
         // Next, get all the users that belong to any of the groups
-        $grouplist = implode(',', $groups);
-        $sql = "SELECT DISTINCT u.uid
-                FROM {$_TABLES['users']} u
-                LEFT JOIN {$_TABLES['group_assignments']} ga
-                    ON ga.ug_uid = u.uid
-                WHERE uid > 1
-                    AND ga.ug_main_grp_id IN ({$grouplist})
-                ORDER BY u.uid";
-        $result = DB_query ($sql, 1);
-        while ($A = DB_fetchArray($result, false)) {
-            $users[] = $A['uid'];
+        $qb = $db->conn->createQueryBuilder();
+        try {
+            $data = $qb->select('DISTINCT u.uid')
+               ->from($_TABLES['users'], 'u')
+               ->leftJoin('u', $_TABLES['group_assignments'], 'ga', 'u.uid = ga.ug_uid')
+               ->where('uid > 1')
+               ->andWhere('ga.ug_main_grp_id IN (:groups)')
+               ->orderBy('u.uid', 'ASC')
+               ->setParameter('groups', $groups, Database::PARAM_INT_ARRAY)
+               ->execute()->fetchAllAssociative();
+        } catch (\Exception $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+            $data = false;
+        }
+        if (is_array($data) && !empty($data)) {
+            foreach ($data as $A) {
+                $users[] = $A['uid'];
+            }
         }
         return implode(',', $users);
     }
@@ -1283,7 +1320,6 @@ class UserList
                 );
             }
         }
-        //var_dump($fields);die;
         return $fields;
     }
 

@@ -2,8 +2,9 @@
 
 ## Version 1.2.8
 Release 2022-02-16
-- Fix #11, no default allowed for text columns in recent MySQL versions
-- Log profile errors when overriden by admin saving user
+- Fix #11, no default allowed for text columns in recent MySQL versions.
+- Log profile errors when overriden by admin saving user.
+- Fix all logged-in users not showing in profile lists. (#14)
 
 ## Version 1.2.7
 Release 2021-06-29
