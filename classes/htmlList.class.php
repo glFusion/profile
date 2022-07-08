@@ -97,7 +97,7 @@ class htmlList extends UserList
 
         // Open template
         $T = new \Template(PRF_PI_PATH . 'templates/pdf');
-        if (file_exists(PRF_PI_PATH . "templates/pdf/{$this->listid}.thtml")) {
+        if (file_exists(PRF_PI_PATH . "templates/pdf/custom/{$this->listid}.thtml")) {
             $T->set_file('list', $this->listid . '.thtml');
             $def_tpl = false;
         } else {
@@ -108,17 +108,21 @@ class htmlList extends UserList
         $T->set_block('list', 'HeaderRow', 'hrow');
         foreach ($this->fields as $field) {
             if ($def_tpl) {
-                $fldname = $field['field'];
-                if (
-                    strpos($fldname, 'sys_') === 0 ||
-                    strpos($fldname, 'prf_') === 0
-                ) {
-                    $fldname = substr($fldname, 4);
-                }
-                if (isset($LANG_PROFILE[$fldname])) {
-                    $text = $LANG_PROFILE[$fldname];
+                if (!empty($field['text'])) {
+                    $text = $field['text'];
                 } else {
-                    $text = ucfirst($fldname);
+                    $fldname = $field['field'];
+                    if (
+                        strpos($fldname, 'sys_') === 0 ||
+                        strpos($fldname, 'prf_') === 0
+                    ) {
+                        $fldname = substr($fldname, 4);
+                    }
+                    if (isset($LANG_PROFILE[$fldname])) {
+                        $text = $LANG_PROFILE[$fldname];
+                    } else {
+                        $text = ucfirst($fldname);
+                    }
                 }
                 $T->set_var('fld_hdr', $text);
             }
@@ -165,8 +169,6 @@ class htmlList extends UserList
         $T->parse('output', 'list');
         $content = $T->finish($T->get_var('output'));
         return $content;
-    }   // function Render()
+    }
 
-}   // class hTMLList
-
-?>
+}

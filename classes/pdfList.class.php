@@ -74,8 +74,7 @@ class pdfList extends htmlList
             return 2;
         }
 
-    }   // function Render()
+    }
 
-}   // class pdfList
+}
 
-?>
