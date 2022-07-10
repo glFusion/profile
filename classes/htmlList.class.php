@@ -55,7 +55,13 @@ class htmlList extends UserList
         if (!is_array($this->fields)) return '';
         $this->setGroupby('u.uid');
         $sql = $this->_getListSQL();
+        if ($this->name_format == 1) {
+            $sql .= ' ORDER BY sys_lname ASC, sys_fname ASC';
+        } else {
+            $sql .= ' ORDER BY fullname ASC';
+        }
         //echo $sql;die;
+
         $result = DB_query($sql, 1);
         if (!$result || DB_numRows($result) < 1) {
             return false;
