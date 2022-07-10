@@ -1,12 +1,22 @@
 {# begin {templatelocation} #}
-<form id="frm1" action="{site_url}/admin/plugins/profile/index.php"
-    method="POST">
-  <span class="alert">
-    Warning: This function will reset ALL permissions on ALL profile fields to the defaults.
-    <br />If this is not what you want, click the "{$LANG_ADMIN['cancel']}" button now.
-  </span>
-  <input class="uk-button uk-button-success" type="submit" name="permresetconfirm" value="{$LANG_ADMIN['submit']}">
-  <input class="uk-button uk-button-primary" type="submit" name="button2" value="{$LANG_ADMIN['cancel']}">
+<form uk-form class="uk-form uk-form-horizontal" id="frm1" action="{site_url}/admin/plugins/profile/index.php"
+	method="post">
+	<div class="uk-alert uk-alert-danger">{$LANG_PROFILE['warn_bulkperm']}</div>
+	<div class="uk-form-row uk-margin">
+		<label class="uk-form-label">{$LANG_PROFILE['reset_perms']}</label>
+		<div class="uk-form-controls">
+			<select class="uk-select" type="select" name="permresetconfirm">
+				<option value="0" selected="selected">{$LANG_PROFILE['no']}</option>
+				<option value="1">{$LANG_PROFILE['yes']}</option>
+			</select>
+		</div>
+	</div>
+	<div class="uk-form-row uk-margin">
+		<div class="uk-form-controls">
+			<button class="uk-button uk-button-success" type="submit" name="default">{$LANG_ADMIN['submit']}</button>
+			<a href="{site_admin_url}/plugins/profile/index.php" class="uk-button uk-button-primary">{$LANG_ADMIN['cancel']}</a>
+		</div>
+	</div>
 </form>
 {# end {templatelocation} #}
 

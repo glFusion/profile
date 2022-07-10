@@ -184,7 +184,7 @@ $LANG_PROFILE = array(
 'parent_uid' => 'Parent Account',
 'child_accounts' => 'Child Accounts',
 // END MEMBERSHIP FIELDS
-
+'warn_bulkperm' => 'Warning: This function will reset ALL permissions on ALL profile fields to the defaults.',
 );
 
 $PLG_profile_MESSAGE03  = 'There was an error getting the plugin version.';

@@ -1,6 +1,6 @@
 {# begin {templatelocation} #}
-<form id="srch" action="{site_url}/admin/plugins/profile/index.php"
-    method="POST">
+<form uk-form class="uk-form uk-form-horizontal id="srch" action="{site_url}/admin/plugins/profile/index.php"
+    method="post">
 <table>
 <tr>
   <th>{$LANG_PROFILE['field']}</th>
@@ -17,9 +17,11 @@
 </tr>
 <!-- END FldRow -->
 </table>
-
-<input class="uk-button uk-button-primary" type="submit" name="dousersearch" value="{$LANG_ADMIN['submit']}" />
-<input class="uk-button" type="reset" name="searchreset" value="{$LANG_PROFILE['reset']}" />
+<div class="uk-form-row uk-margin">
+	<div class="uk-form-controls">
+		<button class="uk-button uk-button-success" type="submit" name="dousersearch">{$LANG_ADMIN['submit']}</button>
+		<button class="uk-button" type="reset" name="searchreset">{$LANG_PROFILE['reset']}</button>
+	</div>
+</div>
 </form>
-
 {# end {templatelocation} #}
