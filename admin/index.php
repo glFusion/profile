@@ -29,6 +29,7 @@ if (!SEC_hasRights('profile.admin')) {
 }
 
 // Import administration functions
+use glFusion\FieldList;
 USES_lib_admin();
 
 $expected = array(
@@ -60,9 +61,11 @@ case 'permreset':
     break;
 
 case 'permresetconfirm':
-    PRF_permReset();
-    $content .= COM_showMessage('102', $_PRF_CONF['pi_name']);
-    $view = 'listfields';
+    if ($actionval) {
+        PRF_permReset();
+        COM_setMsg($PLG_profile_MESSAGE102);
+    }
+    echo COM_refresh(PRF_ADMIN_URL . '/index.php');
     break;
 
 case 'move':
@@ -303,27 +306,24 @@ function PRF_getField_list($fieldname, $fieldvalue, $A, $icon_arr, $extra)
 
     switch($fieldname) {
     case 'edit':
-        $retval =
-            COM_createLink(
-                '<i class="uk-icon uk-icon-edit"></i>',
-                PRF_ADMIN_URL . '/index.php?editlist=' . $A['listid'],
-                array(
-                    'title' => $LANG_ADMIN['edit'],
-                    'data-uk-tooltip' => '',
-                )
-            );
+        $retval = FieldList::edit(array(
+            'url' => PRF_ADMIN_URL . '/index.php?editlist=' . $A['listid'],
+            'attr' => array(
+                'title' => $LANG_ADMIN['edit'],
+                'class' => 'tooltip',
+            ),
+        ) );
        break;
 
     case 'delete':
-        $retval = COM_createLink(
-                '<i class="uk-icon uk-icon-remove uk-text-danger"></i>',
-                PRF_ADMIN_URL . '/index.php?deletelist=' . $A['listid'],
-                array(
-                    'title' => $LANG_ADMIN['delete'],
-                    'data-uk-tooltip' => '',
-                    'onclick' => "return confirm('{$LANG_PROFILE['q_conf_del']}');",
-                )
-            );
+        $retval = FieldList::delete(array(
+            'delete_url' => PRF_ADMIN_URL . '/index.php?deletelist=' . $A['listid'],
+            'attr' => array(
+                'title' => $LANG_ADMIN['delete'],
+                'class' => 'tooltip',
+                'onclick' => "return confirm('{$LANG_PROFILE['q_conf_del']}');",
+            )
+        ) );
         break;
 
     case 'listid':
@@ -334,20 +334,20 @@ function PRF_getField_list($fieldname, $fieldvalue, $A, $icon_arr, $extra)
 
     case 'orderby':
         if ($fieldvalue > 10) {
-            $retval = COM_createLink(
-                '<i class="uk-icon uk-icon-arrow-up uk-icon-justify"></i>',
-                PRF_ADMIN_URL . '/index.php?movelist=up&id=' . $A['listid']
-            );
+            $retval = FieldList::up(array(
+                'url' => PRF_ADMIN_URL . '/index.php?movelist=up&id=' . $A['listid'],
+            ) );
         } else {
-            $retval = '<i class="uk-icon uk-icon-justify">&nbsp;</i>';
+            $retval = '<i class="uk-icon uk-icon-justify"></i>';
+            //$retval = FieldList::blank();
         }
         if ($fieldvalue < $extra['list_count'] * 10) {
-            $retval .= COM_createLink(
-                '<i class="uk-icon uk-icon-arrow-down uk-icon-justify"></i>',
-                PRF_ADMIN_URL . '/index.php?movelist=down&id=' . $A['listid']
-            );
+            $retval .= FieldList::down(array(
+                'url' => PRF_ADMIN_URL . '/index.php?movelist=down&id=' . $A['listid'],
+            ) );
         } else {
-            $retval .= '<i class="uk-icon uk-icon-justify">&nbsp;</i>';
+            $retval .= '<i class="uk-icon uk-icon-justify"></i>';
+            //$retval = FieldList::blank();
         }
         break;
 
@@ -358,7 +358,6 @@ function PRF_getField_list($fieldname, $fieldvalue, $A, $icon_arr, $extra)
 
     return $retval;
 }
-
 
 
 /**
@@ -487,30 +486,35 @@ function PRF_getField_profile($fieldname, $fieldvalue, $A, $icon_arr, $extra)
         break;
 
     case 'edit':
-        $retval = COM_createLink(
-            '<i class="uk-icon uk-icon-edit" data-uk-tooltip title="' . $LANG_ADMIN['edit'] . '"></i>',
-            PRF_ADMIN_URL . '/index.php?edit=x&amp;id=' . $A['id']
-        );
-       break;
+        $retval = FieldList::edit(array(
+            'url' => PRF_ADMIN_URL . '/index.php?edit=x&amp;id=' . $A['id'],
+            'attr' => array(
+                'class' => 'tooltip',
+                'title' => $LANG_ADMIN['edit'],
+            ),
+        ) );
+        break;
 
     case 'edituser':
-        $retval = COM_createLink(
-            '<i class="uk-icon uk-icon-edit" data-uk-tooltip title="' . $LANG_ADMIN['edit'] . '"></i>',
-            "{$_CONF['site_url']}/admin/user.php?edit=x&amp;uid={$A['uid']}"
-        );
+        $retval = FieldList::edit(array(
+            'url' => "{$_CONF['site_url']}/admin/user.php?edit=x&amp;uid={$A['uid']}",
+            'attr' => array(
+                'class' => 'tooltip',
+                'title' => $LANG_ADMIN['edit'],
+            ),
+        ) );
         break;
 
     case 'delete':
         if (!$A['sys']) {
-            $retval = COM_createLink(
-                '<i class="uk-icon uk-icon-remove uk-text-danger"></i>',
-                PRF_ADMIN_URL . '/index.php?deletedef=x&id=' . $A['id'],
-                array(
+            $retval = FieldList::delete(array(
+                'delete_url' => PRF_ADMIN_URL . '/index.php?deletedef=x&id=' . $A['id'],
+                'attr' => array(
                     'onclick' => "return confirm('{$LANG_PROFILE['q_conf_del']}');",
                     'title' => $LANG_ADMIN['delete'],
-                    'data-uk-tooltip' => '',
+                    'class' => 'tooltip',
                 )
-            );
+            ) );
         }
         break;
 
@@ -518,32 +522,21 @@ function PRF_getField_profile($fieldname, $fieldvalue, $A, $icon_arr, $extra)
     case 'required':
     case 'user_reg':
     case 'show_in_profile':
-        if ($A[$fieldname] == 1) {
-            $chk = PRF_CHECKED;
-            $enabled = 1;
-        } else {
-            $chk = '';
-            $enabled = 0;
-        }
-        $retval =
-                "<input name=\"{$fieldname}_{$A['id']}\" " .
-                "type=\"checkbox\" $chk " .
-                'data-uk-tooltip title="' . $LANG_PROFILE['click_to_change'] . '" ' .
-                "onclick='PRFtoggleEnabled(this, \"{$A['id']}\", \"{$fieldname}\");' ".
-                ">\n";
+        $retval = FieldList::checkbox(array(
+            'name' => $fieldname . '_' . $A['id'],
+            'checked' => (int)$fieldvalue,
+            'title' => $LANG_PROFILE['click_to_change'],
+            'class' => 'tooltip',
+            'onclick' => "PRFtoggleEnabled(this, '{$A['id']}', '{$fieldname}');",
+        ) );
     break;
 
     case 'public':
-        if ($A['perm_members'] == 2 && $A['perm_anon'] == 2) {
-            $chk = PRF_CHECKED;
-        } else {
-            $chk = '';
-        }
-        $retval =
-                "<input name=\"{$fieldname}_{$A['id']}\" " .
-                "type=\"checkbox\" $chk " .
-                "onclick='PRFtoggleEnabled(this, \"{$A['id']}\", \"{$fieldname}\");' ".
-                ">\n";
+        $retval = FieldList::checkbox(array(
+            'name' => $fieldname . '_' . $A['id'],
+            'checked' => ($A['perm_members'] == 2 && $A['perm_anon'] == 2),
+            'onclick' => "PRFtoggleEnabled(this, '{$A['id']}', '{$fieldname}');",
+        ) );
         break;
 
     case 'id':
@@ -552,19 +545,19 @@ function PRF_getField_profile($fieldname, $fieldvalue, $A, $icon_arr, $extra)
 
     case 'orderby':
         if ($fieldvalue > 10) {
-            $retval = COM_createLink(
-                '<i class="uk-icon uk-icon-arrow-up uk-icon-justify"></i>',
-                PRF_ADMIN_URL . '/index.php?move=up&id=' . $A['id']
-            );
+            $retval = FieldList::up(array(
+                'url' => PRF_ADMIN_URL . '/index.php?move=up&id=' . $A['id'],
+            ) );
         } else {
+            //$retval = FieldList::blank();
             $retval = '<i class="uk-icon uk-icon-justify">&nbsp;</i>';
         }
         if ($fieldvalue < $extra['prf_count'] * 10) {
-            $retval .= COM_createLink(
-                '<i class="uk-icon uk-icon-arrow-down uk-icon-justify"></i>',
-                PRF_ADMIN_URL . '/index.php?move=down&id=' . $A['id']
-            );
+            $retval .= FieldList::down(array(
+                'url' => PRF_ADMIN_URL . '/index.php?move=down&id=' . $A['id'],
+            ) );
         } else {
+            //$retval = FieldList::blank();
             $retval .= '<i class="uk-icon uk-icon-justify">&nbsp;</i>';
         }
         break;
