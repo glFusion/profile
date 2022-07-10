@@ -13,9 +13,11 @@
 namespace Profile;
 use glFusion\Database\Database;
 use glFusion\Log\Log;
+use glFusion\FieldList;
 
 /** Import user library for USER_getPhoto() */
 USES_lib_user();
+
 
 /**
  * Class for profile lists.
@@ -94,7 +96,7 @@ class UserList
 
     /** Fname Lname, 1 = "Lname, Fname".
      * @var integer */
-    private $name_format = 0;
+    protected $name_format = 0;
 
     /** Query string obtained from plugins.
      * @var string */
@@ -208,11 +210,13 @@ class UserList
         $this->title = trim($A['title']);
         $this->group_id = (int)$A['group_id'];
         $this->incl_grp = (int)$A['incl_grp'];
-        if (is_array($A['incl_user_stat'])) {
-            $this->incl_user_stat = $A['incl_user_stat'];
-        } else {
-            $this->incl_user_stat = @unserialize($A['incl_user_stat']);
-            if (!$this->incl_user_stat) $this->incl_user_stat = array();
+        if (isset($A['incl_user_stat'])) {
+            if (is_array($A['incl_user_stat'])) {
+                $this->incl_user_stat = $A['incl_user_stat'];
+            } else {
+                $this->incl_user_stat = @unserialize($A['incl_user_stat']);
+                if (!$this->incl_user_stat) $this->incl_user_stat = array();
+            }
         }
 
         if ($fromDB) {
@@ -277,8 +281,8 @@ class UserList
 
         $pi_addjoin = array();  // additional JOIN clauses
         $pi_search = array();   // additional WHERE clauses
-        $pi_tmp = array();      // output from LGLIB_invokeService()
-        $svc_msg = '';          // service message from LGLIB_invokeService()
+        $pi_tmp = array();      // output from service functions()
+        $svc_msg = '';          // service message from service functions()
         $fieldnames = array();
         $pi_where = array();    // additional "where" clauses
         $args = array('post' => $_POST, 'get' => $_GET);
@@ -372,12 +376,13 @@ class UserList
                 FROM {$_TABLES['users']} u
                 LEFT JOIN {$_TABLES['profile_data']} p
                 ON u.uid = p.puid
-                $addjoin
-                WHERE u.uid > $noshow_uid
-                $where_and ";
-        if (!empty($this->group_by)) {
+                $addjoin";
+                //WHERE u.uid > $noshow_uid
+                //$where_and ";
+        $this->_filter_sql = "WHERE u.uid > $noshow_uid $where_and";
+        /*if (!empty($this->group_by)) {
             $sql .= " GROUP BY {$this->group_by}";
-        }
+        }*/
                 //GROUP BY u.uid";
         return $sql;
     }
@@ -465,6 +470,7 @@ class UserList
             if (!$this->getFirst()) return '';
         }
 
+        $db = Database::getInstance();
         $retval = '';
 
         // Verify that the current user is allowed to see this list, and
@@ -516,7 +522,10 @@ class UserList
 
         $this->_getPluginFilters();
 
-        $extras = array('f_info' => array());
+        $extras = array(
+            'f_info' => array(),
+            'db' => $db,
+        );
         $query_sql = $this->_getListSQL('', $extras);
 
         if (!empty($this->sortby)) {
@@ -530,12 +539,17 @@ class UserList
                 'direction' => 'ASC',
             );
         }
+
+        $query_fields = $this->_setQueryFields();
         $query_arr = array('table' => 'profile_lists',
             'sql' => $query_sql,
+            'default_filter' => $this->_filter_sql,
             'query_fields' => $query_fields,
-            'default_filter' => '',
             //'group_by' => 'u.uid',
         );
+        if (!empty($this->_group_by)) {
+            $query_arr['group_by'] = $this->_group_by;
+        }
 
         // Need this to get the listid into the column header sorting links
         $text_arr = array(
@@ -575,30 +589,34 @@ class UserList
                     $LANG_PROFILE['displayed'] . '</a> / ' .
                     '<a href="' . $exportlink_all . '">' .
                     $LANG_PROFILE['all_fields'] . '</a>';
+            $baselink = PRF_PI_URL . '/list.php?listid=' . $this->listid;
+            if (!empty($this->pi_query)) {
+                $baselink .= '&amp;' . $this->pi_query;
+            }
             // Add the export link if requested.
-            /*$pdflink = '/ <a href="' . PRF_PI_URL .
-                '/list.php?action=pdf&listid=' . $this->listid;
-            if (!empty($this->pi_query)) {
-                $pdflink .= '&amp;' . $this->pi_query;
-            }
-            $pdflink .= '" target="_new">PDF</a>';*/
-
-            $htmllink = '/ <a href="' . PRF_PI_URL .
-                '/list.php?action=html&listid=' . $this->listid;
-            if (!empty($this->pi_query)) {
-                $htmllink .= '&amp;' . $this->pi_query;
-            }
-            $htmllink .= '" target="_new">HTML</a>';
+            $pdflink = COM_createLink(
+                'PDF',
+                $baselink . '&action=pdf',
+                array(
+                    'target' => '_new',
+                )
+            );
+            $htmllink = '/ ' . COM_createLink(
+                'HTML',
+                $baselink . '&action=html',
+                array(
+                    'target' => '_new',
+                )
+            );
         }
 
         // Add the menu of available lists, if requested
         $menu = $this->showMenu ? $this->_getListMenu() : '';
-
         $T = new \Template(PRF_PI_PATH . 'templates/');
         $T->set_file('list', 'memberlist.thtml');
         $T->set_var(array(
             'list_contents' => ADMIN_list(
-                'membership_list_' . $this->listid,
+                'profile_list_' . $this->listid,
                 array(__CLASS__, 'getListField'),
                 $header_arr, $text_arr, $query_arr, $defsort_arr,
                 $this->pi_filter, $extras, '', $form_arr
@@ -886,17 +904,20 @@ class UserList
                  $pi_tmp,
                  $svc_msg
             );
-            if ($status == PLG_RET_OK &&
-                    isset($pi_tmp['names']) &&
-                    is_array($pi_tmp['names'])) {
-                    foreach($pi_tmp['names'] as $name=>$info) {
-                        if (!isset($info['title']) || !isset($info['field'])) continue;
-                        $tmp[$name] = array(
-                                'title' => $info['title'],
-                                'field' => $info['field'],
-                                //'field' => $name,
-                                'perm'  => 2);
-                    }
+            if (
+                $status == PLG_RET_OK &&
+                isset($pi_tmp['names']) &&
+                is_array($pi_tmp['names'])
+            ) {
+                foreach($pi_tmp['names'] as $name=>$info) {
+                    if (!isset($info['title']) || !isset($info['field'])) continue;
+                    $tmp[$name] = array(
+                        'title' => $info['title'],
+                        'field' => $info['field'],
+                        //'field' => $name,
+                        'perm'  => 2,
+                    );
+                }
                 $avail_fields = array_merge($avail_fields, $tmp);
             }
         }
@@ -1381,20 +1402,18 @@ class UserList
 
         switch($fieldname) {
         case 'edit':
-            $retval = COM_createLink(
-                '<i class="uk-icon uk-icon-edit"></i>',
-                "{$_CONF['site_admin_url']}/user.php?edit=x&amp;uid={$A['uid']}"
-            );
+            $retval = FieldList::edit(array(
+                'url' => "{$_CONF['site_admin_url']}/user.php?edit=x&amp;uid={$A['uid']}",
+            ) );
             break;
 
         case 'delete':
-            $retval = COM_createLink(
-                '<i class="uk-icon uk-icon-remove-o uk-text-danger"></i>',
-                "{$pi_admin_url}/list.php?action=delete&id={$A['id']}",
-                array(
+            $retval = FieldList::delete(array(
+                'delete_url' => "{$pi_admin_url}/list.php?action=delete&id={$A['id']}",
+                'attr' => array(
                     'onclick' => "return confirm('Do you really want to delete this item?');",
-                )
-            );
+                ),
+            ) );
            break;
 
         case 'fullname':
@@ -1402,11 +1421,6 @@ class UserList
                 $fieldvalue = $A['username'];
             }
             if ($A['name_format'] == 1) {
-                /*$parts = NameParser::Parse($fieldvalue);
-                $fieldvalue = NameParser::LCF($fieldvalue);
-                if ($parts['suffix'] != '') {
-                    $fieldvalue .= ' ' . $parts['suffix'];
-                }*/
                 // Fix single-word fullnames, like "Cher"
                 if ($fieldvalue == $A['realfullname'] . ', ' . $A['realfullname']) {
                     $fieldvalue = $A['realfullname'];
@@ -1449,18 +1463,23 @@ class UserList
                 // to display the value. This has to be done for every field in
                 // every record, so use $custflds to minimize DB calls.
                 if (!isset($custflds[$fieldname])) {
-                    $custflds[$fieldname] = DB_fetchArray(
-                        DB_query("SELECT * FROM {$_TABLES['profile_def']}
-                            WHERE name='$fieldname'", 1), false);
+                    try {
+                        $custflds = $db->conn->executeQuery(
+                            "SELECT * FROM {$_TABLES['profile_def']}
+                            WHERE name = ?",
+                            array($fieldname),
+                            array(Database::STRING)
+                        )->fetchAssociative();
+                    } catch (\Exception $e) {
+                        Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+                        $custflds = false;
+                    }
+                    if (!is_array($custflds)) {
+                        $custflds = array();
+                    }
                 }
-                if ($custflds[$fieldname]) {
+                if (isset($custflds[$fieldname]) && $custflds[$fldname]) {
                     // A custom profile field was found.
-                    /*$classname = 'prf' . $custflds[$fieldname]['type'];
-                    if (class_exists($classname)) {
-                        $F = new $classname($custflds[$fieldname], $fieldvalue, $A['uid']);
-                    } else {
-                        $F = new prfText($custflds[$fieldname], $fieldvalue, $A['uid']);
-                    }*/
                     $F = Field::getInstance($custflds[$fieldname], $fieldvalue, $A['uid']);
                     $retval = $F->FormatValue();
                 } else {
@@ -1475,6 +1494,5 @@ class UserList
         return $beg . $retval . $end;
     }
 
-}   // class UserList
+}
 
-?>
