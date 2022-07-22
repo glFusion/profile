@@ -147,7 +147,7 @@ $LANG_PROFILE = array(
 
 // begin membership fields
 'del_selected' => 'Delete Selected',
-'export'    => 'Export CSV',
+'export'    => 'Export',
 'displayed' => 'Displayed',
 'all_fields' => 'All Fields',
 'submitter' => 'Submitter',

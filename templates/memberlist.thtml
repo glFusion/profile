@@ -5,9 +5,11 @@ div.scroll {
 }
 </style>
 {menu}
-{export_link} {pdf_link} {html_link}
+{!if show_export}
+{$LANG_PROFILE['export']} {csv_disp} / {csv_all} / {pdf_link} / {html_link}
+{!endif}
 <div class="scroll">
-  {list_contents}
+	{list_contents}
 </div>
 <div class="alignright">{footer}</div>
 {# end {templatelocation} #}

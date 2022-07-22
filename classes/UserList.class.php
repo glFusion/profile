@@ -275,9 +275,15 @@ class UserList
      * @param   array   $extras Extras field info to be used by the list func.
      * @return  string      SQL query to find users in the list
      */
-    protected function _getListSQL($query='', &$extras=array('f_info'=>array()))
+    protected function _getListSQL(string $query='', ?array &$extras=NULL) : string
     {
         global $_TABLES, $_PLUGINS, $_PRF_CONF;
+
+        if (!is_array($extras)) {
+            $extras = array('f_info'=>array());
+        } elseif (!isset($extras['f_info'])) {
+            $extras['f_info'] = array();
+        }
 
         $pi_addjoin = array();  // additional JOIN clauses
         $pi_search = array();   // additional WHERE clauses
@@ -584,16 +590,18 @@ class UserList
                         '&amp;direction=' . $_GET['direction'];
             }
             $exportlink_all = $exportlink_disp . '&amp;allfields';
-            $exportlink = $LANG_PROFILE['export'] .
-                    ': <a href="' . $exportlink_disp . '">' .
-                    $LANG_PROFILE['displayed'] . '</a> / ' .
-                    '<a href="' . $exportlink_all . '">' .
-                    $LANG_PROFILE['all_fields'] . '</a>';
+            $csv_disp = COM_createLink(
+                'CSV ' . $LANG_PROFILE['displayed'],
+                $exportlink_disp
+            );
+            $csv_all = COM_createLink(
+                'CSV ' . $LANG_PROFILE['all_fields'],
+                $exportlink_all
+            );
             $baselink = PRF_PI_URL . '/list.php?listid=' . $this->listid;
             if (!empty($this->pi_query)) {
                 $baselink .= '&amp;' . $this->pi_query;
             }
-            // Add the export link if requested.
             $pdflink = COM_createLink(
                 'PDF',
                 $baselink . '&action=pdf',
@@ -601,7 +609,7 @@ class UserList
                     'target' => '_new',
                 )
             );
-            $htmllink = '/ ' . COM_createLink(
+            $htmllink = COM_createLink(
                 'HTML',
                 $baselink . '&action=html',
                 array(
@@ -621,7 +629,9 @@ class UserList
                 $header_arr, $text_arr, $query_arr, $defsort_arr,
                 $this->pi_filter, $extras, '', $form_arr
             ),
-            'export_link'   => $exportlink,
+            'show_export'   => $this->show_export,
+            'csv_disp'      => $csv_disp,
+            'csv_all'       => $csv_all,
             'pdf_link'      => $pdflink,
             'html_link'     => $htmllink,
             'menu'          => $menu,
