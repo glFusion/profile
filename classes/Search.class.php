@@ -168,6 +168,7 @@ class Search
 
         $data_arr = array();
         $text_arr = array();
+        $extra = '';
 
         while ($A = DB_fetchArray($res, false)) {
             $data_arr[] = $A;
@@ -182,4 +183,3 @@ class Search
 
 }
 
-?>
