@@ -856,6 +856,8 @@ function PRF_remove_old_files()
             'templates/admin/profile.uikit.thtml',
             'templates/pdf/default.thtml',
             'css/calendar-blue.css',
+            // 1.3.0
+            'language/german_formal_utf-8.php',
         ),
         // public_html/profile
         $_CONF['path_html'] . 'profile' => array(
