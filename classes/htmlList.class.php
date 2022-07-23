@@ -54,7 +54,7 @@ class htmlList extends UserList
 
         if (!is_array($this->fields)) return '';
         $this->setGroupby('u.uid');
-        $sql = $this->_getListSQL();
+        $sql = $this->_getListSQL('', $extras);
         if ($this->name_format == 1) {
             $sql .= ' ORDER BY sys_lname ASC, sys_fname ASC';
         } else {
@@ -148,11 +148,26 @@ class htmlList extends UserList
                     $data = USER_getPhoto($A['uid'], $A['photo'], $A['email']);
                     break;
                 default:
-                    $fldClass = $classes[$field['field']];
-                    if ($fldClass !== NULL) {
-                        $data = $fldClass->FormatValue($A[$fldname]);
+                    if (isset($classes[$field['field']])) {
+                        $fldClass = $classes[$field['field']];
                     } else {
+                        $fldClass = NULL;
+                    }
+                    if (isset($A[$fldname])) {
                         $data = $A[$fldname];
+                    } else {
+                        $data = '';
+                    }
+                    if ($fldClass !== NULL) {
+                        $data = $fldClass->FormatValue($data);
+                    } elseif (
+                        isset($extras['f_info'][$fldname]) &&
+                        isset($extras['f_info'][$fldname]['disp_func']) &&
+                        function_exists($extras['f_info'][$fldname]['disp_func'])
+                    ) {
+                        $data = $extras['f_info'][$fldname]['disp_func'](
+                            $fldname, $data, $A, NULL, $extras
+                        );
                     }
                     break;
                 }
