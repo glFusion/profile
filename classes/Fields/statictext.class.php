@@ -101,6 +101,32 @@ class statictext extends \Profile\Field
         return $sql;
     }
 
+
+    /**
+     * Alter the data table.
+     * If changing from another field type to static text, drop the old field.
+     *
+     * @param   array   $A      Array of field information
+     * @return  bool        True on success, False on error
+     */
+    protected function alterTable(array $A) : bool
+    {
+        global $_TABLES;
+
+        if ($A['oldtype'] != 'statictext') {
+            $db = Database::getInstance();
+            $fld_name = $db->conn->quoteIdentifier($A['oldname']);
+            try {
+                $db->conn->executeStatement(
+                    "ALTER TABLE {$_TABLES['profile_data']} DROP {$fld_name}"
+                );
+            } catch (\Throwable $e) {
+                Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
 
-?>
