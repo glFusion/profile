@@ -429,7 +429,7 @@ class date extends \Profile\Field
      * @param   string  $tbl    Table indicator
      * @return  string          SQL query fragment
      */
-    public function createSearchSQL($post, $tbl='data')
+    public function createSearchSQL(array $post, string $tbl='data') : string
     {
         if (isset($post['empty'][$this->name])) {
             $fld = "(`{$tbl}`.`{$this->name}` = '' OR
@@ -484,7 +484,7 @@ class date extends \Profile\Field
      *
      * @return  string      SQL field definition
      */
-    public function getSqlType()
+    public function getSqlType() : string
     {
         return $this->options['timeformat'] !== '' ? 'DATETIME' : 'DATE';
     }

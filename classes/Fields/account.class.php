@@ -146,7 +146,7 @@ class account extends \Profile\Field
      *
      * @return  string      SQL field definition
      */
-    public function getSqlType()
+    public function getSqlType() : string
     {
         return 'MEDIUMINT(8) DEFAULT 0';
     }

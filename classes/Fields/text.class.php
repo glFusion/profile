@@ -65,7 +65,7 @@ class text extends \Profile\Field
      *
      * @return  string      SQL field definition
      */
-    public function getSqlType()
+    public function getSqlType() : string
     {
         return 'VARCHAR(255)';
     }

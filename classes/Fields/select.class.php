@@ -171,7 +171,7 @@ class select extends \Profile\Field
      * @param   string  $tbl    Table prefix used in parent search
      * @return  string      SQL query portion
      */
-    public function createSearchSQL($post, $tbl='data')
+    public function createSearchSQL(array $post, string $tbl='data') : string
     {
         if (!isset($post[$this->name])) return '';
 
