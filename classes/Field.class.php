@@ -3,15 +3,17 @@
  * Class to handle individual profile items.
  *
  * @author      Lee Garner <lee@leegarner.com>
- * @copyright   Copyright (c) 2009-2021 Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2022 Lee Garner <lee@leegarner.com>
  * @package     profile
- * @version     v1.2.6
+ * @version     v1.3.0
  * @since       v1.1.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
  */
 namespace Profile;
+use glFusion\Database\Database;
+use glFusion\Log\Log;
 
 
 /**
@@ -134,10 +136,17 @@ class Field
         if (is_array($item)) {
             $A = $item;
         } elseif ($item !== NULL) {
-            $sql = "SELECT * FROM {$_TABLES['profile_def']}
-                    WHERE name='" . DB_escapeString($item) . "'";
-            $res = DB_query($sql);
-            $A = DB_fetchArray($res, false);
+            try {
+                $A = Database::getInstance()->conn->executeQuery(
+                    "SELECT * FROM {$_TABLES['profile_def']}
+                    WHERE name = ?",
+                    array($item),
+                    array(Database::STRING)
+                )->fetchAssociative();
+            } catch (\Throwable $e) {
+                Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+                $A = false;
+            }
         }
         if (!empty($A)) {
             $this->setVars($A, true);
@@ -366,17 +375,6 @@ class Field
 
 
     /**
-     * Prepare this item's values to be saved in the database.
-     *
-     * @return  string      DB-safe version of the value(s)
-     */
-    public function prepareForDB()
-    {
-        return DB_escapeString($this->value);
-    }
-
-
-    /**
      * Create the form elements for editing the value selections.
      * Returns the default value for single-value fields (text, textarea, etc).
      *
@@ -455,9 +453,14 @@ class Field
             $sql = "SELECT * FROM {$_TABLES['profile_def']}";
             if ($enabled) $sql .= ' WHERE enabled = 1';
             $sql .= ' ORDER BY orderby ASC';
-            $res = DB_query($sql);
-            if ($res) {
-                while ($f = DB_fetchArray($res, false)) {
+            try {
+                $stmt = Database::getInstance()->conn->executeQuery($sql);
+            } catch (\Throwable $e) {
+                Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+                $stmt = false;
+            }
+            if ($stmt) {
+                while ($f = $stmt->fetchAssociative()) {
                     $A[$f['id']] = $f;
                 }
             }
@@ -490,10 +493,16 @@ class Field
         if (!is_array($A)) {
             // Need to retrieve the field to find the type
             $id = (int)$A;
-            $sql = "SELECT * FROM {$_TABLES['profile_def']}
-                    WHERE id = '$id'";
-            $res = DB_query($sql);
-            $A = DB_fetchArray($res, false);
+            try {
+                $A = Database::getInstance()->conn->executeQuery(
+                    "SELECT * FROM {$_TABLES['profile_def']} WHERE id = ?",
+                    array($id),
+                    array(Database::INTEGER)
+                )->fetchAssociative();
+            } catch (\Throwable $e) {
+                Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+                $A = false;
+            }
         }
         if (is_array($A)) {
             if (isset($A['id'])) {
@@ -635,7 +644,7 @@ class Field
      *
      * @param   array   $A          Array of all values from the submitted form
      */
-    public function saveDef($A)
+    public function saveDef(array $A)
     {
         global $_TABLES;
 
@@ -658,7 +667,7 @@ class Field
         // For a new record, make sure the field name is unique
         if ($this->id == 0) {
             // for existing records, make sure it's not a duplicate name
-            $cnt = DB_count($_TABLES['profile_def'], 'name', $A['name']);
+            $cnt = Database::getInstance()->getCount($_TABLES['profile_def'], 'name', $A['name'], Database::STRING);
             if ($cnt > 0) return '103';
         }
 
@@ -691,14 +700,8 @@ class Field
         // Now alter the data table.  We do this first in case there's any SQL
         // error so we don't end up with a mismatch between the definitions and
         // the values.
-        $sql = $this->getDataSql($A);
-        if (!empty($sql)) {
-            $sql = "ALTER TABLE {$_TABLES['profile_data']} $sql";
-            //echo $sql;die;
-            DB_query($sql, 1);
-            if (DB_error()) {
-                return '103';
-            }
+        if (!$this->alterTable($A)) {
+            return '103';
         }
 
         // After all default options are set, allow the field types to
@@ -708,37 +711,58 @@ class Field
         // This serializes any options set
         //$A['options'] = PRF_setOpts($options);
         $options = DB_escapeString(@serialize($this->options));
+        $values = array(
+            'orderby' => $this->orderby,
+            'name' => $this->name,
+            'type' => $this->type,
+            'enabled' => $this->enabled,
+            'required' => $this->required,
+            'user_reg' => $this->user_reg,
+            'show_in_profile' => $this->show_in_profile,
+            'prompt' => $this->prompt,
+            'options' => $options,
+            'group_id' => $this->group_id,
+            'perm_owner' => $this->perm_owner,
+            'perm_group' => $this->perm_group,
+            'perm_members' => $this->perm_members,
+            'perm_anon' => $this->perm_anon,
+        );
+        $types = array(
+            Database::INTEGER,
+            Database::STRING,
+            Database::INTEGER,
+            Database::INTEGER,
+            Database::INTEGER,
+            Database::INTEGER,
+            Database::INTEGER,
+            Database::STRING,
+            Database::STRING,
+            Database::INTEGER,
+            Database::INTEGER,
+            Database::INTEGER,
+            Database::INTEGER,
+            Database::INTEGER,
+        );
 
-        // Make all entries SQL-safe
-        //$A = array_map('PRF_escape_string', $A);
-
-        if ($id > 0) {
-            // Existing record, perform update
-            $sql1 = "UPDATE {$_TABLES['profile_def']} SET ";
-            $sql3 = " WHERE id = {$this->id}";
-        } else {
-            // New record
-            $sql1 = "INSERT INTO {$_TABLES['profile_def']} SET ";
-            $sql3 = '';
-        }
-        $sql2 = "orderby = '{$this->orderby}',
-                name = '{$this->name}',
-                type = '{$this->type}',
-                enabled = '{$this->enabled}',
-                required = '{$this->required}',
-                user_reg = '{$this->user_reg}',
-                show_in_profile= '{$this->show_in_profile}',
-                prompt = '{$this->prompt}',
-                options = '{$options}',
-                group_id = '{$this->group_id}',
-                perm_owner = {$this->perm_owner},
-                perm_group = {$this->perm_group},
-                perm_members = {$this->perm_members},
-                perm_anon = {$this->perm_anon}";
-        $sql = $sql1 . $sql2 . $sql3;
-        //echo $sql;die;
-        DB_query($sql);
-        if (DB_error()) {
+        try {
+            if ($id > 0) {
+                $types[] = Database::INTEGER;
+                $db->conn->update(
+                    $_TABLES['profile_def'],
+                    $values,
+                    array('id' => $this->id),
+                    $types
+                );
+            } else {
+                // New record
+                $db->conn->insert(
+                    $_TABLES['profile_def'],
+                    $values,
+                    $types,
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
             return '103';
         }
         // Values array may be affected by changes to definition, so clear both
@@ -754,12 +778,12 @@ class Field
      * @param   array   $A      Array of form fields.
      * @return  string          SQL statement fragment.
      */
-    private function getDataSql($A)
+    private function getDataSql(array $A) : string
     {
         $sql = '';
         if ($A['oldtype'] != $A['type'] || $A['name'] != $A['oldname']) {
             // Only need to update the data table if name or type changed
-            $sql_type = $this->getSqlType($A);
+            $sql_type = $this->getSqlType();
             if ($this->id == 0) {
                 $sql .= "ADD {$A['name']} $sql_type";
             } else {
@@ -771,29 +795,80 @@ class Field
 
 
     /**
+     * Perform the table alteration when a field type has changed.
+     *
+     * @param   array   $A      Array of form fields.
+     * @return  boolean     True on success, False on error
+     */
+    protected function alterTable(array $A) : bool
+    {
+        global $_TABLES;
+
+        $sql = '';
+        if ($A['oldtype'] != $A['type'] || $A['name'] != $A['oldname']) {
+            // Only need to update the data table if name or type changed
+            $sql_type = $this->getSqlType();
+            $new_name = $db->conn->quoteIdentifier($A['name']);
+            if ($this->id == 0) {
+                // Creating a new field.
+                $sql = "ADD {$new_name} $sql_type";
+            } else {
+                // Changing a field, either the name or data type.
+                $old_name = $db->conn->quoteIdentifier($A['oldname']);
+                $sql = "CHANGE {$old_name} {$new_name} $sql_type";
+            }
+
+            $db = Database::getInstance();
+            try {
+                $db->conn->executeStatement(
+                    "ALTER TABLE {$_TABLES['profile_data']} $sql"
+                );
+            } catch (\Throwable $e) {
+                Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    /**
      * Reorder all items in a table.
      */
-    private static function reOrder()
+    private static function reOrder() : void
     {
         global $_TABLES;
 
         $updated = false;
-        $sql = "SELECT id, orderby
-                FROM {$_TABLES['profile_def']}
-                ORDER BY orderby ASC;";
-        $result = DB_query($sql, 1);
-        if (!$result) return;
+        $db = Database::getInstance();
+        try {
+            $stmt = $db->conn->executeQuery(
+                "SELECT id, orderby FROM {$_TABLES['profile_def']}
+                ORDER BY orderby ASC;"
+            );
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+            $stmt = false;
+        }
+        if (!$stmt) {
+            return;
+        }
 
         $order = 10;
         $stepNumber = 10;
-
-        while ($A = DB_fetchArray($result, false)) {
+        while ($A = $stmt->fetchAssociative()) {
             if ($A['orderby'] != $order) {  // only update incorrect ones
-                $sql = "UPDATE {$_TABLES['profile_def']}
-                        SET orderby = '$order'
-                        WHERE id = '" . (int)$A['id'] . "'";
-                DB_query($sql, 1);
-                $updated = true;
+                try {
+                    $db->conn->update(
+                        $_TABLES['profile_def'],
+                        array('orderby' => $order),
+                        array('id' => $A['id']),
+                        array(Database::INTEGER, Database::INTEGER)
+                    );
+                    $updated = true;
+                } catch (\Throwable $e) {
+                    Log::write('system', Log::ERROR, __METHOD__ . ': ' . $e->getMessage());
+                }
             }
             $order += $stepNumber;
         }
@@ -846,7 +921,7 @@ class Field
      * @param   string  $tbl    Table indicator
      * @return  string          SQL query fragment
      */
-    public function createSearchSQL($post, $tbl='data')
+    public function createSearchSQL(array $post, string $tbl='data') : string
     {
         if (!isset($post[$this->name])) return '';
 
@@ -855,6 +930,9 @@ class Field
             $sql = "(`{$tbl}`.`{$this->name}` = '' OR
                      `{$tbl}`.`{$this->name}` IS NULL)";
         } elseif (isset($post[$this->name]) && $post[$this->name] !== '') {
+            if ($this instanceof \Profile\Fields\checkbox) {
+                var_dump($post[$this->name]);die;
+            }
             $value = DB_escapeString($post[$this->name]);
             $sql = "`{$tbl}`.`{$this->name}` like '%{$value}%'";
         }
@@ -881,7 +959,7 @@ class Field
      *
      * @return  string      SQL field definition
      */
-    public function getSqlType()
+    public function getSqlType() : string
     {
         return 'TEXT';
     }

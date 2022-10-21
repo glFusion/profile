@@ -5,7 +5,7 @@
  * @author      Lee Garner <lee@leegarner.com>
  * @copyright   Copyright (c) 2009-2022 Lee Garner <lee@leegarner.com>
  * @package     profile
- * @version     v1.2.8
+ * @version     v1.3.0
  * @license     http://opensource.org/licenses/gpl-2.0.php
  *              GNU Public License v2 or later
  * @filesource
@@ -13,6 +13,8 @@
 
 // Required to get the config values
 global $_CONF, $_PRF_CONF;
+use glFusion\Database\Database;
+use glFusion\Log\Log;
 
 
 /**
@@ -121,18 +123,28 @@ function profile_do_upgrade($dvlp = false)
     if (!COM_checkVersion($current_ver, '1.2.8')) {
         $current_ver = '1.2.8';
 
+        $db = Database::getInstance();
+
         // Multiple date_format items got into the config table
-        $count = DB_count(
+        $count = $db->getCount(
             $_TABLES['conf_values'],
             array('name', 'group_name'),
-            array('date_format', $pi_name)
+            array('date_format', $pi_name),
+            array(Database::STRING, Database::STRING)
         );
         if ($count > 1) {
             $count--;
-            $sql = "DELETE FROM {$_TABLES['conf_values']}
-                WHERE name = 'date_format' AND group_name = '$pi_name'
-                LIMIT $count";
-            DB_query($sql, 1);
+            try {
+                $db->conn->executeStatement(
+                    "DELETE FROM {$_TABLES['conf_values']}
+                    WHERE name = 'date_format' AND group_name = '$pi_name'
+                    LIMIT $count",
+                    array($pi_name, $count),
+                    array(Database::STRING, Database::INTEGER)
+                );
+            } catch (\Throwable $d) {
+                Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+            }
         }
         //if (!profile_do_upgrade_sql($current_ver, $sql, $dvlp)) return false;
         if (!profile_do_set_version($current_ver)) return false;
@@ -157,7 +169,7 @@ function profile_do_upgrade($dvlp = false)
         @unlink(COM_getJSCacheLocation()[0]);
     }
     // Catch any final version update needed for code-only upgrades
-    if (!COM_checkVersion($current_ver, $installed_ver)) {
+    if ($current_ver != $installed_ver) {
         if (!profile_do_set_version($installed_ver)) return false;
     }
     return true;
@@ -181,14 +193,17 @@ function profile_do_upgrade_sql($version, $sql='', $dvlp=false)
         return true;
     }
 
+    $db = Database::getInstance();
+
     // Execute SQL now to perform the upgrade
-    COM_errorLOG("--Updating glProfile to version $version");
+    Log::write('system', Log::INFO, "--Updating glProfile to version $version");
     $errmsg = 'SQL Error during Profile plugin update';
     if ($dvlp) $errmsg .= ' (ignored)';
     foreach ($sql as $query) {
-        DB_query($query, 1);
-        if (DB_error()) {
-            COM_errorLog("$errmsg: $query",1);
+        try {
+            $db->conn->executeStatement($query);
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
             if (!$dvlp) return false;
         }
     }
@@ -208,19 +223,26 @@ function profile_do_set_version($ver)
 {
     global $_TABLES, $_PRF_CONF;
 
-    // now update the current version number.
-    $sql = "UPDATE {$_TABLES['plugins']} SET
-            pi_version = '{$_PRF_CONF['pi_version']}',
-            pi_gl_version = '{$_PRF_CONF['gl_version']}',
-            pi_homepage = '{$_PRF_CONF['pi_url']}'
-        WHERE pi_name = '{$_PRF_CONF['pi_name']}'";
-
-    $res = DB_query($sql, 1);
-    if (DB_error()) {
-        COM_errorLog("Error updating the {$_PRF_CONF['pi_display_name']} Plugin version",1);
-        return false;
-    } else {
+    try {
+        Database::getInstance()->conn->update(
+            $_TABLES['plugins'],
+            array(
+                'pi_version' => $_PRF_CONF['pi_version'],
+                'pi_gl_version' => $_PRF_CONF['gl_version'],
+                'pi_homepage' => $_PRF_CONF['pi_url'],
+            ),
+            array('pi_name' => $_PRF_CONF['pi_name']),
+            array(
+                Database::STRING,
+                Database::STRING,
+                Database::STRING,
+                Database::STRING,
+            )
+        );
         return true;
+    } catch (\Throwable $e) {
+        Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+        return false;
     }
 }
 
@@ -230,22 +252,35 @@ function profile_upgrade_0_0_2()
 {
     global $_TABLES, $_CONF, $_PRF_CONF;
 
-    COM_errorLog('Upgrading the profile plugin to 0.0.2');
-    $grp_id = (int)DB_getItem($_TABLES['groups'], 'grp_id',
-                "grp_name='profile Admin'");
+    $db = Database::getInstance();
+    Log::write('system', Log::INFO, 'Upgrading the profile plugin to 0.0.2');
+    $grp_id = (int)$db->getItem(
+        $_TABLES['groups'],
+        'grp_id',
+        array('grp_name' => 'profile Admin')
+    );
 
-    $sql[] = "ALTER TABLE {$_TABLES['profile_def']}
-        ADD `group_id` mediumint(8) unsigned NOT NULL default '$grp_id',
-        ADD `perm_owner` tinyint(1) unsigned NOT NULL default '3',
-        ADD `perm_group` tinyint(1) unsigned NOT NULL default '3',
-        ADD `perm_members` tinyint(1) unsigned NOT NULL default '1',
-        ADD `perm_anon` tinyint(1) unsigned NOT NULL default '1'";
+    try {
+        $db->conn->executeStatement(
+            "ALTER TABLE {$_TABLES['profile_def']}
+            ADD `group_id` mediumint(8) unsigned NOT NULL default '$grp_id',
+            ADD `perm_owner` tinyint(1) unsigned NOT NULL default '3',
+            ADD `perm_group` tinyint(1) unsigned NOT NULL default '3',
+            ADD `perm_members` tinyint(1) unsigned NOT NULL default '1',
+            ADD `perm_anon` tinyint(1) unsigned NOT NULL default '1'",
+            array($grp_id),
+            array(Database::INTEGER)
+        );
+    } catch (\Throwable $e) {
+        Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+    }
 
     // Implement the glFusion online config system.
     require_once $_CONF['path_system'] . 'classes/config.class.php';
     require_once PRF_PI_PATH . 'install_defaults.php';
-    if (!plugin_initconfig_profile($grp_id))
+    if (!plugin_initconfig_profile($grp_id)) {
         return false;
+    }
 
     if (!profile_do_upgrade_sql('0.0.2', $sql)) return false;
     return profile_do_set_version('0.0.2');
@@ -257,32 +292,54 @@ function profile_upgrade_1_0_2()
 {
     global $_TABLES, $_CONF, $_PRF_CONF;
 
-    $sql1 = "SELECT name, options FROM {$_TABLES['profile_def']}
-            WHERE type='date'";
-    $res1 = DB_query($sql1);
-    while ($A = DB_fetchArray($res1, false)) {
-        $options = unserialize($A['options']);
-        if (!$options)
-            continue;
+    $db = Database::getInstance();
+    try {
+        $stmt = $db->conn->executeQuery(
+            "SELECT name, options FROM {$_TABLES['profile_def']}
+            WHERE type='date'"
+        );
+    } catch (\Throwable $e) {
+        Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+        $stmt = false;
+    }
 
-        $sql2 = "SELECT * FROM {$_TABLES['profile_values']}
-            WHERE name='{$A['name']}'";
-        $res2 = DB_query($sql2);
-        while ($B = DB_fetchArray($res2, false)) {
-            if (empty($B['value']))
+    if ($stmt) {
+        while ($A = $stmt->fetchAssociative()) {
+            $options = @unserialize($A['options']);
+            if (!$options) {
                 continue;
+            }
+
+            try {
+                $B = $db->conn->executeQuery(
+                    "SELECT * FROM {$_TABLES['profile_values']} WHERE name = ?",
+                    array($A['name']),
+                    array(Database::STRING)
+                )->fetchAssociative();
+            } catch (\Throwable $e) {
+                Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+                $B = false;
+            }
+            if (!is_array($B) || empty($B['value'])) {
+                continue;
+            }
 
             $ts = strtotime($B['value']);
             if (!$ts) {
-                COM_errorLog("Cannot convert date- uid:{$B['uid']}, name:{$B['name']}, value:{$B['value']}");
+                Log::write('system', Log::ERROR, "Cannot convert date- uid:{$B['uid']}, name:{$B['name']}, value:{$B['value']}");
                 continue;
             }
             $dt = date('Y-m-d H:i:s', $ts);
-            $sql3 = "UPDATE {$_TABLES['profile_values']}
-                    SET value='$dt'
-                    WHERE uid='{$B['uid']}'
-                    AND name='{$B['name']}'";
-            DB_query($sql3);
+            try {
+                $db->conn->update(
+                    $_TABLES['profile_values'],
+                    array('value' => $dt),
+                    array('uid' => $B['uid'], 'name' => $B['name']),
+                    array(Database::STRING, Database::INTEGER, Database::STRING)
+                );
+            } catch (\Throwable $e) {
+                Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+            }
         }
     }
 
@@ -304,8 +361,12 @@ function profile_upgrade_1_1_0()
 
     require_once PRF_PI_PATH . 'install_defaults.php';
 
-    $grp_id = (int)DB_getItem($_TABLES['groups'], 'grp_id',
-                    "grp_name='profile Admin'");
+    $db = Database::getInstance();
+    $grp_id = (int)$db->getItem(
+        $_TABLES['groups'],
+        'grp_id',
+        array('grp_name' => 'profile Admin')
+    );
 
     // New configuration item(s)
     $c = config::get_instance();
@@ -325,19 +386,29 @@ function profile_upgrade_1_1_0()
     }
 
     // Add the new profile.export feature
-    DB_query("INSERT INTO {$_TABLES['features']}
-            (ft_name, ft_descr)
-        VALUES (
-            'profile.export',
-            'Access to export user lists'
-        )", 1);
-    if (!DB_error()) {
-        $feat_id = DB_insertId();
-        if ($grp_id > 0 && $feat_id > 0) {
-            DB_query("INSERT INTO {$_TABLES['access']}
-                    (acc_ft_id, acc_grp_id)
-                VALUES
-                    ($feat_id, $grp_id)", 1);
+    try {
+        $db->conn->insert(
+            $_TABLES['features'],
+            array(
+                'ft_name' => 'profile.export',
+                'ft_descr' => 'Access to export user lists',
+            ),
+            array(Database::STRING, Database::STRING)
+        );
+        $feat_id = $db->conn->lastInsertId();
+    } catch (\Throwable $e) {
+        Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+        $feat_id = 0;
+    }
+    if ($grp_id > 0 && $feat_id > 0) {
+        try {
+            $db->conn->insert(
+                $_TABLES['access'],
+                array('acc_ft_id' => $feat_id, 'acc_grp_id' => $grp_id),
+                array(Database::INTEGER, Database::INTEGER)
+            );
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
         }
     }
 
@@ -348,15 +419,29 @@ function profile_upgrade_1_1_0()
     // Update the table to move the "readonly" function into perm_owner
     // This is the first version to have the "invisible" function, so
     // perm_owner should always be 2 or 3
-    DB_query("UPDATE {$_TABLES['profile_def']}
+    try {
+        $db->conn->executeStatement(
+            "UPDATE {$_TABLES['profile_def']}
             SET perm_owner = 2
-            WHERE perm_owner > 1 AND readonly = 1", 1);
+            WHERE perm_owner > 1 AND readonly = 1"
+        );
+    } catch (\Throwable $e) {
+        Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+    }
 
     // Convert values to new table layout
-    $rDef = DB_query("SELECT id,name,type,options
-                FROM {$_TABLES['profile_def']}");
-    while ($A = DB_fetchArray($rDef, false)) {
-        $fldDefs[$A['name']] = $A;
+    try {
+        $stmt = $db->conn->executeQuery(
+            "SELECT id,name,type,options FROM {$_TABLES['profile_def']}"
+        );
+    } catch (\Throwable $e) {
+        Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+        $stmt = false;
+    }
+    if ($stmt) {
+        while ($A = $stmt->fetchAssociative()) {
+            $fldDefs[$A['name']] = $A;
+        }
     }
 
     // Now make the SQL to create the fields as actual database columns.
@@ -366,7 +451,7 @@ function profile_upgrade_1_1_0()
         $opt_str = '';
         $fldDefs[$name]['dbname'] = PRF_dbname($name);
         $default_val = isset($data['defvalue']) && !empty($data['defvalue']) ?
-                "DEFAULT '" . DB_escapeString($data['defvalue']) . "'" : '';
+                "DEFAULT '" . $db->conn->quote($data['defvalue']) . "'" : '';
         switch ($data['type']) {
         case 'date':
             if (isset($options['showtime']) && $options['showtime'] == '1') {
@@ -408,8 +493,12 @@ function profile_upgrade_1_1_0()
             $sql .= ", options='$opt_str'";
         }
         $sql .= " WHERE id='{$fldDefs[$name]['id']}'";
-        DB_query($sql, 1);
-        if (DB_error()) return false;
+        try {
+            $db->conn->executeStatement($sql);
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+            return false;
+        }
     }
 
     if (!empty($createsql)) {
@@ -426,31 +515,51 @@ function profile_upgrade_1_1_0()
             $createsql_str
             PRIMARY KEY (`puid`)
         ) ENGINE=MyISAM";
-        //echo $sql;
-        DB_query($sql, 1);
-        if (DB_error()) return false;
+    try {
+        $db->conn->executeStatement($sql);
+    } catch (\Throwable $e) {
+        Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+        return false;
+    }
 
     // Now get the existing values from the values table.  Go through each
     // user to create a single record containing all the values from the
     // old values table.
-    $vRes = DB_query("SELECT DISTINCT uid FROM {$_TABLES['profile_values']}");
-    while ($A = DB_fetchArray($vRes, false)) {
-        $uid = (int)$A['uid'];
-        // Get the defined fields
-        $sql = "SELECT *
-            FROM {$_TABLES['profile_values']}
-            WHERE uid = $uid";
-        $res = DB_query($sql);
-        $colsql = array();
-        while ($U = DB_fetchArray($res, false)) {
-            if (isset($fldDefs[$U['name']]) && $U['name'] != 'uid') {
-                if (is_array($old_vals[$U['name']])) {
-                    if (isset($old_vals[$U['name']][$U['value']])) {
-                        $U['value'] = $old_vals[$U['name']][$U['value']];
+    try {
+        $vRes = $db->conn->executeQuery(
+            "SELECT DISTINCT uid FROM {$_TABLES['profile_values']}"
+        );
+    } catch (\Throwable $e) {
+        Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+        $vRes = false;
+    }
+    if ($vRes) {
+        while ($A = $vRes->fetchAssociative()) {
+            $uid = (int)$A['uid'];
+            // Get the defined fields
+            try {
+                $stmt = $db->conn->executeQuery(
+                    "SELECT * FROM {$_TABLES['profile_values']} WHERE uid = ?",
+                    array($uid),
+                    array(Database::INTEGER)
+                );
+            } catch (\Throwable $e) {
+                Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+                $stmt = false;
+            }
+            $colsql = array();
+            if ($stmt) {
+                while ($U = $stmt->fetchAssociative()) {
+                    if (isset($fldDefs[$U['name']]) && $U['name'] != 'uid') {
+                        if (is_array($old_vals[$U['name']])) {
+                            if (isset($old_vals[$U['name']][$U['value']])) {
+                                $U['value'] = $old_vals[$U['name']][$U['value']];
+                            }
+                        }
+                        $value = $db->conn->quote($U['value']);
+                        $colsql[] = $fldDefs[$U['name']]['dbname'] . "='$value'";
                     }
                 }
-                $value = DB_escapeString($U['value']);
-                $colsql[] = $fldDefs[$U['name']]['dbname'] . "='$value'";
             }
         }
         if (!empty($colsql)) {
@@ -461,21 +570,30 @@ function profile_upgrade_1_1_0()
             // It's ok to have missing rows in the data table if there's no
             // data for a user yet.
             $colsqlstr = implode(',', $colsql);
-            $dsql = "INSERT INTO {$_TABLES['profile_data']} SET
-                    puid = $uid, $colsqlstr";
-            DB_query($dsql, 1);
-            if (DB_error()) {
-                COM_errorLog("Error executing $dsql");
-                 return false;
+            try {
+                $db->conn->executeStatement(
+                    "INSERT INTO {$_TABLES['profile_data']} SET
+                    puid = $uid, $colsqlstr"
+                );
+            } catch (\Throwable $e) {
+                Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+                return false;
             }
         }
     }
 
     // Make sure that we created a record for Admin, to disable showing
     // on the lists
-    if (DB_count($_TABLES['profile_data'], 'puid', '2') == 0) {
-        DB_query("INSERT INTO {$_TABLES['profile_data']}
-                SET puid = 2, sys_directory = 0", 1);
+    if ($db->getCount($_TABLES['profile_data'], 'puid', '2', Database::INTEGER) == 0) {
+        try {
+            $db->conn->insert(
+                $_TABLES['profile_data'],
+                array('puid' => 2, 'sys_directory' => 0)
+                array(Database::INTEGER, Database::INTEGER)
+            );
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+        }
     }
 
     // Now add the required fields to the definitions table
@@ -520,29 +638,58 @@ function profile_upgrade_1_1_1()
 {
     global $_TABLES, $_PRF_CONF;
 
-    $grp_id = (int)DB_getItem($_TABLES['groups'], 'grp_id',
-                    "grp_name='{$_PRF_CONF['pi_name']} Admin'");
+    $db = Database::getInstance();
+    $grp_id = (int)$db->getItem(
+        $_TABLES['groups'],
+        'grp_id',
+        array('grp_name' => $_PRF_CONF['pi_name'] . ' Admin')
+    );
 
     // Add the new profile.export feature
-    DB_query("INSERT INTO {$_TABLES['features']}
-            (ft_name, ft_descr)
-        VALUES (
-            'profile.viewall',
-            'Access to view ALL user profiles, overriding user preferences.'
-        )", 1);
-    if (!DB_error()) {
-        $feat_id = DB_insertId();
-        if ($grp_id > 0 && $feat_id > 0) {
-            DB_query("INSERT INTO {$_TABLES['access']}
-                    (acc_ft_id, acc_grp_id)
-                VALUES
-                    ($feat_id, $grp_id)", 1);
+    try {
+        $db->conn->insert(
+            $_TABLES['features'],
+            array(
+                'ft_name' => 'profile.viewall',
+                'ft_descr' => 'Access to view ALL user profiles, overriding user preferences.',
+            ),
+            array(Database::STRING, Database::STRINg)
+        );
+        $feat_id = $db->conn->lastInsertId();
+    } catch (\Throwable $e) {
+        Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+        $feat_id = 0;
+    }
+    if ($grp_id > 0 && $feat_id > 0) {
+        try {
+            $db->conn->insert(
+                $_TABLES['access'],
+                array(
+                    'acc_ft_id' => $feat_id,
+                    'acc_grp_id' => $grp_id,
+                ),
+                array(Database::INTEGER, Database::INTEGER)
+            );
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
         }
     }
 
-    DB_query("DROP TABLE IF EXISTS {$_TABLES['profile_values']}");
-    DB_query("ALTER TABLE {$_TABLES['profile_lists']}
-            ADD incl_grp int(11) unsigned default 2");
+    try {
+        $db->conn->executeStatement(
+            "DROP TABLE IF EXISTS {$_TABLES['profile_values']}"
+        );
+    } catch (\Throwable $e) {
+        Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+    }
+    try {
+        $db->conn->executeStatement(
+            "ALTER TABLE {$_TABLES['profile_lists']}
+            ADD incl_grp int(11) unsigned default 2"
+        );
+    } catch (\Throwable $e) {
+        Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+    }
     return profile_do_set_version('1.1.1');
 }
 
@@ -558,6 +705,7 @@ function profile_upgrade_1_1_2()
     global $_TABLES, $_PRF_CONF, $LANG_PROFILE;
 
     require_once PRF_PI_PATH . 'install_defaults.php';
+    $db = Database::getInstance();
 
     // New configuration item(s)
     $c = config::get_instance();
@@ -567,8 +715,11 @@ function profile_upgrade_1_1_2()
                 $_PRF_CONF['pi_name']);
     $c->del('grace_arrears', $_PRF_CONF['pi_name']);
 
-    $grp_id = (int)DB_getItem($_TABLES['groups'], 'grp_id',
-            "grp_name='{$_PRF_CONF['pi_name']} Admin'");
+    $grp_id = (int)$db->getItem(
+        $_TABLES['groups'],
+        'grp_id',
+        array('grp_name' => $_PRF_CONF['pi_name'] . ' Admin')
+    );
     if ($grp_id < 1) $grp_id = 1;
 
     $sql = array(
@@ -606,6 +757,8 @@ function profile_upgrade_1_1_3()
 {
     global $_TABLES;
 
+    $db = Database::getInstance();
+
     // Special handling for adding show_in_profile. This function is called
     // for the 1.1.3 and 1.1.4 update since the SQL wasn't include in new
     // installations for 1.1.3
@@ -616,9 +769,15 @@ function profile_upgrade_1_1_3()
     }
 
     $need_update = false;   // assume it's done and check if it's needed
-    $r = DB_query("SHOW COLUMNS FROM {$_TABLES['profile_lists']} LIKE 'incl_user_stat'");
-    $A = DB_fetchArray($r, false);
-    if ($A['Type'] !== 'varchar(64)') {
+    try {
+        $A = $db->conn->executeQuery(
+            "SHOW COLUMNS FROM {$_TABLES['profile_lists']} LIKE 'incl_user_stat'"
+        )->fetchAssociative();
+    } catch (\Throwable $e) {
+        Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+        $A = false;
+    }
+    if (is_array($A) && $A['Type'] !== 'varchar(64)') {
         $sql[] = "ALTER TABLE {$_TABLES['profile_lists']}
             CHANGE incl_user_stat incl_user_stat varchar(64) NOT NULL
             DEFAULT 'a:4:{i:1;i:1;i:2;i:2;i:3;i:3;i:4;i:4;}'";
@@ -627,16 +786,32 @@ function profile_upgrade_1_1_3()
     if (!profile_do_upgrade_sql('1.1.3', $sql)) return false;
 
     if ($need_update) {     // updated profile_lists schema, now change data
-        $sql = "SELECT listid,incl_user_stat FROM {$_TABLES['profile_lists']}";
-        $res = DB_query($sql);
-        while ($A = DB_fetchArray($res, false)) {
-            $listid = DB_escapeString($A['listid']);
-            $ustat = (int)$A['incl_user_stat'];
-            if ($ustat == -1) $ustat = array(1,2,3,4);
-            else $ustat = array($ustat);
-            $nstat = DB_escapeString(@serialize($ustat));
-            DB_query("UPDATE {$_TABLES['profile_lists']} SET
-                    incl_user_stat = '$nstat' WHERE listid='$listid'");
+        try {
+            $stmt = $db->conn->executeQuery(
+                "SELECT listid,incl_user_stat FROM {$_TABLES['profile_lists']}"
+            );
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+            $stmt = false;
+        }
+        if ($stmt) {
+            while ($A = $stmt->fetchAssociative()) {
+                $listid = $A['listid'];
+                $ustat = (int)$A['incl_user_stat'];
+                if ($ustat == -1) $ustat = array(1,2,3,4);
+                else $ustat = array($ustat);
+                $nstat = @serialize($ustat);
+                try {
+                    $db->conn->update(
+                        $_TABLES['profile_lists'],
+                        array('incl_user_stat' => $nstat),
+                        array('listid' => $listid)
+                    );
+                } catch (\Throwable $e) {
+                    Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+                    $stmt = false;
+                }
+            }
         }
     }
     return profile_do_set_version('1.1.3');
@@ -656,6 +831,7 @@ function profile_upgrade_1_1_4($dvlp=false)
 
     COM_errorLog('Performing 1.1.3 SQL updates if needed');
     profile_upgrade_1_1_3(true);
+    $db = Database::getInstance();
 
     $sql = array();
     $add_name_parts = false;
@@ -664,7 +840,7 @@ function profile_upgrade_1_1_4($dvlp=false)
         $sql[] = "ALTER TABLE {$_TABLES['profile_data']}
             ADD sys_fname varchar(40) AFTER puid";
     }
-    if (DB_count($_TABLES['profile_def'], 'name', 'sys_fname') < 1) {
+    if ($db->getCount($_TABLES['profile_def'], 'name', 'sys_fname', Database::INTEGER) < 1) {
         $sql[] = "INSERT INTO {$_TABLES['profile_def']}
                 (orderby, name, type, enabled, required, user_reg,
                 prompt, options, sys, perm_owner)
@@ -677,7 +853,7 @@ function profile_upgrade_1_1_4($dvlp=false)
         $sql[] = "ALTER TABLE {$_TABLES['profile_data']}
             ADD sys_lname varchar(40) AFTER sys_fname";
     }
-    if (DB_count($_TABLES['profile_def'], 'name', 'sys_lname') < 1) {
+    if ($db->getCount($_TABLES['profile_def'], 'name', 'sys_lname', Database::STRING) < 1) {
         $sql[] = "INSERT INTO {$_TABLES['profile_def']}
                 (orderby, name, type, enabled, required, user_reg,
                 prompt, options, sys, perm_owner)
@@ -691,7 +867,7 @@ function profile_upgrade_1_1_4($dvlp=false)
     // needed.
     // The def was omitted when the sample data was originally added.
     if (_PRFtableHasColumn('profile_data', 'prf_phone')) {
-        $r2 = DB_count($_TABLES['profile_def'], 'name', 'prf_phone');
+        $r2 = $db->getCount($_TABLES['profile_def'], 'name', 'prf_phone', Database::STRING);
         if ($r2 == 0) {
             $sql[] = "INSERT INTO {$_TABLES['profile_def']}
                 (orderby, name, type, enabled, required, user_reg,
@@ -707,22 +883,33 @@ function profile_upgrade_1_1_4($dvlp=false)
     if (!profile_do_upgrade_sql('1.1.4', $sql, $dvlp)) return false;
 
     if ($add_name_parts) {
-        $sql = "SELECT uid, username, fullname FROM {$_TABLES['users']}";
-        $res = DB_query($sql);
-        while ($A = DB_fetchArray($res, false)) {
-            // use username if fullname is empty
-            // fullname may be empty, but username can't be
-            if ($A['fullname'] == '') $A['fullname'] = $A['username'];
-            $fname = DB_escapeString(\LGLib\NameParser::F($A['fullname']));
-            $lname = DB_escapeString(\LGLib\NameParser::L($A['fullname']));
-            $uid = (int)$A['uid'];
-            $sql = "UPDATE {$_TABLES['profile_data']} SET
-                    sys_fname='$fname', sys_lname='$lname'
-                    WHERE puid=$uid";
-            DB_query($sql, 1);
-            if (DB_error()) {
-                COM_errorLog("Error executing sql in profile 1.1.4 update: $sql");
-                if (!$dvlp) return false;
+        try {
+            $stmt = $db->conn->executeQuery(
+                "SELECT uid, username, fullname FROM {$_TABLES['users']}"
+            );
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+            $stmt = false;
+        }
+        if ($stmt) {
+            while ($A = $stmt->fetchAssociative()) {
+                // use username if fullname is empty
+                // fullname may be empty, but username can't be
+                if ($A['fullname'] == '') $A['fullname'] = $A['username'];
+                $fname = \LGLib\NameParser::F($A['fullname']);
+                $lname = \LGLib\NameParser::L($A['fullname']);
+                $uid = (int)$A['uid'];
+                try {
+                    $db->conn->update(
+                        $_TABLES['profile_data'],
+                        array('sys_fname' => $fname, 'sys_lname' => $lname),
+                        array('puid' => $uid),
+                        array(Database::STRING, Database::STRING, Database::INTEGER)
+                    );
+                } catch (\Throwable $e) {
+                    Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+                    if (!$dvlp) return false;
+                }
             }
         }
     }
@@ -741,6 +928,7 @@ function profile_upgrade_1_2_0($dvlp=false)
 {
     global $_TABLES, $LANG_PROFILE, $_PRF_CONF;
 
+    $db = Database::getInstance();
     $sql = array(
         "ALTER TABLE {$_TABLES['profile_def']}
             CHANGE `prompt` `prompt` text COLLATE utf8_unicode_ci",
@@ -774,25 +962,44 @@ function profile_upgrade_1_2_0($dvlp=false)
     if (!profile_do_upgrade_sql('1.2.0', $sql, $dvlp)) return false;
 
     // Add the profile.view permission to be used in place of "members"
-    $ft_descr = DB_getItem($_TABLES['features'], 'ft_name', "ft_name='profile.view'");
+    $ft_descr = $db->getItem(
+        $_TABLES['features'],
+        'ft_name',
+        array('ft_name' => 'profile.view')
+    );
     if (!$ft_descr) {
-        DB_query(
-            "INSERT IGNORE INTO {$_TABLES['features']} (ft_name, ft_descr)
-            VALUES ('profile.view','Access to view public profile fields for other members.')",
-            1
-        );
-        if (!DB_error()) {
-            $feat_id = DB_insertId();
-            $grp_id = (int)DB_getItem(
+        try {
+            $db->conn->insert(
+                $_TABLES['features'],
+                array(
+                    'ft_name' => 'profile.view',
+                    'ft_descr' => 'Access to view public profile fields for other members.',
+                ),
+                array(Database::STRING, Database::STRING)
+            );
+            $feat_id = $db->conn->lastInsertId();
+        } catch (\Throwable $e) {
+            Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+        }
+        if ($feat_id > 0) {
+            $grp_id = (int)$db->getItem(
                 $_TABLES['groups'],
                 'grp_id',
-                "grp_name = 'Logged-In Users'"
+                array('grp_name' => 'Logged-In Users')
             );
             if ($grp_id > 0) {
-                DB_query(
-                    "INSERT INTO {$_TABLES['access']} (acc_ft_id, acc_grp_id)
-                    VALUES ($feat_id, {$grp_id})"
-                );
+                try {
+                    $db->conn->insert(
+                        $_TABLES['access']
+                        array(
+                            'acc_ft_id' => $feat_id,
+                            'acc_grp_id' => $grp_id,
+                        ),
+                        array(Database::INTEGER, Database::INTEGER)
+                    );
+                } catch (\Throwable $e) {
+                    Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+                }
             }
         }
     }
@@ -891,8 +1098,17 @@ function _PRFtableHasColumn($table, $col_name)
 {
     global $_TABLES;
 
-    $col_name = DB_escapeString($col_name);
-    $res = DB_query("SHOW COLUMNS FROM {$_TABLES[$table]} LIKE '$col_name'");
-    return DB_numRows($res) == 0 ? false : true;
+    try {
+        $stmt = Database::getInstance()->conn->executeQuery(
+            "SHOW COLUMNS FROM {$_TABLES[$table]} LIKE ?",
+            array($col_name),
+            array(Database::STRING)
+        );
+        $rows = $stmt->rowCount();
+    } catch (\Throwable $e) {
+        Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+        $rows = 0;
+    }
+    return $rows;
 }
 

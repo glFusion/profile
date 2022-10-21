@@ -15,6 +15,9 @@ if (!defined ('GVERSION')) {
     die ('This file can not be used on its own.');
 }
 
+use glFusion\Database\Database;
+use glFusion\Log\Log;
+
 /** @global string $_DB_dbms */
 global $_DB_dbms;
 /** @global array $PRF_sampledata */
@@ -141,41 +144,71 @@ function plugin_postinstall_profile()
 {
     global $PRF_sampledata, $_TABLES, $_PRF_CONF;
 
+    $db = Database::getInstance();
+
     // Create data records for each user and populate first and
     // last name fields
-    $sql = "SELECT uid, username, fullname FROM {$_TABLES['users']}";
-    $res = DB_query($sql);
-    while ($A = DB_fetchArray($res, false)) {
-        // use username if fullname is empty
-        // fullname may be empty, but username can't be
-        if ($A['fullname'] == '') {
-            $A['fullname'] = $A['username'];
-        }
-        $fname = DB_escapeString(LGLib\NameParser::F($A['fullname']));
-        $lname = DB_escapeString(LGLib\NameParser::L($A['fullname']));
-        $uid = (int)$A['uid'];
-        $value_arr[] = "($uid, '$fname', '$lname')";
+    try {
+        $stmt = $db->conn->executeQuery(
+            "SELECT uid, username, fullname FROM {$_TABLES['users']}"
+        );
+    } catch (\Throwable $e) {
+        Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+        $stmt = false;
     }
-    $values = implode(',', $value_arr);
-    $sql = "INSERT INTO {$_TABLES['profile_data']}
-                (puid, sys_fname, sys_lname)
-            VALUES $values";
-    DB_query($sql);
+    if ($stmt) {
+        while ($A = $stmt->fetchAssociative()) {
+            // use username if fullname is empty
+            // fullname may be empty, but username can't be
+            if ($A['fullname'] == '') {
+                $A['fullname'] = $A['username'];
+            }
+            try {
+                $db->conn->insert(
+                    $_TABLES['profile_data'],
+                    array(
+                        'puid' => $uid,
+                        'sys_fname' => LGLib\NameParser::F($A['fullname']),
+                        'sys_lname' => LGLib\NameParser::L($A['fullname']),
+                    ),
+                    array(
+                        Database::INTEGER,
+                        Database::STRING,
+                        Database::STRING,
+                    )
+                );
+            } catch (\Throwable $e) {
+                Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+            }
+        }
+    }
 
     // Install sample data
     if (is_array($PRF_sampledata)) {
         foreach ($PRF_sampledata as $sql) {
-            DB_query($sql);
+            try {
+                $db->conn->executeStatement($sql);
+            } catch (\Throwable $e) {
+                Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+            }
         }
 
         // Set the correct default Group ID
-        $gid = (int)DB_getItem(
+        $gid = (int)$db->getItem(
             $_TABLES['groups'],
             'grp_id',
-            "grp_name='{$_PRF_CONF['pi_name']} Admin'"
+            array('grp_name' => $_PRF_CONF['pi_name'] . ' Admin')
         );
         if ($gid > 0) {
-            DB_query("UPDATE {$_TABLES['profile_def']} SET group_id=$gid");
+            try {
+                $db->conn->executeStatement(
+                    "UPDATE {$_TABLES['profile_def']} SET group_id = ?",
+                    array($gid),
+                    array(Database::INTEGER)
+                );
+            } catch (\Throwable $e) {
+                Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+            }
         }
     }
 
@@ -204,10 +237,10 @@ function plugin_load_configuration_profile()
     require_once __DIR__ . '/install_defaults.php';
 
     // Get the admin group ID that was saved previously.
-    $group_id = (int)DB_getItem(
+    $group_id = (int)$db->getItem(
         $_TABLES['groups'],
         'grp_id',
-        "grp_name='{$_PRF_CONF['pi_name']} Admin'"
+        array('grp_name' => $_PRF_CONF['pi_name'] . ' Admin')
     );
     return plugin_initconfig_profile($group_id);
 }

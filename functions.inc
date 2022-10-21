@@ -81,12 +81,8 @@ spl_autoload_register(function ($class)
         require $file;
     }
 });
-
-// Set the custom values into the $_USER array.  Check that this plugin
-// is enabled as an extra safety check.
-if (isset($_PLUGINS) && is_array($_PLUGINS) && in_array('profile', $_PLUGINS)) {
-    PRF_setUserValues();
-}
+use glFusion\Database\Database;
+use glFusion\Log\Log;
 
 /** Include api functions for other plugins */
 require_once __DIR__ . '/services.inc.php';
@@ -154,7 +150,11 @@ function plugin_user_delete_profile($uid)
 {
     global $_TABLES;
 
-    DB_delete($_TABLES['profile_data'], 'puid', (int)$uid);
+    Database::getInstance()->conn->delete(
+        $_TABLES['profile_data'],
+        array('puid' => (int)$uid),
+        array(Database::INTEGER)
+    );
 }
 
 
@@ -171,8 +171,16 @@ function plugin_user_move_profile($origUID, $destUID)
     $origUID = (int)$origUID;
     $destUID = (int)$destUID;
 
-    DB_query("UPDATE {$_TABLES['profile_data']}
-            SET puid = $destUID WHERE puid = $origUID", 1);
+    try {
+        Database::getInstance()->conn->update(
+            $_TABLES['profile_data'],
+            array('puid' => $destUID),
+            array('puid' => $origUID),
+            array(Database::INTEGER, Database::INTEGER)
+        );
+    } catch (\Throwable $e) {
+        Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+    }
 }
 
 
@@ -273,6 +281,8 @@ function plugin_getheaderjs_profile()
 function plugin_getheadercss_profile()
 {
     global $_CONF, $_PRF_CONF;
+
+    PRF_setUserValues();
 
     $styles = array();
     $files = array(
@@ -506,18 +516,6 @@ function PRF_setOpts($A)
         $str = serialize($A);
 
     return $str;
-}
-
-
-/**
- * Sanitize all values in an array.  Used as a calback function to array_map.
- *
- * @param   string  $val    Value to sanitize
- * @return  string          SQL-safe version of $val
- */
-function PRF_escape_string($val)
-{
-    return is_string($val) ? DB_escapeString($val) : $val;
 }
 
 
@@ -839,11 +837,17 @@ function PRF_getGroups($grplist='', $NOT='')
         $query .= " WHERE grp_name $NOT IN ($grplist)";
     }
 
-    $result = DB_query($query);
-    while ($row = DB_fetchArray($result)) {
-        $A[$row['grp_name']] = $row['grp_id'];
+    try {
+        $stmt = Database::getInstance()->conn->executeQuery($query);
+    } catch (\Throwable $e) {
+        Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+        $stmt = false;
     }
-
+    if ($stmt) {
+        while ($row = $stmt->fetchAssociative()) {
+            $A[$row['grp_name']] = $row['grp_id'];
+        }
+    }
     return $A;
 }
 
@@ -989,24 +993,38 @@ function PRF_reorderDef($table, $id_fld='id')
 {
     global $_TABLES;
 
-    $id_fld = DB_escapeString($id_fld);
-
-    $sql = "SELECT $id_fld, orderby
+    $db = Database::getInstance();
+    $id_fld = $db->conn->quoteIdentifier($id_fld);
+    try {
+        $stmt = $db->conn->executeQuery(
+            "SELECT $id_fld, orderby
             FROM {$_TABLES[$table]}
-            ORDER BY orderby ASC;";
-    $result = DB_query($sql, 1);
-    if (!$result) return;
+            ORDER BY orderby ASC;"
+        );
+    } catch (\Throwable $e) {
+        Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+        $stmt = false;
+    }
+    if (!$stmt) {
+        return;
+    }
 
     $order = 10;
     $stepNumber = 10;
     $changed = false;
-    while ($A = DB_fetchArray($result, false)) {
+    while ($A = $stmt->fetchAssociative()) {
         if ($A['orderby'] != $order) {  // only update incorrect ones
             $changed = true;
-            $sql = "UPDATE {$_TABLES[$table]}
-                SET orderby = '$order'
-                WHERE $id_fld = '" . DB_escapeString($A[$id_fld]) . "'";
-            DB_query($sql, 1);
+            try {
+                $db->conn->update(
+                    $_TABLES[$table],
+                    array('orderby' => $order),
+                    array($id_fld => $A[$id_fld]),
+                    array(Database::INTEGER, Database::STRING)
+                );
+            } catch (\Throwable $e) {
+                Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+            }
         }
         $order += $stepNumber;
     }
@@ -1190,10 +1208,10 @@ function PRF_GroupDropdown($group_id, $access)
         $groupdd = COM_optionList($_TABLES['groups'], 'grp_id,grp_name', $group_id);
     } else {
         // They can't set the group then
-        $groupdd .= DB_getItem(
+        $groupdd .= Database::getInstance()->getItem(
             $_TABLES['groups'],
             'grp_name',
-            "grp_id = '".DB_escapeString($group_id)."'"
+            array('grp_id' => $group_id)
         ) .
         '<input type="hidden" name="group_id" value="' . $group_id . '" />';
     }

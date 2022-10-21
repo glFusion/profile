@@ -14,6 +14,8 @@
 if (!defined ('GVERSION')) {
     die ('This file can not be used on its own!');
 }
+use glFusion\Database\Database;
+use glFusion\Log\Log;
 
 /**
  * Set system values in a user's profile.
@@ -42,50 +44,63 @@ function service_setvalue_profile($args, &$output, &$svc_msg)
     ) {
         return PLG_RET_ERROR;
     }
+    $db = Database::getInstance();
     $uid = (int)$args['uid'];
-    $field = DB_escapeString($args['field']);
+    $field = $db->conn->quoteIdentifier($args['field']);
 
     if (!isset($args['value'])) {
         $value='';
     } else {
-        $value = DB_escapeString($args['value']);
+        $value = $args['value'];
     }
 
-    $where = "name='$field'";
+    $where = array('name' => $field);
     if (isset($args['plugin)'])) {
-        $where .= " AND plugin='" . DB_escapeString($plugin) . "'";
+        $where['plugin'] = $plugin;
     }
 
-    $type = DB_getItem($_TABLES['profile_def'], 'type', $where);
+    $type = $db->getItem($_TABLES['profile_def'], 'type', $where);
     if (!$type) {
         return PLG_RET_ERROR;
     }
 
     // Verify that the column exists
-    $res = DB_query("SHOW COLUMNS FROM {$_TABLES['profile_data']}
-            WHERE Field = '{$field}'");
-    if (DB_numRows($res) != 1) {
+    try {
+        $stmt = $db->conn->executeQuery(
+            "SHOW COLUMNS FROM {$_TABLES['profile_data']} WHERE Field = '{$field}'"
+        );
+        $numrows = $stmt->rowCount();
+    } catch (\Throwable $e) {
+        Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
+        $numrows = 0;
+    }
+    if ($numrows != 1) {
         return PLG_RET_ERROR;
     }
 
     // See if there is a record for this user.  Create one if not.
-    $puid = DB_getItem(
+    $puid = $db->getItem(
         $_TABLES['profile_data'],
         'puid',
-        "puid = $uid"
+        array('puid' => $uid)
     );
-    if (empty($puid)) {
-        $sql = "INSERT INTO {$_TABLES['profile_data']}
-            SET puid = $uid, $field = '$value'";
-    } else {
-        $sql = "UPDATE {$_TABLES['profile_data']}
-            SET $field = '$value'
-            WHERE puid = $uid";
-    }
-    DB_query($sql, 1);
-    if (!DB_error()) {
+    $values = array($field => $value);
+    $types = array(Database::STRING, Database::INTEGER);
+    try {
+        if (empty($puid)) {
+            $values['puid'] = $uid;
+            $db->conn->insert($_TABLES['profile_data'], $values, $types);
+        } else {
+            $db->conn->update(
+                $_TABLES['profile_data'],
+                $values,
+                array('puid' => $uid),
+                $types
+            );
+        }
         return PLG_RET_SUCCESS;
-    } else {
+    } catch (\Throwable $e) {
+        Log::write('system', Log::ERROR, __FUNCTION__ . ': ' . $e->getMessage());
         return PLG_RET_ERROR;
     }
 }
