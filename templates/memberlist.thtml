@@ -6,7 +6,9 @@ div.scroll {
 </style>
 {menu}
 {!if show_export}
-{$LANG_PROFILE['export']} {csv_disp} / {csv_all} / {pdf_link} / {html_link}
+<div style="padding-top:10px;">
+	{$LANG_PROFILE['export']} {csv_disp} / {csv_all} / {pdf_link} / {html_link}
+</div>
 {!endif}
 <div class="scroll">
 	{list_contents}
