@@ -194,11 +194,35 @@ class checkbox extends \Profile\Field
      *
      * @return  string      SQL field definition
      */
-    public function getSqlType()
+    public function getSqlType() : string
     {
         return 'TINYINT(1) UNSIGNED NOT NULL DEFAULT ' . (int)$this->getOption('default', 0);
     }
 
+
+    /**
+     * Create the search sql for this field.
+     * This is the default function where there is a single value for a field,
+     * e.g. text, textarea, radio
+     *
+     * @param   array   $post   Values from $_POST
+     * @param   string  $tbl    Table indicator
+     * @return  string          SQL query fragment
+     */
+    public function createSearchSQL(array $post, string $tbl='data') : string
+    {
+        if (!isset($post[$this->name])) return '';
+
+        $sql = '';
+        if (isset($post['empty'][$this->name])) {
+            $sql = "(`{$tbl}`.`{$this->name}` = '' OR
+                     `{$tbl}`.`{$this->name}` IS NULL)";
+        } elseif (isset($post[$this->name]) && is_array($post[$this->name])) {
+            $value = DB_escapeString($post[$this->name][0]);
+            $sql = "`{$tbl}`.`{$this->name}` like '%{$value}%'";
+        }
+        return $sql;
+    }
+
 }
 
-?>
